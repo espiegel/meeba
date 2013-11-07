@@ -1,6 +1,7 @@
 package com.meeba.google;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -19,7 +20,7 @@ public class LoginActivity extends Activity implements OnClickListener,
 ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener 
 {
 
-
+    private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 	private static final int REQUEST_CODE_SIGN_IN = 1;
 	private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
 
@@ -27,9 +28,7 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 	private ConnectionResult mConnectionResult;
 	private SignInButton mSignInButton;
 	private TextView mSignInStatus;
-
-
-
+    private ProgressDialog mConnectionProgressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,9 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		mSignInButton.setOnClickListener(this);
 		mSignInStatus = (TextView) findViewById(R.id.tvSignInStatus);
 
-
+        // Progress bar to be displayed if the connection failure is not resolved.
+        mConnectionProgressDialog = new ProgressDialog(this);
+        mConnectionProgressDialog.setMessage("Signing in...");
 
 	}
 
@@ -61,9 +62,6 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		//mPlusClient.revokeAccessAndDisconnect(this); //for debugging use mPlusClient.disconnect(); instead 
 	}
 
-
-
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -73,6 +71,19 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
+        if (mConnectionProgressDialog.isShowing()) {
+            // The user clicked the sign-in button already. Start to resolve
+            // connection errors. Wait until onConnected() to dismiss the
+            // connection dialog.
+            if (result.hasResolution()) {
+                try {
+                    result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
+                } catch (IntentSender.SendIntentException e) {
+                    mPlusClient.connect();
+                }
+            }
+        }
+
 		// Save the intent so that we can start an activity when the user clicks
 		// the sign-in button.
 		mConnectionResult = result;
@@ -87,8 +98,6 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
                 ? mPlusClient.getCurrentPerson().getDisplayName()
                 :  getString(R.string.unknown_person);
                mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
-       
-		
 	}
 
 
@@ -112,14 +121,16 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		}
 
 		if (view.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
+            if (mConnectionResult == null) {
+                mConnectionProgressDialog.show();
+            } else {
+                try {
+                    mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
 
-			try {
-				mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
-
-			} catch (IntentSender.SendIntentException e) {
-				mPlusClient.connect();
-			}
-
+                } catch (IntentSender.SendIntentException e) {
+                    mPlusClient.connect();
+                }
+            }
 		}
 	}
 
@@ -136,12 +147,5 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 			}
 		}
 	}
-
-/*
-	@Override
-	public void onAccessRevoked(ConnectionResult arg0) {
-		
-	}
-*/
 
 }
