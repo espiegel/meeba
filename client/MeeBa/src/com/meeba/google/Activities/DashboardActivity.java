@@ -1,7 +1,9 @@
-package com.meeba.google;
+package com.meeba.google.Activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.meeba.google.R;
 
 /**
  * Created by Padi on 07/11/13.

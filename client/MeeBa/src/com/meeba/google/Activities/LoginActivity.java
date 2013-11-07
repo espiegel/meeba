@@ -1,4 +1,4 @@
-package com.meeba.google;
+package com.meeba.google.Activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -15,6 +15,7 @@ import com.google.android.gms.common.*;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.plus.PlusClient;
+import com.meeba.google.R;
 
 public class LoginActivity extends Activity implements OnClickListener,
 ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener 
