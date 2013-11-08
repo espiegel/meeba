@@ -2,6 +2,7 @@ package com.meeba.google.Activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -97,7 +98,6 @@ ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedList
          if not , ask his number , otherwise resume to next screen*/
 
         //until  Eidan finishes his DB methods , we cant check if the user is registered ,so we will  assume he isn't:
-
         askUserPhoneNumber();
 
 
@@ -139,19 +139,24 @@ ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedList
     @Override
     public void onClick(View view) {
         if (view.getId()==R.id.sign_in_button){
+
         if(mPlusClient.isConnected()){
             Toast.makeText(this, "you are already signed in!", Toast.LENGTH_LONG).show();
         }
 
             int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
             if (available != ConnectionResult.SUCCESS) {
-                showDialog(DIALOG_GET_GOOGLE_PLAY_SERVICES); //this  makes you install google play services
+                /* show a dialog that offers you to install  google play services */
+                Dialog dialog = GooglePlayServicesUtil.
+               getErrorDialog(available, this, DIALOG_GET_GOOGLE_PLAY_SERVICES);
+                dialog.show();
                 return;
             }
 
         if (view.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
             try {
                 mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
+
             } catch (IntentSender.SendIntentException e) {
                 mPlusClient.connect();
             }
