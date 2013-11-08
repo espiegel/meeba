@@ -1,7 +1,6 @@
 package com.meeba.google.Activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -18,10 +17,9 @@ import com.google.android.gms.plus.PlusClient;
 import com.meeba.google.R;
 
 public class LoginActivity extends Activity implements OnClickListener,
-ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener 
+ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 {
 
-    private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 	private static final int REQUEST_CODE_SIGN_IN = 1;
 	private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
 
@@ -29,7 +27,7 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 	private ConnectionResult mConnectionResult;
 	private SignInButton mSignInButton;
 	private TextView mSignInStatus;
-    private ProgressDialog mConnectionProgressDialog;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +42,6 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		mSignInButton.setOnClickListener(this);
 		mSignInStatus = (TextView) findViewById(R.id.tvSignInStatus);
 
-        // Progress bar to be displayed if the connection failure is not resolved.
-        mConnectionProgressDialog = new ProgressDialog(this);
-        mConnectionProgressDialog.setMessage("Signing in...");
 
 	}
 
@@ -60,7 +55,7 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 	protected void onStop() {
 		super.onStop();
 		mPlusClient.disconnect();
-		//mPlusClient.revokeAccessAndDisconnect(this); //for debugging use mPlusClient.disconnect(); instead 
+		//mPlusClient.revokeAccessAndDisconnect(this); //for debugging use mPlusClient.disconnect(); instead
 	}
 
 	@Override
@@ -70,31 +65,18 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		return true;
 	}
 
-	@Override
-	public void onConnectionFailed(ConnectionResult result) {
-        if (mConnectionProgressDialog.isShowing()) {
-            // The user clicked the sign-in button already. Start to resolve
-            // connection errors. Wait until onConnected() to dismiss the
-            // connection dialog.
-            if (result.hasResolution()) {
-                try {
-                    result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
-                } catch (IntentSender.SendIntentException e) {
-                    mPlusClient.connect();
-                }
-            }
-        }
-
-		// Save the intent so that we can start an activity when the user clicks
-		// the sign-in button.
-		mConnectionResult = result;
-	}
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Save the intent so that we can start an activity when the user clicks
+        // the sign-in button.
+        mConnectionResult = result;
+    }
 
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
 		//Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
-		
+
 		String currentPersonName = mPlusClient.getCurrentPerson() != null
                 ? mPlusClient.getCurrentPerson().getDisplayName()
                 :  getString(R.string.unknown_person);
@@ -108,32 +90,30 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 
 	}
 
-	@Override
-	public void onClick(View view) {
-		if(mPlusClient.isConnected()){
-			Toast.makeText(this, "you are already signed in!", Toast.LENGTH_LONG).show();
-		}
+    @Override
+    public void onClick(View view) {
+        if(mPlusClient.isConnected()){
+            Toast.makeText(this, "you are already signed in!", Toast.LENGTH_LONG).show();
+        }
 
 
-		int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-		if (available != ConnectionResult.SUCCESS) {
-			Toast.makeText(this, "Google Play Services Unavailble!", Toast.LENGTH_LONG).show();
-			return;
-		}
+        int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (available != ConnectionResult.SUCCESS) {
+            Toast.makeText(this, "Google Play Services Unavailble!", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-		if (view.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
-            if (mConnectionResult == null) {
-                mConnectionProgressDialog.show();
-            } else {
-                try {
-                    mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
+        if (view.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
 
-                } catch (IntentSender.SendIntentException e) {
-                    mPlusClient.connect();
-                }
+            try {
+                mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
+
+            } catch (IntentSender.SendIntentException e) {
+                mPlusClient.connect();
             }
-		}
-	}
+
+        }
+    }
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
