@@ -31,8 +31,26 @@
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSignInStatus"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" >
+        android:layout_marginTop="68dp">
     </com.google.android.gms.common.SignInButton>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Revoke Access"
+        android:id="@+id/revoke_access_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sign out"
+        android:id="@+id/sign_out_button"
+        android:layout_above="@+id/revoke_access_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="46dp" />
 
 </RelativeLayout>

@@ -17,9 +17,10 @@ import com.google.android.gms.plus.PlusClient;
 import com.meeba.google.R;
 
 public class LoginActivity extends Activity implements OnClickListener,
-ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
+ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedListener
 {
 
+    private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
 	private static final int REQUEST_CODE_SIGN_IN = 1;
 	private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
 
@@ -27,6 +28,8 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 	private ConnectionResult mConnectionResult;
 	private SignInButton mSignInButton;
 	private TextView mSignInStatus;
+    private View mSignOutButton;
+    private View mRevokeAccessButton;
 
 
 	@Override
@@ -41,6 +44,11 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
 		mSignInButton.setOnClickListener(this);
 		mSignInStatus = (TextView) findViewById(R.id.tvSignInStatus);
+
+        mSignOutButton = findViewById(R.id.sign_out_button);
+        mSignOutButton.setOnClickListener(this);
+        mRevokeAccessButton = findViewById(R.id.revoke_access_button);
+        mRevokeAccessButton.setOnClickListener(this);
 
 
 	}
@@ -92,27 +100,40 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 
     @Override
     public void onClick(View view) {
+        if (view.getId()==R.id.sign_in_button){
         if(mPlusClient.isConnected()){
             Toast.makeText(this, "you are already signed in!", Toast.LENGTH_LONG).show();
         }
 
-
-        int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (available != ConnectionResult.SUCCESS) {
-            Toast.makeText(this, "Google Play Services Unavailble!", Toast.LENGTH_LONG).show();
-            return;
-        }
+            int available = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+            if (available != ConnectionResult.SUCCESS) {
+                showDialog(DIALOG_GET_GOOGLE_PLAY_SERVICES); //this  makes you install google play services
+                return;
+            }
 
         if (view.getId() == R.id.sign_in_button && !mPlusClient.isConnected()) {
-
             try {
                 mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
-
             } catch (IntentSender.SendIntentException e) {
                 mPlusClient.connect();
             }
-
         }
+      }
+
+        else if (view.getId()==R.id.sign_out_button){
+            if (mPlusClient.isConnected()) {
+                mPlusClient.clearDefaultAccount();
+                mPlusClient.disconnect();
+                mPlusClient.connect();
+                mSignInStatus.setText("signed out");
+            }
+        }
+
+        else {//(view.getId()==R.id.revoke_access_button
+            if (mPlusClient.isConnected()) {
+                mPlusClient.revokeAccessAndDisconnect(this);
+        }
+      }
     }
 
 	@Override
@@ -129,4 +150,14 @@ ConnectionCallbacks, OnConnectionFailedListener //, OnAccessRevokedListener
 		}
 	}
 
+    @Override
+    public void onAccessRevoked(ConnectionResult status) {
+        if (status.isSuccess()) {
+            mSignInStatus.setText("access revoked");
+        } else {
+            mSignInStatus.setText("unable to revoke access");
+            mPlusClient.disconnect();
+        }
+        mPlusClient.connect();
+    }
 }
