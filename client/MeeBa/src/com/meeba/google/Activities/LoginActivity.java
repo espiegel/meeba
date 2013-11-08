@@ -1,12 +1,15 @@
 package com.meeba.google.Activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,10 +92,45 @@ ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedList
                 ? mPlusClient.getCurrentPerson().getDisplayName()
                 :  getString(R.string.unknown_person);
                mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
+
+        /*check if the user's google account is registered in the DB ,
+         if not , ask his number , otherwise resume to next screen*/
+
+        //until  Eidan finishes his DB methods , we cant check if the user is registered ,so we will  assume he isn't:
+
+        askUserPhoneNumber();
+
+
 	}
 
+    private void askUserPhoneNumber() {
+//TODO check if  user entered  a legal phone number
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Please Enter Your Phone Number");
 
-	@Override
+        // Set an EditText view to get user input
+        final EditText input = new EditText(this);
+        input.setBackgroundColor(0); // 0 == Transparent . looks better
+        alert.setView(input);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = input.getText().toString();
+                Toast.makeText(getApplicationContext(), value,
+                        Toast.LENGTH_LONG).show();
+
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+
+    @Override
 	public void onDisconnected() {
 		mPlusClient.connect();
 
