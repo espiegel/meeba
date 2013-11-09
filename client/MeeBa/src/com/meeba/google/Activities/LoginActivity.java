@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -18,7 +19,14 @@ import com.google.android.gms.common.*;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.plus.PlusClient;
+import com.meeba.google.Objects.Event;
+import com.meeba.google.Objects.User;
 import com.meeba.google.R;
+import com.meeba.google.Util.UserFunctions;
+import com.meeba.google.Util.Utils;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class LoginActivity extends Activity implements OnClickListener,
 ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedListener
@@ -40,6 +48,59 @@ ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedList
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+
+        // Testing the web services. Output is in the android log
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            protected void onPreExecute() {
+                Utils.LOGD("onPreExecute");
+            }
+            protected Void doInBackground(Void... params) {
+                Utils.LOGD("doInBackground");
+
+                User user = UserFunctions.getUserByEmail("a@a.com");
+
+                if(user != null)
+                    Utils.LOGD(user.toString());
+
+                Utils.LOGD("CREATING A NEW USER!!!");
+                user = UserFunctions.createUser("my@email.com", "silly billy", "0234987", "987asdflkj");
+
+                if(user != null)
+                    Utils.LOGD(user.toString());
+
+                Utils.LOGD("GETTING EVENTS OF USER!");
+                List<Event> events = UserFunctions.getEventsByUser(2);
+
+                Utils.LOGD("GETTING USERS BY PHONE NUMBERS");
+                String[] phones = {"345345", "1","12","123","467845673", "234"};
+                List<User> users = UserFunctions.getUsersByPhones(Arrays.asList(phones));
+
+                if(users != null) {
+                    for(User u : users) {
+                        Utils.LOGD(u.toString());
+                    }
+                }
+
+                Utils.LOGD("TESTING CREATE EVENT");
+                String[] uids = {"2", "7", "8"};
+                Event event = UserFunctions.createEvent(1, "thailand", "summer 2014", Arrays.asList(uids));
+
+                if(event != null) {
+                    Utils.LOGD(event.toString());
+                }
+
+                Utils.LOGD("testing accept / decline");
+                UserFunctions.acceptInvite(7, 4);
+                UserFunctions.declineInvite(8, 4);
+                return null;
+            }
+
+            protected void onPostExecute(Void v) {
+                Utils.LOGD("onPostExecute");
+
+            }
+        };
+        task.execute();
 
 		mPlusClient = new PlusClient.Builder(this, this, this)
 		.setActions("http://schemas.google.com/AddActivity").build();

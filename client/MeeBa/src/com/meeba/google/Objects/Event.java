@@ -5,9 +5,18 @@ package com.meeba.google.Objects;
  */
 public class Event {
     private int eid;
-    private int hostUid;
+    private int host_uid;
     private String where;
     private String when;
+    private String created_at;
+
+    public String getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
+    }
 
     public int getEid() {
         return eid;
@@ -17,12 +26,12 @@ public class Event {
         this.eid = eid;
     }
 
-    public int getHostUid() {
-        return hostUid;
+    public int getHost_uid() {
+        return host_uid;
     }
 
-    public void setHostUid(int hostUid) {
-        this.hostUid = hostUid;
+    public void setHost_uid(int host_uid) {
+        this.host_uid = host_uid;
     }
 
     public String getWhere() {
@@ -43,8 +52,19 @@ public class Event {
 
     public Event(int eid, int hostUid, String where, String when) {
         this.eid = eid;
-        this.hostUid = hostUid;
+        this.host_uid = hostUid;
         this.where = where;
         this.when = when;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eid=" + eid +
+                ", host_uid=" + host_uid +
+                ", where='" + where + '\'' +
+                ", when='" + when + '\'' +
+                ", created_at='" + created_at + '\'' +
+                '}';
     }
 }
