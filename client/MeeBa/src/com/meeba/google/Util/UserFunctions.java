@@ -21,8 +21,11 @@ import java.util.List;
  */
 public class UserFunctions {
 
-    // TODO: will complete this once server code is ready
-
+    /**
+     * Get a user by his email
+     * @param email Email of the user
+     * @return Returns a User object of the user with the same email or null if none was found.
+     */
     public static User getUserByEmail(String email) {
         try {
             Gson lGson = new Gson();
@@ -39,6 +42,14 @@ public class UserFunctions {
         }
     }
 
+    /**
+     * Creates a new user
+     * @param email Email of the new user
+     * @param name Name of the new user
+     * @param phone Phone number of the new user
+     * @param rid Registration ID of the new user (from GCM)
+     * @return Returns a User object of the created user or null if user creation failed.
+     */
     public static User createUser(String email, String name, String phone, String rid) {
         try {
             Gson lGson = new Gson();
@@ -63,6 +74,11 @@ public class UserFunctions {
         }
     }
 
+    /**
+     * Get the events that user is participating in. Events that he is a host of and events that he is invited to.
+     * @param uid User if of the user.
+     * @return Returns a list of all events or null if the web service failed.
+     */
     public static List<Event> getEventsByUser(int uid) {
         try {
             List<Event> events = new ArrayList<Event>();
@@ -88,6 +104,11 @@ public class UserFunctions {
         }
     }
 
+    /**
+     * Gets a list of all users from a list of phone numbers
+     * @param phones A list of all phone numbers. Every phone number must be a string of digits only.
+     * @return Returns a list of users with the given phone numbers.
+     */
     public static List<User> getUsersByPhones(List<String> phones) {
         try {
             List<User> users = new ArrayList<User>();
@@ -119,6 +140,14 @@ public class UserFunctions {
         }
     }
 
+    /**
+     * Creates a new event. Sends out invitations to all users and sends them a push notification.
+     * @param host_uid User id of the host
+     * @param where Where the event is taking place
+     * @param when When the event is taking place
+     * @param uids A List of Strings containing the uids of all the invited guests.
+     * @return Returns the created event on success or null if an error occurred.
+     */
     public static Event createEvent(int host_uid, String where, String when, List<String> uids) {
         try {
             Gson lGson = new Gson();
@@ -143,6 +172,35 @@ public class UserFunctions {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Accept an invitation
+     * @param uid The user id of the current user that is accepting this invitation
+     * @param eid The event id that this user is accepting
+     * @return Returns true on success and false on failure.
+     */
+    public static boolean acceptInvite(int uid, int eid) {
+        return respondToInvite(uid, eid, 1);
+    }
+
+    /**
+     * Decline an invitation
+     * @param uid The user id of the current user that is declining this invitation
+     * @param eid The event id that this user is declining
+     * @return Returns true on success and false on failure.
+     */
+    public static boolean declineInvite(int uid, int eid) {
+        return respondToInvite(uid, eid, -1);
+    }
+
+    /**
+     * TODO
+     * @param eid Event id
+     * @return Returns a list of all users that are a part of this event
+     */
+    public static List<User> getUsersOfEvent(int eid) {
+        return null;
     }
 
     private static boolean respondToInvite(int uid, int eid, int status) {
@@ -172,21 +230,5 @@ public class UserFunctions {
             ex.printStackTrace();
             return false;
         }
-    }
-    public static boolean acceptInvite(int uid, int eid) {
-        return respondToInvite(uid, eid, 1);
-    }
-
-    public static boolean declineInvite(int uid, int eid) {
-        return respondToInvite(uid, eid, -1);
-    }
-
-    /**
-     * TODO
-     * @param eid Event id
-     * @return Returns a list of all users that are a part of this event
-     */
-    public static List<User> getUsersOfEvent(int eid) {
-        return null;
     }
 }
