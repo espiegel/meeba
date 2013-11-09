@@ -50,6 +50,7 @@ ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedList
 		setContentView(R.layout.activity_login);
 
         // Testing the web services. Output is in the android log
+        // You can delete this... This is not important
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
@@ -101,6 +102,8 @@ ConnectionCallbacks, OnConnectionFailedListener , PlusClient.OnAccessRevokedList
             }
         };
         task.execute();
+        // End of web services testing
+
 
 		mPlusClient = new PlusClient.Builder(this, this, this)
 		.setActions("http://schemas.google.com/AddActivity").build();
