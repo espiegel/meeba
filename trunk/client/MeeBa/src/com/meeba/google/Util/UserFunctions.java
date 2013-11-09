@@ -1,8 +1,13 @@
-package com.meeba.google.Database;
+package com.meeba.google.Util;
 
+import com.google.gson.Gson;
 import com.meeba.google.Objects.Event;
 import com.meeba.google.Objects.User;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +18,15 @@ public class UserFunctions {
     // TODO: will complete this once server code is ready
 
     public static User getUserByEmail(String email) {
-        return null;
+        try {
+            Gson lGson = new Gson();
+            JSONObject lJsonObject = (JSONObject) new JSONParser().doGETRequest(Utils.BASE_URL + "getUserByEmail/" + email);
+
+            return lGson.fromJson(lJsonObject.getString("user"), User.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     public static User createUser(String email, String name, String phone, String rid) {
