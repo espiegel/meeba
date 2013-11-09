@@ -1,6 +1,7 @@
 package com.meeba.google.Util;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.client.CookieStore;
@@ -9,7 +10,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class Utils {
 
     public static final boolean DEBUG = true;
-    public static final String BASE_URL = "http://54.214.243.219/meeba//";
+    public static final String BASE_URL = "http://54.214.243.219/meeba/";
 
     private static Utils mInstance = null;
     private CookieStore mCookie = null;
@@ -37,5 +38,9 @@ public class Utils {
     public static void showToast(Context ctx, String text) {
         Toast.makeText(ctx, text, Toast.LENGTH_SHORT).show();
 
+    }
+
+    public static void LOGD(String message) {
+        Log.d("debug", message);
     }
 }
