@@ -2,6 +2,7 @@ package com.meeba.google.Activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,9 +27,10 @@ import com.meeba.google.Objects.User;
 import com.meeba.google.R;
 import com.meeba.google.Util.UserFunctions;
 import com.meeba.google.Util.Utils;
-import java.util.Arrays;
- import java.util.List;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class LoginActivity extends Activity implements OnClickListener,
@@ -38,8 +40,6 @@ public class LoginActivity extends Activity implements OnClickListener,
      * project number =   1023637778529
      * API KEY= AIzaSyCRftoO8hmXEoEDBF75SapiefJ8xh3_Up4
      */
-
-    private final Boolean USER_IS_REGISTERD = false;
 
     private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
     private static final int REQUEST_CODE_SIGN_IN = 1;
@@ -54,8 +54,12 @@ public class LoginActivity extends Activity implements OnClickListener,
     private View mSignOutButton;
     private View mRevokeAccessButton;
 
-    String regid;
+    String email;
+    String phoneNumber;
+    String name;
+    String rid;
     String SENDER_ID = "1023637778529";
+    Boolean isRegistered;
     Context context;
 
 
@@ -63,7 +67,6 @@ public class LoginActivity extends Activity implements OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
 
         // Testing the web services. Output is in the android log
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
@@ -133,8 +136,6 @@ public class LoginActivity extends Activity implements OnClickListener,
         /*check if google play services are available*/
         checkPlayServices();
         context = getApplicationContext();
-
-
     }
 
 
@@ -149,28 +150,105 @@ public class LoginActivity extends Activity implements OnClickListener,
                 : getString(R.string.unknown_person);
         mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
 
-        /*now check if the user's google account is registered in the DB ,
-         if not , ask his number , otherwise resume to next screen
-         currently we will assume he is never registered :*/
+        /**
+         now :
+         1) check if the user's google account is registered in the DB (in background) , then:
+         2)if not ,get a regid from google(in background), then:
+         3)ask his phone number, then:
+         4) register him(in background)
+         **/
 
-        if (USER_IS_REGISTERD == false) {
-            registerUser(mPlusClient.getAccountName());
-        }
+        /** this method starts the above chain of events  **/
+        backgroundCheckIfRegistered();
+    }
 
+    private void backgroundCheckIfRegistered() {
+        new AsyncTask<Void, Void, Void>() {
+            ProgressDialog progressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog = ProgressDialog
+                        .show(LoginActivity.this, "counting", "until ten  million!", true);
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                for (int i = 0; i < 10000000; i++) ;
+                isRegistered = false; //for now;
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                super.onPostExecute(v);
+                progressDialog.dismiss();
+                if (isRegistered == false) {
+                    backgroundGetRegid();
+                }
+            }
+        }.execute(null, null, null);
     }
 
 
-    private void registerUser(String emailAdress) {
+    private void backgroundGetRegid() {
+        new AsyncTask<Void, Void, Void>() {
+            ProgressDialog progressDialog;
 
-        askUserPhoneNumber();
-        gcm = GoogleCloudMessaging.getInstance(this);
-        registerInBackground();
-        //  UserFunctions.createUser(emailAdress,mPlusClient.getCurrentPerson().getDisplayName(),"051111111",regid);
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+                progressDialog = ProgressDialog
+                        .show(LoginActivity.this, "getting  regID from google", "wait!", true);
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(context);
+                    }
+                    rid = gcm.register(SENDER_ID);
+                } catch (IOException ex) {
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                super.onPostExecute(v);
+                progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), rid, Toast.LENGTH_LONG).show();
+                askUserPhoneNumber();
+            }
+        }.execute(null, null, null);
     }
 
-    private void registerInBackground() {
+    private void askUserPhoneNumber() {
 
+//TODO check if  user entered  a legal phone number
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Please Enter Your Phone Number");
 
+        // Set an EditText view to get user input
+        final EditText input = new EditText(this);
+        input.setBackgroundColor(0); // 0 == Transparent . looks better
+        alert.setView(input);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                phoneNumber = input.getText().toString();
+                backgroundRegisterUser();
+            }
+
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+        alert.show();
     }
 
 
@@ -203,30 +281,9 @@ public class LoginActivity extends Activity implements OnClickListener,
     }
 
 
-    private void askUserPhoneNumber() {
+    private void backgroundRegisterUser() {
+        Toast.makeText(getApplicationContext(), "time to register", Toast.LENGTH_LONG).show();
 
-//TODO check if  user entered  a legal phone number
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Please Enter Your Phone Number");
-
-        // Set an EditText view to get user input
-        final EditText input = new EditText(this);
-        input.setBackgroundColor(0); // 0 == Transparent . looks better
-        alert.setView(input);
-
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String value = input.getText().toString();
-                Toast.makeText(getApplicationContext(), value,
-                        Toast.LENGTH_LONG).show();
-            }
-
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
-        alert.show();
     }
 
 
