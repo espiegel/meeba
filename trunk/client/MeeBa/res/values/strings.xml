@@ -8,4 +8,17 @@
     <string name="signed_in_status">You are signed in as %s</string>
     <string name="unknown_person">Unknown</string>
 
+    <!-- Dashboard -->
+    <string name="txtWelcome">WELCOME</string>
+    <string name="txtLogout">Sign Out</string>
+    <string name="btnInvite">Invite</string>
+    <string name="txtCreateEvent">+  Create New Event</string>
+
+    <color name="green">#33C733</color>
+    <color name="red">#C73333</color>
+    <color name="white">#DADADA</color>
+    <color name="blue">#4979A9</color>
+    <color name="black">#000000</color>
+    <!--<color name="background">#3b3b3b</color>-->
+
 </resources>
