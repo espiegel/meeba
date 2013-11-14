@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.meeba.google.Objects.Contact;
+//import com.meeba.google.Objects.Contact;
 import com.meeba.google.R;
 
 import java.util.ArrayList;
