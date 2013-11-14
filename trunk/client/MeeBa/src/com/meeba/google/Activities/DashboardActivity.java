@@ -128,7 +128,7 @@ public class DashboardActivity extends Activity {
         createEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                  Utils.LOGD("on click");
                 //when we click on the button it will bring us to the  WhereWhenActivity activity
                 Intent i = new Intent(getApplicationContext(),
                         WhereWhenActivity.class);

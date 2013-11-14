@@ -37,7 +37,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.DashboardActivity" />
+        <activity android:name=".Activities.DashboardActivity" /> >
+        <activity android:name=".Activities.ContactsActivity" />
 
     </application>
 
