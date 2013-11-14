@@ -99,14 +99,20 @@ public class LoginActivity extends Activity implements OnClickListener,
             //other wise user can  click sign in while sing in is in progress
 
         /* greet the user */
-            String currentPersonName = mPlusClient.getCurrentPerson() != null
-                    ? mPlusClient.getCurrentPerson().getDisplayName()
-                    : getString(R.string.unknown_person);
-            mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
 
-            email = mPlusClient.getAccountName();
-            name = mPlusClient.getCurrentPerson().getDisplayName();
 
+            if (mPlusClient.getCurrentPerson() == null) {
+                  Utils.LOGD("maxagi: mPlusClient.getCurrentPerson is null ");
+                  Toast.makeText(getApplicationContext(), "Error getting account details!", Toast.LENGTH_LONG).show();
+            } else {
+                  Utils.LOGD("maxagi: mPlusClient.getCurrentPerson=  " + (mPlusClient.getCurrentPerson()));
+                  String currentPersonName = mPlusClient.getCurrentPerson().getDisplayName();
+                  // getString(R.string.unknown_person);
+                  mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
+
+                  email = mPlusClient.getAccountName();
+                  name = mPlusClient.getCurrentPerson().getDisplayName();
+            }
             /**
              now :
              1) check if the user's google account is registered in the DB (in background) , then:
@@ -205,7 +211,7 @@ public class LoginActivity extends Activity implements OnClickListener,
        * ask the user's phone number , and then call backgroundRegisterUser();
        */
       private void askUserPhoneNumber() {
-
+            Utils.LOGD("maxagi: in askUserPhoneNumber");
 //TODO check if  user entered  a legal phone number
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setTitle("Please Enter Your Phone Number");
@@ -215,6 +221,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             final EditText input = new EditText(this);
             input.setBackgroundColor(0); // 0 == Transparent . looks better
             alert.setView(input);
+            Utils.LOGD("maxagi: in askUserPhoneNumber Stage 2 ");
 
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                   public void onClick(DialogInterface dialog, int whichButton) {
@@ -228,6 +235,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                   }
             });
             alert.show();
+            Utils.LOGD("maxagi: in askUserPhoneNumber Stage 3 ");
       }
 
       private void backgroundRegisterUser() {
