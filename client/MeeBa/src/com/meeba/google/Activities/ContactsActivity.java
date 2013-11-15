@@ -1,21 +1,13 @@
 package com.meeba.google.Activities;
 
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.Contacts;
-import android.provider.ContactsContract;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
-//import com.meeba.google.Objects.Contact;
 import com.meeba.google.R;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by or malka on 11/11/13.
