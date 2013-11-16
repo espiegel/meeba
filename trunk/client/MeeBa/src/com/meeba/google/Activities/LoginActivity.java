@@ -23,6 +23,7 @@ import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallback
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
+import com.meeba.google.Database.DatabaseFunctions;
 import com.meeba.google.Objects.Event;
 import com.meeba.google.Objects.User;
 import com.meeba.google.R;
@@ -168,6 +169,15 @@ public class LoginActivity extends Activity implements OnClickListener,
                               backgroundGetRegid();
                         } else if (isRegistered) {
                               // moveToNextView();
+                              // Since we are logging in for the first time then reset all tables. (upgrade)
+                              // Later if the user is already logged in he will skip this phase and go
+                              // directly to the dashboard activity
+                              //DatabaseFunctions.upgradeDatabase(context);
+
+                              // Store the user's details inside our local database for later use
+                              DatabaseFunctions.storeUserDetails(getApplicationContext(), user);
+                              Utils.LOGD("eidan: testing if we stored user details successfully");
+                              Utils.LOGD("eidan: user="+DatabaseFunctions.getUserDetails(getApplicationContext()));
                         }
 
                   }
@@ -321,6 +331,8 @@ public class LoginActivity extends Activity implements OnClickListener,
                         mPlusClient.clearDefaultAccount();
                         mPlusClient.disconnect();
                         mPlusClient.connect();
+                        // Remove the current user from the local database
+                        DatabaseFunctions.resetTables(getApplicationContext());
                         mSignInStatus.setText("signed out");
                   }
             } else { //(view.getId()==R.id.revoke_access_button
