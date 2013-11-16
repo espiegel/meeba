@@ -1,4 +1,4 @@
-package com.meeba.google.Util;
+package com.meeba.google.util;
 
 import android.content.Context;
 import android.util.Log;

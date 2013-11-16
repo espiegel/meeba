@@ -3,7 +3,7 @@ package com.meeba.google.database;
 import android.content.Context;
 
 import com.meeba.google.objects.User;
-import com.meeba.google.Util.Utils;
+import com.meeba.google.util.Utils;
 
 import java.util.HashMap;
 
