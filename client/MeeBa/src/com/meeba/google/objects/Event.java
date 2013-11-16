@@ -1,4 +1,4 @@
-package com.meeba.google.Objects;
+package com.meeba.google.objects;
 
 /**
  * Created by Eidan on 11/8/13.

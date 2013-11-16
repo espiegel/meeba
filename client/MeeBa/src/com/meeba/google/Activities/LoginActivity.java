@@ -24,8 +24,8 @@ import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailed
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
 import com.meeba.google.database.DatabaseFunctions;
-import com.meeba.google.Objects.Event;
-import com.meeba.google.Objects.User;
+import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 import com.meeba.google.R;
 import com.meeba.google.Util.UserFunctions;
 import com.meeba.google.Util.Utils;

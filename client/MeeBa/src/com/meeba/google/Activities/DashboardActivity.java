@@ -10,8 +10,8 @@ import android.widget.ListView;
 import android.content.Intent;
 
 import com.meeba.google.database.DatabaseFunctions;
-import com.meeba.google.Objects.Event;
-import com.meeba.google.Objects.User;
+import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 import com.meeba.google.R;
 import com.meeba.google.Util.UserFunctions;
 import com.meeba.google.Util.Utils;
@@ -85,7 +85,6 @@ public class DashboardActivity extends Activity {
 
                 // update the event list view
                 mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
-                Utils.LOGD(mEventListView.toString());
                 mEventListView.setAdapter(mEventArrayAdapter);
 
             }
