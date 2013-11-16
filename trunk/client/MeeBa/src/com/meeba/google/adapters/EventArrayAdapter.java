@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.meeba.google.Objects.Event;
+import com.meeba.google.objects.Event;
 import com.meeba.google.R;
 
 import java.util.List;

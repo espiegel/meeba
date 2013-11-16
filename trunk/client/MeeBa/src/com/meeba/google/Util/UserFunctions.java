@@ -1,8 +1,8 @@
 package com.meeba.google.Util;
 
 import com.google.gson.Gson;
-import com.meeba.google.Objects.Event;
-import com.meeba.google.Objects.User;
+import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;

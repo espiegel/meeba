@@ -1,4 +1,4 @@
-package com.meeba.google.Objects;
+package com.meeba.google.objects;
 
 /**
  * Created by Padi on 07/11/13.
