@@ -97,6 +97,7 @@ public class UserFunctions {
             for(Event e : events) {
                 Utils.LOGD("event = "+e.toString());
             }
+
             return events;
         } catch (Exception ex) {
             ex.printStackTrace();
