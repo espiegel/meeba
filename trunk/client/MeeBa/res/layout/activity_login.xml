@@ -8,24 +8,24 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".LoginActivity" >
 
-    <TextView
-        android:id="@+id/tvGreeting"
+
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp"
-        android:text="@string/welcomeString" />
+        android:id="@+id/imageView"
+        android:src="@drawable/meeba_logo"
+        android:layout_above="@+id/sign_out_button"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="105dp" />
 
     <TextView
         android:id="@+id/tvSignInStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvGreeting"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="31dp"
         android:text="@string/signed_out_status"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_alignBottom="@+id/imageView"
+        android:layout_centerHorizontal="true" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvSignInStatus"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="68dp">
+        android:layout_marginTop="26dp">
     </com.google.android.gms.common.SignInButton>
 
     <Button
@@ -50,7 +50,7 @@
         android:text="sign out"
         android:id="@+id/sign_out_button"
         android:layout_above="@+id/revoke_access_button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="46dp" />
+        android:layout_centerHorizontal="true" />
+
 
 </RelativeLayout>
