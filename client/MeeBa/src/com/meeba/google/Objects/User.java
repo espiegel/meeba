@@ -9,13 +9,23 @@ public class User {
     private String name;
     private String phone_number;
     private String rid;
+    private String created_at;
 
-    public User(String rid, int uid, String email, String name, String phone_number) {
-        this.rid = rid;
+    public User(int uid, String email, String name, String phone_number, String rid, String created_at) {
         this.uid = uid;
         this.email = email;
         this.name = name;
         this.phone_number = phone_number;
+        this.rid = rid;
+        this.created_at = created_at;
+    }
+
+    public String getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(String created_at) {
+        this.created_at = created_at;
     }
 
     public String getRid() {
