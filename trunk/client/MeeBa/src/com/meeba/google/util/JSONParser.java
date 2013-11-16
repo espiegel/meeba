@@ -1,4 +1,4 @@
-package com.meeba.google.Util;
+package com.meeba.google.util;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;

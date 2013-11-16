@@ -27,8 +27,8 @@ import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
-import com.meeba.google.Util.UserFunctions;
-import com.meeba.google.Util.Utils;
+import com.meeba.google.util.UserFunctions;
+import com.meeba.google.util.Utils;
 
 import java.io.IOException;
 import java.util.Arrays;

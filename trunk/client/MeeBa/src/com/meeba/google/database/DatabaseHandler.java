@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.meeba.google.objects.User;
-import com.meeba.google.Util.Utils;
+import com.meeba.google.util.Utils;
 
 import java.util.HashMap;
 

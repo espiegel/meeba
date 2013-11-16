@@ -1,4 +1,4 @@
-package com.meeba.google.Util;
+package com.meeba.google.util;
 
 import com.google.gson.Gson;
 import com.meeba.google.objects.Event;
