@@ -168,7 +168,6 @@ public class LoginActivity extends Activity implements OnClickListener,
                         if (isRegistered != null && !isRegistered) {
                               backgroundGetRegid();
                         } else if (isRegistered) {
-                              // moveToNextView();
                               // Since we are logging in for the first time then reset all tables. (upgrade)
                               // Later if the user is already logged in he will skip this phase and go
                               // directly to the dashboard activity
@@ -178,6 +177,10 @@ public class LoginActivity extends Activity implements OnClickListener,
                               DatabaseFunctions.storeUserDetails(getApplicationContext(), user);
                               Utils.LOGD("eidan: testing if we stored user details successfully");
                               Utils.LOGD("eidan: user="+DatabaseFunctions.getUserDetails(getApplicationContext()));
+
+                              Intent i = new Intent(getApplicationContext(),
+                                        DashboardActivity.class);
+                              startActivity(i);
                         }
 
                   }
