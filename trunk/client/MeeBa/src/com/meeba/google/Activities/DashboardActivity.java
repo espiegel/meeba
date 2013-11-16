@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.content.Intent;
 
-import com.meeba.google.Database.DatabaseFunctions;
+import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.Objects.Event;
 import com.meeba.google.Objects.User;
 import com.meeba.google.R;

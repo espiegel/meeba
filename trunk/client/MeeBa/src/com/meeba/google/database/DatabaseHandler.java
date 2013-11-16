@@ -1,4 +1,4 @@
-package com.meeba.google.Database;
+package com.meeba.google.database;
 
 import android.content.ContentValues;
 import android.content.Context;
