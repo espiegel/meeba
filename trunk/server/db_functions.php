@@ -88,7 +88,14 @@ class DB_Functions {
 
         $no_of_rows = mysql_num_rows($result);
         if ($no_of_rows > 0) {
-            return mysql_fetch_assoc($result);
+            $response = mysql_fetch_assoc($result);
+
+            $host_uid = $response['host_uid'];
+
+            $host_name = mysql_fetch_assoc(mysql_query("SELECT name from `users` where uid = $host_uid"));
+
+            $response['host_name'] = $host_name['name'];
+            return $response;
         } else {
             // user not found
             return false;
@@ -117,8 +124,11 @@ class DB_Functions {
                 $data = mysql_fetch_array($eventdata);
                 $hostuid = $data['host_uid'];            
                 
+                $hostdata = mysql_fetch_assoc(mysql_query("SELECT name from `users` WHERE uid = $hostuid"));
+
                 $events[$i]['eid'] = $eid;
                 $events[$i]['host_uid'] = $hostuid;
+                $events[$i]['host_name'] = $hostdata['name'];
                 $events[$i]['where'] = $data['where'];
                 $events[$i]['when'] = $data['when'];
                 $events[$i]['created_at'] = $data['created_at'];
@@ -173,6 +183,9 @@ class DB_Functions {
         $eid = mysql_insert_id();
         $event = mysql_query("SELECT * FROM `events` WHERE eid = $eid");
         $event = mysql_fetch_assoc($event);
+
+        $host_name = mysql_fetch_assoc(mysql_query("SELECT name from `users` WHERE uid = $host_uid"));
+        $event['host_name'] = $host_name['name'];
 
         // Lets get an array of rids
         $guests = array();
