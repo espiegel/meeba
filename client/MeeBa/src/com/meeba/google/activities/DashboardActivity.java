@@ -1,4 +1,4 @@
-package com.meeba.google.Activities;
+package com.meeba.google.activities;
 
 import android.app.Activity;
 import android.content.Context;

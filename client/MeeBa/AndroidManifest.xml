@@ -28,7 +28,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Activities.LoginActivity"
+            android:name=".activities.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,9 +37,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.DashboardActivity" />
-        <activity android:name=".Activities.WhereWhenActivity" />
-        <activity android:name=".Activities.ContactsActivity" />
+        <activity android:name=".activities.DashboardActivity" />
+        <activity android:name=".activities.WhereWhenActivity" />
+        <activity android:name=".activities.ContactsActivity" />
 
     </application>
 
