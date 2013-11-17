@@ -64,7 +64,6 @@ public class LoginActivity extends Activity implements OnClickListener,
       Boolean isRegistered;
       User user;
       Context context;
-      private ProgressDialog mConnectionProgressDialog;
 
 
       @Override
@@ -98,9 +97,7 @@ public class LoginActivity extends Activity implements OnClickListener,
       public void onConnected(Bundle connectionHint) {
             Utils.LOGD("maxagi: onConnected started");
             Utils.LOGD("maxagi:mPlusClient in onConnected is =" + mPlusClient);
-            if (mConnectionProgressDialog != null) {
-                  mConnectionProgressDialog.dismiss();
-            }
+
             //other wise user can click sign in while sing in is in progress
 
 
@@ -178,9 +175,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                               Utils.LOGD("eidan: testing if we stored user details successfully");
                               Utils.LOGD("eidan: user="+DatabaseFunctions.getUserDetails(getApplicationContext()));
 
-                              Intent i = new Intent(getApplicationContext(),
-                                        DashboardActivity.class);
-                              startActivity(i);
+                              moveToNextView();
                         }
 
                   }
@@ -293,14 +288,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             Utils.LOGD("maxagi: onClick");
             Utils.LOGD("maxagi: onClick - View = " + view);
             Utils.LOGD("maxagi: FIRST mConnectionResult=" + mConnectionResult);
-/*
-            if (mConnectionResult == null) {
-                  mConnectionProgressDialog = new ProgressDialog(this);
-                  mConnectionProgressDialog.setMessage("Signing in...");
-                  mConnectionProgressDialog.show();
-                  return;
-            }
-*/
+
             if (view.getId() == R.id.sign_in_button) {
                   Utils.LOGD("maxagi: onClick  : mPlusClient status  = " + mPlusClient);
                   if (mPlusClient.isConnected()) {
