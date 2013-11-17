@@ -24,15 +24,12 @@ import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailed
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
 import com.meeba.google.database.DatabaseFunctions;
-import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class LoginActivity extends Activity implements OnClickListener,
@@ -51,19 +48,16 @@ public class LoginActivity extends Activity implements OnClickListener,
       private PlusClient mPlusClient;
 
       private ConnectionResult mConnectionResult;
-      private SignInButton mSignInButton;
       private TextView mSignInStatus;
-      private View mSignOutButton;
-      private View mRevokeAccessButton;
 
-      String email;
-      String phoneNumber;
-      String name;
-      String rid;
-      String SENDER_ID = "1023637778529";
-      Boolean isRegistered;
-      User user;
-      Context context;
+      private String email;
+      private String phoneNumber;
+      private String name;
+      private String rid;
+      private final  String SENDER_ID = "1023637778529";
+      private Boolean isRegistered;
+      private User user;
+      private Context context;
 
 
       @Override
@@ -77,12 +71,12 @@ public class LoginActivity extends Activity implements OnClickListener,
             Utils.LOGD("maxagi: mPlusClient = :" + mPlusClient);
 
 
-            mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+            SignInButton mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
             mSignInButton.setOnClickListener(this);
             mSignInStatus = (TextView) findViewById(R.id.tvSignInStatus);
-            mSignOutButton = findViewById(R.id.sign_out_button);
+            View mSignOutButton = findViewById(R.id.sign_out_button);
             mSignOutButton.setOnClickListener(this);
-            mRevokeAccessButton = findViewById(R.id.revoke_access_button);
+            View mRevokeAccessButton = findViewById(R.id.revoke_access_button);
             mRevokeAccessButton.setOnClickListener(this);
 
         /*check if google play services are available*/
@@ -173,7 +167,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                               // Store the user's details inside our local database for later use
                               DatabaseFunctions.storeUserDetails(getApplicationContext(), user);
                               Utils.LOGD("eidan: testing if we stored user details successfully");
-                              Utils.LOGD("eidan: user="+DatabaseFunctions.getUserDetails(getApplicationContext()));
+                              Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(getApplicationContext()));
 
                               moveToNextView();
                         }
