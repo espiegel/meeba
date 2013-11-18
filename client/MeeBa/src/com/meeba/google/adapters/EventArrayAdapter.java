@@ -41,7 +41,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             LayoutInflater inflator = context.getLayoutInflater();
             view = inflator.inflate(R.layout.eventlistlayout, null);
             final ViewHolder viewHolder = new ViewHolder();
-            viewHolder.eventHostName = (TextView) view.findViewById(R.id.eventhostname);
+            //viewHolder.eventHostName = (TextView) view.findViewById(R.id.eventhostname);
             viewHolder.eventwhere = (TextView) view.findViewById(R.id.eventwhere);
             viewHolder.eventwhen = (TextView) view.findViewById(R.id.eventwhen);
 
@@ -51,7 +51,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         }
         ViewHolder holder = (ViewHolder) view.getTag();
         // For now just show the name
-        holder.eventHostName.setText("Host: "+list.get(position).getHost_name());
+       // holder.eventHostName.setText("Host: "+list.get(position).getHost_name());
         holder.eventwhere.setText(list.get(position).getWhere());
         holder.eventwhen.setText(list.get(position).getWhen());
 
