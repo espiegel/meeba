@@ -41,11 +41,11 @@ public class LoginActivity extends Activity implements OnClickListener,
        * API KEY= AIzaSyCRftoO8hmXEoEDBF75SapiefJ8xh3_Up4
        */
 
-    /**
-     * eidan's values
-     * project number =   266943873561
-     * API KEY= AIzaSyB7uaYL60o0MJtTs18_G0mspWWXOlUybzk
-     */
+      /**
+       * eidan's values
+       * project number =   266943873561
+       * API KEY= AIzaSyB7uaYL60o0MJtTs18_G0mspWWXOlUybzk
+       */
       private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
       private static final int REQUEST_CODE_SIGN_IN = 1;
       private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
@@ -107,8 +107,7 @@ public class LoginActivity extends Activity implements OnClickListener,
 
             if (mPlusClient.getCurrentPerson() == null) {
                   Utils.LOGD("maxagi: mPlusClient.getCurrentPerson is null ");
-                  mPlusClient.disconnect();
-                  mPlusClient.clearDefaultAccount();
+                  signoutAndDisconnect();
                   Toast.makeText(getApplicationContext(), "Error getting account details!\n" +
                           "you sure you have internet access?", Toast.LENGTH_LONG).show();
             } else {
@@ -187,7 +186,7 @@ public class LoginActivity extends Activity implements OnClickListener,
        * get a regID from google, and then call  askUserPhoneNumber();
        */
       private void backgroundGetRegid() {
-          final Context context = getApplicationContext();
+            final Context context = getApplicationContext();
             Utils.LOGD("maxagi: in backgroundGetRegid();");
             new AsyncTask<Void, Void, Object>() {
                   ProgressDialog progressDialog;
@@ -217,11 +216,11 @@ public class LoginActivity extends Activity implements OnClickListener,
 
                   @Override
                   protected void onPostExecute(Object error) {
-                       if(error != null) {
-                           Toast.makeText(context,
-                                   "registration error " + error, Toast.LENGTH_LONG).show();
-                           return;
-                       }
+                        if (error != null) {
+                              Toast.makeText(context,
+                                      "registration error " + error, Toast.LENGTH_LONG).show();
+                              return;
+                        }
                         Utils.LOGD("maxagi: in backgroundGetRegid();onPostExecute");
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), rid, Toast.LENGTH_LONG).show();
@@ -248,13 +247,21 @@ public class LoginActivity extends Activity implements OnClickListener,
 
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                   public void onClick(DialogInterface dialog, int whichButton) {
-                        phoneNumber = input.getText().toString();
-                        backgroundRegisterUser();
+                        phoneNumber = input.getText() != null ? input.getText().toString() : "";
+
+                        //check that  user entered 10 digits and starts with 05
+                        if (phoneNumber.matches("05\\d{8}")) {
+                              backgroundRegisterUser();
+
+                        } else {
+                              Toast.makeText(getApplicationContext(), "you have to enter a valid phone number !", Toast.LENGTH_LONG).show();
+                              signoutAndDisconnect();
+                        }
                   }
 
             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                   public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
+                        signoutAndDisconnect();
                   }
             });
             alert.show();
@@ -323,14 +330,8 @@ public class LoginActivity extends Activity implements OnClickListener,
                   }
 
             } else if (view.getId() == R.id.sign_out_button) {
-                  if (mPlusClient.isConnected()) {
-                        mPlusClient.clearDefaultAccount();
-                        mPlusClient.disconnect();
-                        mPlusClient.connect();
-                        // Remove the current user from the local database
-                        DatabaseFunctions.resetTables(getApplicationContext());
-                        mSignInStatus.setText("signed out");
-                  }
+                  signoutAndDisconnect();
+
             } else { //(view.getId()==R.id.revoke_access_button
                   if (mPlusClient.isConnected()) {
                         mPlusClient.revokeAccessAndDisconnect(this);
@@ -395,7 +396,6 @@ public class LoginActivity extends Activity implements OnClickListener,
             // the sign-in button.
             mConnectionResult = result;
 
-
             if (mConnectionResult.getErrorCode() == ConnectionResult.INTERNAL_ERROR) {
                   //in this case the next try should work
                   Toast.makeText(getApplicationContext(), "connection failed, please try again ", Toast.LENGTH_LONG).show();
@@ -439,5 +439,23 @@ public class LoginActivity extends Activity implements OnClickListener,
             bundle.putInt("uid", user.getUid());
             i.putExtras(bundle);
             startActivity(i);
+      }
+
+      private void signoutAndDisconnect() {
+            if (mPlusClient.isConnected()) {
+                  mPlusClient.clearDefaultAccount();
+                  mPlusClient.disconnect();
+
+                  //connect the mPlusClient again so user can try again
+                  mPlusClient.connect();
+
+                  // Remove the current user from the local database
+                  DatabaseFunctions.resetTables(getApplicationContext());
+                  mSignInStatus.setText("signed out");
+            }
+            else{
+                  Toast.makeText(getApplicationContext(), "user is  not connected / connecting ", Toast.LENGTH_LONG).show();
+            }
+
       }
 }
