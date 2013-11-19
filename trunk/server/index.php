@@ -158,7 +158,7 @@ $app->post('/createEvent', function() use ($app, $db) {
 		$uid = array_values($uid);
 	}
 
-	// Create the event and sent out invites
+	// Create the event and send out invites
 	$event = $db->createEvent($host_uid, $where, $when, $uid);
 
 	if(!$event) {
