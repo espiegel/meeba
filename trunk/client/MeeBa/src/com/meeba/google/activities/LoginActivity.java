@@ -187,8 +187,9 @@ public class LoginActivity extends Activity implements OnClickListener,
        * get a regID from google, and then call  askUserPhoneNumber();
        */
       private void backgroundGetRegid() {
+          final Context context = getApplicationContext();
             Utils.LOGD("maxagi: in backgroundGetRegid();");
-            new AsyncTask<Void, Void, Void>() {
+            new AsyncTask<Void, Void, Object>() {
                   ProgressDialog progressDialog;
 
                   @Override
@@ -201,7 +202,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                   }
 
                   @Override
-                  protected Void doInBackground(Void... params) {
+                  protected Object doInBackground(Void... params) {
                         Utils.LOGD("maxagi: in backgroundGetRegid();doInBackground");
                         try {
                               if (gcm == null) {
@@ -209,16 +210,19 @@ public class LoginActivity extends Activity implements OnClickListener,
                               }
                               rid = gcm.register(SENDER_ID);
                         } catch (IOException ex) {
-                              Toast.makeText(getApplicationContext(),
-                                      "registration error " + ex, Toast.LENGTH_LONG).show();
+                              return ex;
                         }
                         return null;
                   }
 
                   @Override
-                  protected void onPostExecute(Void v) {
+                  protected void onPostExecute(Object error) {
+                       if(error != null) {
+                           Toast.makeText(context,
+                                   "registration error " + error, Toast.LENGTH_LONG).show();
+                           return;
+                       }
                         Utils.LOGD("maxagi: in backgroundGetRegid();onPostExecute");
-                        super.onPostExecute(v);
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), rid, Toast.LENGTH_LONG).show();
                         askUserPhoneNumber();

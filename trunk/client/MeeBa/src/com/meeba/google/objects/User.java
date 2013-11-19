@@ -10,7 +10,19 @@ public class User {
     private String phone_number;
     private String rid;
     private String created_at;
+    private int invite_status;
     private boolean selected;
+
+    public User(int uid, String email, String name, String phone_number, String rid, String created_at, int invite_status) {
+        this.uid = uid;
+        this.email = email;
+        this.name = name;
+        this.phone_number = phone_number;
+        this.rid = rid;
+        this.created_at = created_at;
+        this.invite_status = invite_status;
+        this.selected = false;
+    }
 
     public User(int uid, String email, String name, String phone_number, String rid, String created_at) {
         this.uid = uid;
@@ -20,7 +32,6 @@ public class User {
         this.rid = rid;
         this.created_at = created_at;
         this.selected = false;
-
     }
 
     public String getCreated_at() {
@@ -90,6 +101,9 @@ public class User {
                 ", name='" + name + '\'' +
                 ", phone_number='" + phone_number + '\'' +
                 ", rid='" + rid + '\'' +
+                ", created_at='" + created_at + '\'' +
+                ", invite_status=" + invite_status +
+                ", selected=" + selected +
                 '}';
     }
 }

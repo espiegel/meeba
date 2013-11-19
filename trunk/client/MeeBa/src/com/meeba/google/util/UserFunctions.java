@@ -5,10 +5,12 @@ import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -200,8 +202,35 @@ public class UserFunctions {
      * @param eid Event id
      * @return Returns a list of all users that are a part of this event
      */
-    public static List<User> getUsersOfEvent(int eid) {
-        return null;
+    public static List<User> getUsersByEvent(int eid) {
+        List<User> users = new ArrayList<User>();
+
+        try {
+            Gson lGson = new Gson();
+            JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getUsersByEvent/" + eid);
+
+            if(lJsonObject == null)
+                return null;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+
+            if(lJsonObject.getInt("success") == 1) {
+                for(int i=0;i<lJsonObject.getJSONObject("users").getJSONArray("guests").length();i++) {
+                    users.add(lGson.fromJson(lJsonObject.getJSONObject("users").getJSONArray("guests").get(i).toString(), User.class));
+                }
+
+                for(User e : users) {
+                    Utils.LOGD("user = "+e.toString());
+                }
+                return users;
+            }
+            else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static boolean respondToInvite(int uid, int eid, int status) {
