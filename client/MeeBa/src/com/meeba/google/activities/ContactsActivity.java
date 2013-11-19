@@ -1,23 +1,18 @@
 package com.meeba.google.activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.meeba.google.adapters.ContactsArrayAdapter;
-import com.meeba.google.adapters.EventArrayAdapter;
-import com.meeba.google.database.DatabaseHandler;
+import com.meeba.google.util.UserFunctions;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
-import com.meeba.google.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +26,11 @@ import static com.meeba.google.util.UserFunctions.getUsersByPhones;
  */
 public class ContactsActivity extends Activity {
     Button next;
-    //listview for choose contacts from list
-    ListView listview;
-    ContactsArrayAdapter mContactsArrayAdapter;
+    final Activity con = this;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);
-        final ContactsActivity contactsActivity = this;
 
         //just checking with this button - i will change it to bring us to dayana's activity
         next = (Button) findViewById(R.id.invitebtn);
@@ -47,61 +39,48 @@ public class ContactsActivity extends Activity {
         Toast.makeText(getApplicationContext(),"Loading your contacts list..." ,Toast.LENGTH_LONG).show();
 
 
-        final Activity conAct = this;
 
         AsyncTask<Void, Void, List<User>> aTast = new AsyncTask<Void, Void, List<User>>() {
-         //   final ProgressDialog progress = new ProgressDialog(contactsActivity);
-         ProgressDialog progressDialog;
 
             protected void onPreExecute() {
-                Log.d("load","Loading your contacts list...");
-                //progress.setMessage("Sending Invitations...");
-                //progress.show();
-                progressDialog = ProgressDialog
-                        .show(ContactsActivity.this, "Loading your contacts list ", "please wait !", true);
+
             }
 
             protected List<User> doInBackground(Void... params) {
-                listview = (ListView) findViewById(R.id.appContacts);
-
-
-                DatabaseHandler db = new DatabaseHandler(getApplicationContext());
-                Log.d("a", "getting contacts...");
-                List<String> allPhoneNumbers = phoneList(allPhoneNumbersAndName());
-                // get only app contacts so the user can invite them to his event
-                List<User> appContacts = getUsersByPhones(allPhoneNumbers);
-
-           //     mContactsArrayAdapter = new ContactsArrayAdapter(conAct,appContacts);
-          //      listview.setAdapter(mContactsArrayAdapter);
-            //    listview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-
-
-                //return list of app users
-              //  return listview;
-                return appContacts;
+                HashMap<String, String> HashOfPhoneContacts = allPhoneNumbersAndName();
+                List<String> ListOfPhoneContacts = phoneList(HashOfPhoneContacts);
+                List<User> ListOfAppContacts = getUsersByPhones(ListOfPhoneContacts);
+                return ListOfAppContacts;
             }
 
 
             protected void onPostExecute(List<User> appContacts){
-                Utils.LOGD("onPostExecute");
+            //create list of name string or number string
+                 List<String> appNameOrPhone = null;
+                for(User u: appContacts) {
+                    if(u.getName() == null) {
+                        appNameOrPhone.add(u.getPhone_number());
+                    }
+                    else{
+                        appNameOrPhone.add(u.getName());
+                    }
+                }
 
+                //build adapter
 
-                // update the event list view
-                mContactsArrayAdapter = new ContactsArrayAdapter(conAct, appContacts);
-                listview.setAdapter(mContactsArrayAdapter);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                        con,                    //Context for the activity
+                        R.layout.listview_item, //layout to use(create)
+                        appNameOrPhone);        //items to display
 
-                progressDialog.dismiss();
+                //configure the list view
+                ListView list = (ListView) findViewById(R.id.appContacts);
+                list.setAdapter(adapter);
 
-                //    for(ListView u:appContacts){
-              //      System.out.println(u.getAdapter());
-              //  }
-
-
-            //    Toast.makeText(getApplicationContext(),appContacts. ,Toast.LENGTH_LONG).show();
             }
+
+
         };
-        //  HashMap<String,String> allPhoneNumbersAndName = getAllPhoneNumbers();
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
