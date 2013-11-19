@@ -146,6 +146,10 @@ public class ContactsActivity extends Activity {
         return phoneList;
     }
 
+    public void stamFunc(){
+
+    }
+
 }
 
 
