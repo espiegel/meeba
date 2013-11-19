@@ -17,14 +17,10 @@ import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.meeba.google.adapters.EventArrayAdapter;
 
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-
 
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 /**
  * Created by Padi on 07/11/13.
@@ -35,7 +31,6 @@ public class DashboardActivity extends Activity {
     private Button mCreateEventBtn;
     private User mCurrentUser;
     private List<Event> list;
-   // private ArrayAdapter mEventArrayAdapter;
     private EventArrayAdapter mEventArrayAdapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,15 +40,7 @@ public class DashboardActivity extends Activity {
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
 
         mEventListView = (ListView)findViewById(R.id.listViewDashboard);
-
         mCreateEventBtn = (Button) findViewById(R.id.createEvent);
-       // eventsItems = new ArrayList<String>();
-        //mEventArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, eventsItems);
-
-
-
-
-
 
         mCreateEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,13 +70,6 @@ public class DashboardActivity extends Activity {
 
             protected List<Event> doInBackground(Void... params) {
                 Utils.LOGD("doInBackground");
-                List<String> invites = new ArrayList<String>();
-                invites.add(0,"1");
-                invites.add(1,"7");
-
-
-                UserFunctions.createEvent(mCurrentUser.getUid(),"Salat Aroma", "14:00",invites);
-
 
                 Utils.LOGD("uid=" + mCurrentUser.getUid());
                 list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
@@ -99,7 +79,6 @@ public class DashboardActivity extends Activity {
                 } else {
                     return list;
                 }
-
             }
 
             protected void onPostExecute(List<Event> events) {
@@ -107,20 +86,9 @@ public class DashboardActivity extends Activity {
 
                 // update the event list view
                 mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
-
-
-
-               // for (Event element : list) {
-              //      String eventInfo= "where:" + element.getWhere() + " when:" + element.getWhen();
-              //      eventsItems.add(0,eventInfo);
-            //    }
-
-
                 mEventListView.setAdapter(mEventArrayAdapter);
                 progressDialog.dismiss();
-
             }
-
         };
         task.execute();
 

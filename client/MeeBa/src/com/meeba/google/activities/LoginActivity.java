@@ -36,10 +36,16 @@ public class LoginActivity extends Activity implements OnClickListener,
         ConnectionCallbacks, OnConnectionFailedListener, PlusClient.OnAccessRevokedListener {
 
       /**
+       * max's values
        * project number =   1023637778529
        * API KEY= AIzaSyCRftoO8hmXEoEDBF75SapiefJ8xh3_Up4
        */
 
+    /**
+     * eidan's values
+     * project number =   266943873561
+     * API KEY= AIzaSyB7uaYL60o0MJtTs18_G0mspWWXOlUybzk
+     */
       private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
       private static final int REQUEST_CODE_SIGN_IN = 1;
       private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
@@ -54,7 +60,8 @@ public class LoginActivity extends Activity implements OnClickListener,
       private String phoneNumber;
       private String name;
       private String rid;
-      private final  String SENDER_ID = "1023637778529";
+      //private final  String SENDER_ID = "1023637778529"; max's old value
+      private final String SENDER_ID = "266943873561";
       private Boolean isRegistered;
       private User user;
       private Context context;
