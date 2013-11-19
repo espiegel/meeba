@@ -173,6 +173,8 @@ class DB_Functions {
     * Create an event, create and send out invitations to guests via gcm
     */
     public function createEvent($host_uid, $where, $when, $uid) {
+        $app = \Slim\Slim::getInstance();
+        $app->getLog()->info("inside create_event");
         $result = mysql_query("INSERT INTO events(host_uid, `where`, `when`, `created_at`) VALUES('$host_uid', '$where', '$when', NOW())")
             or die(mysql_error());
 
@@ -204,7 +206,10 @@ class DB_Functions {
         $this->createInvite($eid, $guests);
 
         // Send out invitations to an array of guest rids via gcm
-        $this->sendInvite($host, $rids, $event);
+        $response = $this->sendInvite($host, $rids, $event);
+
+        // Log the response
+        $app->getLog()->info("response = $response, array response=".print_r($response, TRUE));
 
         return $event;
     }
@@ -228,6 +233,8 @@ class DB_Functions {
     *
     */
     public function sendInvite($host, $rids, $event) {
+        $app = \Slim\Slim::getInstance();
+        $app->getLog()->info("inside sendInvite, host=$host, rids=".print_r($rids, TRUE).", event=$event");
         // Message to send      
         $apiKey = API_KEY;
         
@@ -240,7 +247,7 @@ class DB_Functions {
                 'tag' => 'invite',
                 'where' => $event['where'],
                 'when' => $event['when'],
-                'sender' => $host['name'],
+                'hostName' => $host['name'],
                 'senderRid' => $host['rid'],
                 'senderUid' => $host['uid'],
                 'eid' => $event['eid']
@@ -299,6 +306,9 @@ class DB_Functions {
      */
     private function sendNotification( $apiKey, $registrationIdsArray, $messageData )
     {   
+        $app = \Slim\Slim::getInstance();
+        $app->getLog()->info("inside sendNotification: apiKey=$apiKey, messageData=".print_r($messageData,TRUE));
+
         $headers = array("Content-Type:" . "application/json", "Authorization:" . "key=" . $apiKey);
         $data = array(
             'data' => $messageData,
