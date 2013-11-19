@@ -10,6 +10,7 @@ public class User {
     private String phone_number;
     private String rid;
     private String created_at;
+    private boolean selected;
 
     public User(int uid, String email, String name, String phone_number, String rid, String created_at) {
         this.uid = uid;
@@ -18,6 +19,8 @@ public class User {
         this.phone_number = phone_number;
         this.rid = rid;
         this.created_at = created_at;
+        this.selected = false;
+
     }
 
     public String getCreated_at() {
@@ -67,6 +70,17 @@ public class User {
     public void setPhone_number(String phone_number) {
         this.phone_number = phone_number;
     }
+
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+
 
     @Override
     public String toString() {
