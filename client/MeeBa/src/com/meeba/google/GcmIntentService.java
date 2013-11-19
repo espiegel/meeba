@@ -41,20 +41,21 @@ public class GcmIntentService extends IntentService {
              * will be extended in the future with new message types, just ignore
              * any message types you're not interested in, or that you don't
              * recognize.
+             *
              */
-            String tag = extras.getString("tag");
-            String when = extras.getString("when");
-            String where = extras.getString("where");
-            String hostName = extras.getString("hostName");
-
-            Utils.LOGD("hostName="+hostName);
-            int eid = Integer.valueOf(extras.getString("eid"));
 
             if (GoogleCloudMessaging.
                     MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
                 Utils.LOGD("GCM: Error sending a GCM message");
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+                String tag = extras.getString("tag");
+                String when = extras.getString("when");
+                String where = extras.getString("where");
+                String hostName = extras.getString("hostName");
+
+                Utils.LOGD("hostName="+hostName);
+                int eid = Integer.valueOf(extras.getString("eid"));
 
                 if(tag.equals(TAG_INVITE)) {
                     sendNotification(tag, hostName, when, where, eid);

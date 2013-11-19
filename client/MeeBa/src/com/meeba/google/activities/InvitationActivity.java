@@ -28,6 +28,9 @@ public class InvitationActivity extends Activity {
 
     private int uid;
     private int eid;
+    private String mWhere;
+    private String mWhen;
+    private String mHostName;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +47,13 @@ public class InvitationActivity extends Activity {
         Bundle bundle = intent.getExtras();
 
         Utils.LOGD("bundle hostName="+bundle.getString("hostName"));
-        mTxtHost.setText(bundle.getString("hostName"));
-        mTxtWhere.setText(bundle.getString("where"));
-        mTxtWhen.setText(bundle.getString("when"));
+        mHostName = bundle.getString("hostName");
+        mWhere = bundle.getString("where");
+        mWhen = bundle.getString("when");
+
+        mTxtHost.setText(mHostName);
+        mTxtWhere.setText(mWhere);
+        mTxtWhen.setText(mWhen);
 
         uid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
         eid = bundle.getInt("eid");
@@ -72,6 +79,8 @@ public class InvitationActivity extends Activity {
                     protected void onPostExecute(Void v) {
                         super.onPostExecute(v);
                         dialog.dismiss();
+
+                        startEventPage();
                     }
                 }.execute();
             }
@@ -98,10 +107,23 @@ public class InvitationActivity extends Activity {
                     protected void onPostExecute(Void v) {
                         super.onPostExecute(v);
                         dialog.dismiss();
+
+                        startEventPage();
                     }
                 }.execute();
             }
         });
+    }
+
+    private void startEventPage() {
+        Intent intent = new Intent(this, EventPageActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("where", mWhere);
+        bundle.putString("when", mWhen);
+        bundle.putString("hostName", mHostName);
+        bundle.putInt("eid", eid);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
 }

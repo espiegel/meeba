@@ -59,7 +59,7 @@
         <activity android:name=".activities.WhereWhenActivity" />
         <activity android:name=".activities.ContactsActivity" />
         <activity android:name=".activities.InvitationActivity" />
-        <activity android:name=".activities.EventPage" />
+        <activity android:name=".activities.EventPageActivity" />
 
     </application>
 
