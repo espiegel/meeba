@@ -34,6 +34,15 @@ public class User {
         this.selected = false;
     }
 
+
+    public int getInvite_status() {
+        return invite_status;
+    }
+
+    public void setInvite_status(int invite_status) {
+        this.invite_status = invite_status;
+    }
+    
     public String getCreated_at() {
         return created_at;
     }
