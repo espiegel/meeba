@@ -8,21 +8,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
-import android.widget.ArrayAdapter;
-
-
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.meeba.google.R;
 import com.meeba.google.adapters.ContactsArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
-import com.meeba.google.R;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,7 +70,6 @@ public class ContactsActivity extends Activity {
 
                 mListUid = new ArrayList<String>();
 
-                List<User> selectedUsers = new ArrayList<User>();
                 mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
 
                 for(User user : mContactsAdapter.getList()) {
@@ -101,8 +95,7 @@ public class ContactsActivity extends Activity {
 
                     @Override
                     protected Event doInBackground(Void... voids) {
-                        Event event = UserFunctions.createEvent(mHostUid, mWhere, mWhen, mListUid);
-                        return event;
+                        return UserFunctions.createEvent(mHostUid, mWhere, mWhen, mListUid);
                     }
 
                     @Override
@@ -185,9 +178,7 @@ public class ContactsActivity extends Activity {
         while (cursor.moveToNext()) {
             String contactId = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.Contacts._ID));
-            //Log.d("loop", "contactId="+contactId);
             String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-            //Log.d("loop", "hasphone="+hasPhone);
 
             if (Integer.parseInt(hasPhone) == 1) {
                 int nameFieldColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
@@ -198,7 +189,7 @@ public class ContactsActivity extends Activity {
                 while (phones.moveToNext()) {
                     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                    // Filter out all the "-"'s from the phone number
+                    // Filter out all the "-"'s and "*"'s from the phone number
                     phoneNumber = phoneNumber.replaceAll("-","").replaceAll("\\*","");
 
                     phonesMap.put(phoneNumber, contact);

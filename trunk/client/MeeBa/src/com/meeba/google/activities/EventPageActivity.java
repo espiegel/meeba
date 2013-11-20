@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
-import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
@@ -26,7 +24,6 @@ public class EventPageActivity extends Activity {
     private TextView mTxtWhen;
     private ListView mListView;
 
-    private int uid;
     private int eid;
 
     public void onCreate(Bundle savedInstanceState) {
