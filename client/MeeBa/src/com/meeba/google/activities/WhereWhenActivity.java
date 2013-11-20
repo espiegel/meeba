@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import com.meeba.google.R;
+import com.meeba.google.util.Utils;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -13,7 +15,7 @@ import android.widget.Toast;
 /**
  * Created by or malka on 09/11/13.
  */
-public class WhereWhenActivity extends Activity{
+public class WhereWhenActivity extends Activity {
 
     EditText editWhere;
     EditText editWhen;
@@ -22,8 +24,11 @@ public class WhereWhenActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.where_when_activity);
+
+        Utils.setupUI(findViewById(R.id.wherewhenLayout), this);
         editWhen = (EditText) findViewById(R.id.whenTxtUser);
         editWhere = (EditText) findViewById(R.id.whereTxtUser);
+
         next = (Button) findViewById(R.id.NextBtn);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,9 +52,6 @@ public class WhereWhenActivity extends Activity{
             }
         });
     }
-
-
-
 }
 
 
