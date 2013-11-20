@@ -1,18 +1,24 @@
 package com.meeba.google.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.ArrayAdapter;
+
+
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.meeba.google.util.UserFunctions;
+
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
+import com.meeba.google.util.Utils;
+
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,10 +33,21 @@ import static com.meeba.google.util.UserFunctions.getUsersByPhones;
 public class ContactsActivity extends Activity {
     Button next;
     final Activity con = this;
+    List<User> ListOfAppContacts;
+    List<String> ListOfPhoneContacts;
+    HashMap<String, String> HashOfPhoneContacts;
+    Cursor cursor;
+    List<String> ContactItems;
+    private ListView mUserListView;
+
+
+    //DEBUG Dayana
+    private ArrayAdapter mUserArrayAdapter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);
+        mUserListView = (ListView)findViewById(R.id.listViewDashboard);
 
         //just checking with this button - i will change it to bring us to dayana's activity
         next = (Button) findViewById(R.id.invitebtn);
@@ -38,25 +55,44 @@ public class ContactsActivity extends Activity {
         //just for checking
         Toast.makeText(getApplicationContext(),"Loading your contacts list..." ,Toast.LENGTH_LONG).show();
 
+        //setContentView(R.layout.contacts_activity);
+       // List<String> lstr = new ArrayList<String>();
+        //lstr.add("or");
+        //lstr.add("maor");
+        //lstr.add("rotem");
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.listview_item);
+
+      //  ListView list = (ListView) findViewById(R.id.appContacts);
+       // list.setAdapter(adapter);
 
 
         AsyncTask<Void, Void, List<User>> aTast = new AsyncTask<Void, Void, List<User>>() {
 
-            protected void onPreExecute() {
+           protected void onPreExecute() {
 
             }
 
             protected List<User> doInBackground(Void... params) {
-                HashMap<String, String> HashOfPhoneContacts = allPhoneNumbersAndName();
-                List<String> ListOfPhoneContacts = phoneList(HashOfPhoneContacts);
-                List<User> ListOfAppContacts = getUsersByPhones(ListOfPhoneContacts);
+                HashOfPhoneContacts = allPhoneNumbersAndName();
+                ListOfPhoneContacts = phoneList(HashOfPhoneContacts);
+                ListOfPhoneContacts.add("0546266225");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("0544567435");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("0544514240");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("0545356070");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("1213331232");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfAppContacts = getUsersByPhones(ListOfPhoneContacts);
                 return ListOfAppContacts;
             }
 
 
             protected void onPostExecute(List<User> appContacts){
             //create list of name string or number string
-                 List<String> appNameOrPhone = null;
+                List<String> appNameOrPhone = null;
                 for(User u: appContacts) {
                     if(u.getName() == null) {
                         appNameOrPhone.add(u.getPhone_number());
@@ -81,6 +117,17 @@ public class ContactsActivity extends Activity {
 
 
         };
+     //  aTast.execute();
+
+
+
+
+
+
+
+
+
+
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +142,56 @@ public class ContactsActivity extends Activity {
                 //  Toast.makeText(getApplicationContext(),"when? "+bundle.getString("when")+ "  " +"where? "+bundle.getString("where"), Toast.LENGTH_SHORT).show();
             }
         });
+        asyncRefresh();
     }
+
+
+    private void asyncRefresh() {
+        final Activity Contacts = this;
+        AsyncTask<Void, Void, List<User>> task = new AsyncTask<Void, Void, List<User>>() {
+            ProgressDialog progressDialog;
+            protected void onPreExecute() {
+                Utils.LOGD("onPreExecute");
+                super.onPreExecute();
+                progressDialog = ProgressDialog
+                        .show(ContactsActivity.this, "Getting your contact list ", "please wait !", true);
+            }
+
+            protected List<User> doInBackground(Void... params) {
+                Utils.LOGD("doInBackground");
+                ListOfPhoneContacts.add("0546266225");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("0544567435");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("0544514240");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("0545356070");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfPhoneContacts.add("1213331232");
+                Utils.LOGD(ListOfPhoneContacts.get(0));
+                ListOfAppContacts = getUsersByPhones(ListOfPhoneContacts);
+                return ListOfAppContacts;
+            }
+
+            protected void onPostExecute(List<User> ListOfAppContacts) {
+                Utils.LOGD("onPostExecute");
+                for (User element : ListOfAppContacts) {
+                         String eventInfo= "Phone:" + element.getName();
+                         ContactItems.add(0,eventInfo);
+                       }
+
+                mUserArrayAdapter = new ArrayAdapter<String>(con, android.R.layout.simple_list_item_1, ContactItems);
+                mUserListView.setAdapter(mUserArrayAdapter);
+                progressDialog.dismiss();
+
+            }
+        };
+        task.execute();
+
+    }
+
+
+
 
 
     /**
@@ -106,7 +202,7 @@ public class ContactsActivity extends Activity {
     private HashMap<String,String> allPhoneNumbersAndName(){
         HashMap<String,String> phonesMap = new HashMap<String,String>();
 
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
+        cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
         while (cursor.moveToNext()) {
             String contactId = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.Contacts._ID));
@@ -138,6 +234,7 @@ public class ContactsActivity extends Activity {
      * @param hashlist
      * @return List of phone numbers from HashMap so we can use UserFunction function "getUsersByPhones"
      */
+
     private List<String> phoneList(HashMap<String,String> hashlist){
         List<String> phoneList = new ArrayList<String>();
         for(String s : hashlist.keySet()) {
@@ -146,11 +243,16 @@ public class ContactsActivity extends Activity {
         return phoneList;
     }
 
-    public void stamFunc(){
+
+
 
     }
 
-}
+
+
+
+
+
 
 
 
