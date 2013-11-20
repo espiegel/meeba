@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
@@ -15,7 +14,6 @@ import com.meeba.google.R;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +53,7 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
                                     .getTag();
                             element.setSelected(buttonView.isChecked());
                             Utils.LOGD("changed selection to "+buttonView.isChecked());
-                            Utils.LOGD("element= "+element.isSelected());
+                            Utils.LOGD("element= " + element.isSelected());
 
                         }
                     });
