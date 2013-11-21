@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.content.Intent;
 
@@ -54,6 +55,34 @@ public class DashboardActivity extends Activity {
             }
         });
 
+        mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Event event = ((Event)mEventListView.getAdapter().getItem(position));
+
+                if(event == null) {
+                    Utils.LOGD("event is null!");
+                    return;
+                }
+
+                int eid = event.getEid();
+                String where = event.getWhere();
+                String when = event.getWhen();
+                String hostName = event.getHost_name();
+
+                Intent intent = new Intent(DashboardActivity.this, EventPageActivity.class);
+                Bundle extras = new Bundle();
+
+                extras.putInt("eid", eid);
+                extras.putString("where",where);
+                extras.putString("when", when);
+                extras.putString("hostName", hostName);
+
+                intent.putExtras(extras);
+                startActivity(intent);
+
+            }
+        });
         asyncRefresh();
     }
 
