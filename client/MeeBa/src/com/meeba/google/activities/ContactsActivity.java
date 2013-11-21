@@ -90,7 +90,7 @@ public class ContactsActivity extends Activity {
                         Utils.LOGD("onPreExecute");
                         super.onPreExecute();
                         progressDialog = ProgressDialog
-                                .show(ContactsActivity.this, "Getting your contact list ", "please wait !", true);
+                                .show(ContactsActivity.this, "Inviting your friends", "please wait !", true);
                     }
 
                     @Override
