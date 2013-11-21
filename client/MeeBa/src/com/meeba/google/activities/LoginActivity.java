@@ -290,6 +290,11 @@ public class LoginActivity extends Activity implements OnClickListener,
                   @Override
                   protected void onPostExecute(Void v) {
                         Utils.LOGD("maxagi: onPostExecute");
+                      // Store the user's details inside our local database for later use
+                      DatabaseFunctions.storeUserDetails(getApplicationContext(), user);
+                      Utils.LOGD("eidan: testing if we stored user details successfully");
+                      Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(getApplicationContext()));
+                      moveToNextView();
                   }
             };
             register.execute();
