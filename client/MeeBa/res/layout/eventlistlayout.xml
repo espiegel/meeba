@@ -28,11 +28,6 @@
             android:textSize="20sp"
             android:textIsSelectable="false" />
 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/linearLayout"
-        android:layout_marginBottom="3dp">
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
