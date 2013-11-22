@@ -56,13 +56,14 @@ public class LoginActivity extends Activity implements OnClickListener,
       private ConnectionResult mConnectionResult;
       private TextView mSignInStatus;
 
+
       private String email;
       private String phoneNumber;
       private String name;
       private String rid;
       //private final  String SENDER_ID = "1023637778529"; max's old value
       private final String SENDER_ID = "266943873561";
-      private Boolean isRegistered;
+      private Boolean isReisteredInOurDB, isRegisteredInPhone;
       private User user;
       private Context context;
 
@@ -128,7 +129,15 @@ public class LoginActivity extends Activity implements OnClickListener,
                    **/
 
                   /** this method starts the above chain of events  **/
-                  backgroundCheckIfRegistered();
+
+
+                  isRegisteredInPhone = checkIfRegisteredInPhone();
+                  if (isRegisteredInPhone) {
+                        moveToNextView();
+                  } else {
+                        backgroundCheckIfRegistered();
+                  }
+
             }
 
       }
@@ -145,35 +154,29 @@ public class LoginActivity extends Activity implements OnClickListener,
                   protected void onPreExecute() {
                         super.onPreExecute();
                         progressDialog = ProgressDialog
-                                .show(LoginActivity.this, "checking if user is registered ", "wait !", true);
+                                .show(LoginActivity.this, "checking if user is registered in our DB ", "wait !", true);
+                        Utils.LOGD("maxagi:  onPreExecute CheckIfRegistered();");
+                        Utils.LOGD("maxagi: user= " + user);
                   }
 
                   @Override
                   protected Void doInBackground(Void... params) {
                         Utils.LOGD("maxagi: in backgroundCheckIfRegistered();doInBackground");
                         user = UserFunctions.getUserByEmail(email);
-                        isRegistered = (user != null);
+                        Utils.LOGD("maxagi: user retrieved from phone DB= " + user);
+                        isReisteredInOurDB = (user != null);
                         return null;
                   }
 
                   @Override
                   protected void onPostExecute(Void v) {
-                        Utils.LOGD("maxagi: in backgroundCheckIfRegistered();onPostExecute");
+                        Utils.LOGD("maxagi: in background CheckIfRegistered();onPostExecute");
                         super.onPostExecute(v);
                         progressDialog.dismiss();
 
-                        if (isRegistered != null && !isRegistered) {
+                        if (!isReisteredInOurDB) {
                               backgroundGetRegid();
-                        } else if (isRegistered) {
-                              // Since we are logging in for the first time then reset all tables. (upgrade)
-                              // Later if the user is already logged in he will skip this phase and go
-                              // directly to the dashboard activity
-                              //DatabaseFunctions.upgradeDatabase(context);
-
-                              // Store the user's details inside our local database for later use
-                              DatabaseFunctions.storeUserDetails(getApplicationContext(), user);
-                              Utils.LOGD("eidan: testing if we stored user details successfully");
-                              Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(getApplicationContext()));
+                        } else {
 
                               moveToNextView();
                         }
@@ -181,6 +184,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                   }
             }.execute(null, null, null);
       }
+
 
       /**
        * get a regID from google, and then call  askUserPhoneNumber();
@@ -268,7 +272,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             Utils.LOGD("maxagi: in askUserPhoneNumber Stage 3 ");
       }
 
-      private void backgroundRegisterUser() {
+      private void backgroundRegisterUser() {// if the user already exists in our DB , do nothing
             Toast.makeText(getApplicationContext(), "time to register " + email, Toast.LENGTH_LONG).show();
 
             AsyncTask<Void, Void, Void> register = new AsyncTask<Void, Void, Void>() {
@@ -280,21 +284,25 @@ public class LoginActivity extends Activity implements OnClickListener,
                   @Override
                   protected Void doInBackground(Void... params) {
                         Utils.LOGD("maxagi:registering " + email);
-
                         user = UserFunctions.createUser(email, name, phoneNumber, rid);
-                        if (user != null)
-                              Utils.LOGD("maxagi: created " + user.toString());
                         return null;
                   }
 
                   @Override
                   protected void onPostExecute(Void v) {
+                        if (user == null) {
+                              Toast.makeText(getApplicationContext(), "error registering user in database", Toast.LENGTH_LONG).show();
+                              return;
+                        }
+
                         Utils.LOGD("maxagi: onPostExecute");
-                      // Store the user's details inside our local database for later use
-                      DatabaseFunctions.storeUserDetails(getApplicationContext(), user);
-                      Utils.LOGD("eidan: testing if we stored user details successfully");
-                      Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(getApplicationContext()));
-                      moveToNextView();
+                        context = getApplicationContext();
+                        // Store the user's details inside our local database for later use
+                        DatabaseFunctions.upgradeDatabase(context);
+                        DatabaseFunctions.storeUserDetails(context, user);
+                        Utils.LOGD("eidan: testing if we stored user details successfully");
+                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(context));
+                        moveToNextView();
                   }
             };
             register.execute();
@@ -437,13 +445,15 @@ public class LoginActivity extends Activity implements OnClickListener,
       }
 
       private void moveToNextView() {
+
             Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
             Bundle bundle = new Bundle();
 
             /** pass the uid to the DashboardActivity **/
             bundle.putInt("uid", user.getUid());
             i.putExtras(bundle);
-            startActivity(i);
+           startActivity(i);
+
       }
 
       private void signoutAndDisconnect() {
@@ -457,10 +467,17 @@ public class LoginActivity extends Activity implements OnClickListener,
                   // Remove the current user from the local database
                   DatabaseFunctions.resetTables(getApplicationContext());
                   mSignInStatus.setText("signed out");
-            }
-            else{
+            } else {
                   Toast.makeText(getApplicationContext(), "user is  not connected / connecting ", Toast.LENGTH_LONG).show();
             }
 
       }
+
+      private boolean checkIfRegisteredInPhone() {
+            user = DatabaseFunctions.getUserDetails(context);
+            Utils.LOGD("maxagi: user retrieved from phone DB= " + user);
+            return (user != null);
+
+      }
+
 }
