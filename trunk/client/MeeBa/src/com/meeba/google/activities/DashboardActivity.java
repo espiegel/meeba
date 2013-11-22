@@ -19,6 +19,7 @@ import com.meeba.google.util.Utils;
 import com.meeba.google.adapters.EventArrayAdapter;
 
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,11 @@ public class DashboardActivity extends Activity {
         setContentView(R.layout.dashboard_activity);
 
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
+          if( mCurrentUser == null ){
+                Utils.LOGD("diana : user was null !!!!!!!");
+                Toast.makeText(getApplicationContext(), "user  is null !", Toast.LENGTH_LONG).show();
+                return;
+          }
 
         mEventListView = (ListView)findViewById(R.id.listViewDashboard);
         mCreateEventBtn = (Button) findViewById(R.id.createEvent);
@@ -100,7 +106,7 @@ public class DashboardActivity extends Activity {
             protected List<Event> doInBackground(Void... params) {
                 Utils.LOGD("doInBackground");
 
-                Utils.LOGD("uid=" + mCurrentUser.getUid());
+                Utils.LOGD("diana:uid=" + mCurrentUser.getUid());
                 list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
 
                 if(list == null) {

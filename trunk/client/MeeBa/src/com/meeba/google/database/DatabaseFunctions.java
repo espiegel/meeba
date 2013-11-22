@@ -41,6 +41,9 @@ public class DatabaseFunctions {
      */
     public static User getUserDetails(Context context) {
         DatabaseHandler db = getDatabase(context);
+          if(!userIsStored(context) ){
+                return null ;
+          }
 
         return db.getUserDetails();
     }
