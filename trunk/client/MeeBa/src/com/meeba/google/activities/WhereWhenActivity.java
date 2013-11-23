@@ -3,6 +3,10 @@ package com.meeba.google.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.util.Utils;
 
@@ -15,7 +19,7 @@ import android.widget.Toast;
 /**
  * Created by or malka on 09/11/13.
  */
-public class WhereWhenActivity extends Activity {
+public class WhereWhenActivity extends SherlockActivity {
 
     EditText editWhere;
     EditText editWhen;
@@ -24,6 +28,11 @@ public class WhereWhenActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.where_when_activity);
+
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle("Event Details");
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
 
         Utils.setupUI(findViewById(R.id.wherewhenLayout), this);
         editWhen = (EditText) findViewById(R.id.whenTxtUser);
@@ -51,6 +60,13 @@ public class WhereWhenActivity extends Activity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        onBackPressed();
+        return true;
     }
 }
 

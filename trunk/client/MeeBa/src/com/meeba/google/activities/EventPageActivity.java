@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
 import com.meeba.google.objects.User;
@@ -18,7 +21,7 @@ import java.util.List;
 /**
  * Created by Eidan on 11/19/13.
  */
-public class EventPageActivity extends Activity {
+public class EventPageActivity extends SherlockActivity {
     private TextView mTxtHost;
     private TextView mTxtWhere;
     private TextView mTxtWhen;
@@ -29,6 +32,11 @@ public class EventPageActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.eventpage_activity);
+
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle("Event Page");
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
 
         mTxtHost = (TextView)findViewById(R.id.txtHost);
         mTxtWhere = (TextView)findViewById(R.id.txtWhere);
@@ -70,5 +78,12 @@ public class EventPageActivity extends Activity {
                 return null;
             }
         }.execute();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        onBackPressed();
+        return true;
     }
 }
