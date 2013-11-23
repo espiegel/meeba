@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.content.Intent;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
@@ -27,7 +29,7 @@ import java.util.List;
 /**
  * Created by Padi on 07/11/13.
  */
-public class DashboardActivity extends Activity {
+public class DashboardActivity extends SherlockActivity {
     private ListView mEventListView;
     private List<String> eventsItems;
     private Button mCreateEventBtn;
@@ -38,6 +40,9 @@ public class DashboardActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_activity);
+
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle("Dashboard");
 
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
           if( mCurrentUser == null ){

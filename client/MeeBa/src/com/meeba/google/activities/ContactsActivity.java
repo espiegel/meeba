@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.ContactsArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
@@ -28,7 +31,7 @@ import java.util.Map;
 /**
  * Created by or malka on 11/11/13.
  */
-public class ContactsActivity extends Activity {
+public class ContactsActivity extends SherlockActivity {
     private Button next;
     private List<User> ListOfAppContacts;
     private Cursor cursor;
@@ -44,6 +47,11 @@ public class ContactsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);
+
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle("Choose Contacts");
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
 
         mUserListView = (ListView) findViewById(R.id.appContacts);
 
@@ -213,5 +221,12 @@ public class ContactsActivity extends Activity {
             phoneList.add(s);
         }
         return phoneList;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        onBackPressed();
+        return true;
     }
 }
