@@ -61,7 +61,7 @@ public class LoginActivity extends Activity implements OnClickListener,
       private String phoneNumber;
       private String name;
       private String rid;
-      //private final  String SENDER_ID = "1023637778529"; max's old value
+     //private final  String SENDER_ID = "1023637778529"; //max's old value
       private final String SENDER_ID = "266943873561";
       private Boolean isReisteredInOurDB, isRegisteredInPhone;
       private User user;
@@ -156,7 +156,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                         progressDialog = ProgressDialog
                                 .show(LoginActivity.this, "checking if user is registered in our DB ", "wait !", true);
                         Utils.LOGD("maxagi:  onPreExecute CheckIfRegistered();");
-                        Utils.LOGD("maxagi: user= " + user);
+                        Utils.LOGD("maxagi: user before backgroundCheckIfRegistered  = " + user);
                   }
 
                   @Override
@@ -178,6 +178,9 @@ public class LoginActivity extends Activity implements OnClickListener,
                               backgroundGetRegid();
                         } else {
 
+                              //store user in phone DB
+                              DatabaseFunctions.upgradeDatabase(context);
+                              DatabaseFunctions.storeUserDetails(context, user);
                               moveToNextView();
                         }
 
