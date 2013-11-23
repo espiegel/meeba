@@ -14,6 +14,9 @@ import android.content.Intent;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
@@ -33,7 +36,6 @@ import java.util.List;
  */
 public class DashboardActivity extends SherlockActivity {
     private ListView mEventListView;
-    private List<String> eventsItems;
     private Button mCreateEventBtn;
     private User mCurrentUser;
     private List<Event> list;
@@ -44,7 +46,7 @@ public class DashboardActivity extends SherlockActivity {
         setContentView(R.layout.dashboard_activity);
 
         ActionBar ab = getSupportActionBar();
-        ab.setTitle("Dashboard");
+        ab.setTitle("Events");
 
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
           if( mCurrentUser == null ){
@@ -54,19 +56,16 @@ public class DashboardActivity extends SherlockActivity {
           }
 
         mEventListView = (ListView)findViewById(R.id.listViewDashboard);
-        mCreateEventBtn = (Button) findViewById(R.id.createEvent);
+        /*mCreateEventBtn = (Button) findViewById(R.id.createEvent);
 
         mCreateEventBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Utils.LOGD("on click");
                 //when we click on the button it will bring us to the  WhereWhenActivity activity
-                Intent i = new Intent(getApplicationContext(),
-                        WhereWhenActivity.class);
-                startActivity(i);
-
+                createEvent();
             }
-        });
+        });*/
 
         mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -134,6 +133,33 @@ public class DashboardActivity extends SherlockActivity {
         };
         task.execute();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.dashboard, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_create_event:
+                createEvent();
+                break;
+
+            default:
+                break;
+        }
+
+        return true;
+    }
+
+    private void createEvent() {
+        Intent i = new Intent(getApplicationContext(),
+                WhereWhenActivity.class);
+        startActivity(i);
     }
 
     @Override
