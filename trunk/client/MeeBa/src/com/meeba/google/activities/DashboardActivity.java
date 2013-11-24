@@ -40,6 +40,7 @@ public class DashboardActivity extends SherlockActivity {
     private User mCurrentUser;
     private List<Event> list;
     private EventArrayAdapter mEventArrayAdapter;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,59 +50,52 @@ public class DashboardActivity extends SherlockActivity {
         ab.setTitle("Events");
 
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
-          if( mCurrentUser == null ){
-                Utils.LOGD("diana : user was null !!!!!!!");
-                Toast.makeText(getApplicationContext(), "user  is null !", Toast.LENGTH_LONG).show();
-                return;
-          }
+        if (mCurrentUser == null) {
+            // We aren't registered so go back to login screen
+            Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        } else {
+            mEventListView = (ListView) findViewById(R.id.listViewDashboard);
+            mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    Event event = ((Event) mEventListView.getAdapter().getItem(position));
 
-        mEventListView = (ListView)findViewById(R.id.listViewDashboard);
-        /*mCreateEventBtn = (Button) findViewById(R.id.createEvent);
+                    if (event == null) {
+                        Utils.LOGD("event is null!");
+                        return;
+                    }
 
-        mCreateEventBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Utils.LOGD("on click");
-                //when we click on the button it will bring us to the  WhereWhenActivity activity
-                createEvent();
-            }
-        });*/
+                    int eid = event.getEid();
+                    String where = event.getWhere();
+                    String when = event.getWhen();
+                    String hostName = event.getHost_name();
 
-        mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Event event = ((Event)mEventListView.getAdapter().getItem(position));
+                    Intent intent = new Intent(DashboardActivity.this, EventPageActivity.class);
+                    Bundle extras = new Bundle();
 
-                if(event == null) {
-                    Utils.LOGD("event is null!");
-                    return;
+                    extras.putInt("eid", eid);
+                    extras.putString("where", where);
+                    extras.putString("when", when);
+                    extras.putString("hostName", hostName);
+
+                    intent.putExtras(extras);
+                    startActivity(intent);
+
                 }
-
-                int eid = event.getEid();
-                String where = event.getWhere();
-                String when = event.getWhen();
-                String hostName = event.getHost_name();
-
-                Intent intent = new Intent(DashboardActivity.this, EventPageActivity.class);
-                Bundle extras = new Bundle();
-
-                extras.putInt("eid", eid);
-                extras.putString("where",where);
-                extras.putString("when", when);
-                extras.putString("hostName", hostName);
-
-                intent.putExtras(extras);
-                startActivity(intent);
-
-            }
-        });
-        asyncRefresh();
+            });
+            asyncRefresh();
+        }
     }
 
     private void asyncRefresh() {
         final Activity dashboard = this;
         AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
             ProgressDialog progressDialog;
+
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
@@ -115,7 +109,7 @@ public class DashboardActivity extends SherlockActivity {
                 Utils.LOGD("diana:uid=" + mCurrentUser.getUid());
                 list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
 
-                if(list == null) {
+                if (list == null) {
                     return new ArrayList<Event>();
                 } else {
                     return list;
