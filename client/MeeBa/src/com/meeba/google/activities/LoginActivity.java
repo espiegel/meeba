@@ -122,6 +122,7 @@ public class LoginActivity extends Activity implements OnClickListener,
 
                   /**
                    now :
+
                    1) check if the user's google account is registered in the DB (in background) , then:
                    2)if not ,get a regid from google(in background), then:
                    3)ask his phone number, then:
