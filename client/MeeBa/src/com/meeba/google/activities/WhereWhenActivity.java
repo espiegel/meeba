@@ -1,12 +1,16 @@
 package com.meeba.google.activities;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -15,17 +19,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.util.Utils;
-
-import android.os.Handler;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -36,9 +29,6 @@ public class WhereWhenActivity extends SherlockActivity {
 
     EditText editWhere;
     EditText editWhen;
-
-    private static final int DATE_PICKER_ID = 0;
-    private static final int TIME_PICKER_ID = 1;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +55,12 @@ public class WhereWhenActivity extends SherlockActivity {
         editWhen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Calendar mcurrentTime = Calendar.getInstance();
-                int year = mcurrentTime.get(Calendar.YEAR);
-                int month = mcurrentTime.get(Calendar.MONTH);
-                int day = mcurrentTime.get(Calendar.DAY_OF_MONTH);
-                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mcurrentTime.get(Calendar.MINUTE);
+                Calendar currentTime = Calendar.getInstance();
+                int year = currentTime.get(Calendar.YEAR);
+                int month = currentTime.get(Calendar.MONTH);
+                int day = currentTime.get(Calendar.DAY_OF_MONTH);
+                int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = currentTime.get(Calendar.MINUTE);
 
                 final TimePickerDialog mTimePicker;
                 mTimePicker = new TimePickerDialog(WhereWhenActivity.this, new TimePickerDialog.OnTimeSetListener() {
