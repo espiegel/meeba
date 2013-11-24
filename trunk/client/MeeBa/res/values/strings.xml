@@ -17,6 +17,9 @@
     <string name="invitation_decline">Decline</string>
     <string name="txtInviteYourFriends">Invite your friends!</string>
     <string name="create_new_event">Create New Event</string>
+    <string name="when">When?</string>
+    <string name="where">Where?</string>
+    <string name="next">Next</string>
 
     <color name="green">#33C733</color>
     <color name="red">#C73333</color>

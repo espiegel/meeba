@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/wherewhenLayout"
-    android:onClick="onCLick">
+    android:background="@color/second_grey">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="When?"
-        android:id="@+id/whenTxt" />
+        android:orientation="vertical"
+        android:background="@drawable/card_background"
+        android:padding="10dp">
 
-    <EditText
-        android:layout_width="166dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/whenTxtUser"
-        android:layout_gravity="center_horizontal" />
+        <EditText
+            android:hint="@string/when"
+            android:textColorHint="@color/black"
+            android:layout_margin="20dp"
+            android:inputType="text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/whenTxtUser"
+            android:layout_gravity="center_horizontal"
+            android:imeOptions="actionNext"
+            android:drawableLeft="@drawable/when"
+            android:drawablePadding="5dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Where?"
-        android:id="@+id/whereTxt" />
+        <EditText
+            android:hint="@string/where"
+            android:textColorHint="@color/black"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:inputType="text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/whereTxtUser"
+            android:layout_gravity="center_horizontal"
+            android:imeOptions="actionDone"
+            android:drawableLeft="@drawable/where"
+            android:drawablePadding="5dp"/>
 
-    <EditText
-        android:layout_width="168dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/whereTxtUser"
-        android:layout_marginLeft="-2dp"
-        android:layout_gravity="center_horizontal" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next"
-        android:id="@+id/NextBtn"
-        android:layout_gravity="center_horizontal"
-        android:onClick="onClick" />
-
+    </LinearLayout>
 </LinearLayout>
