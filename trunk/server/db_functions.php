@@ -170,6 +170,35 @@ class DB_Functions {
     }
 
     /**
+    * Get an array of users by a specific event
+    */
+    public function getUsersByEvent($eid) {
+        // First get the host
+        $host = mysql_fetch_assoc(mysql_query("SELECT * FROM `users` u,`events` e WHERE e.eid = $eid AND e.host_uid = u.uid"));
+
+        $result = array();
+
+        $result['host'] = $host;
+
+        // Now lets get all the guests
+        $guest_result = mysql_query("SELECT DISTINCT uid, email, name, phone_number, rid, created_at, invite_status FROM ".
+            "`users`,`invites` WHERE `invites`.eid = $eid AND `invites`.guest_uid = `users`.uid");
+
+        $no_of_rows = mysql_num_rows($guest_result);
+        if ($no_of_rows <= 0) {
+            return false;
+        }
+
+        $i = 0;
+        while($row = mysql_fetch_assoc($guest_result)) {
+            $result['guests'][$i] = $row;
+            $i++;
+        }
+
+        return $result;
+    }
+
+    /**
     * Create an event, create and send out invitations to guests via gcm
     */
     public function createEvent($host_uid, $where, $when, $uid) {

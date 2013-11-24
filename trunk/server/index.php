@@ -201,4 +201,24 @@ $app->post('/respondToInvite', function() use ($app, $db) {
 	));
 });
 
+$app->get('/getUsersByEvent/:eid', function($eid) use ($app, $db) {
+	$users = $db->getUsersByEvent($eid);
+
+	if(!$users) {
+		echo json_encode(array(
+			'success' => 0,
+			'error' => "Failed to get users by eid=$eid",
+			'users' => null,
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'error' => null,
+			'users' => $users,
+		));
+});
+
 $app->run();
