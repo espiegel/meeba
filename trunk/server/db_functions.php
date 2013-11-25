@@ -23,8 +23,9 @@ class DB_Functions {
      * Storing new user
      * returns user details
      */
-    public function createUser($email, $name, $rid, $phone) {
-    	$result = mysql_query("INSERT INTO users(phone_number, rid, created_at, email, name) VALUES('$phone', '$rid', NOW(), '$email', '$name')");
+    public function createUser($email, $name, $rid, $phone, $picture_url) {
+    	$result = mysql_query("INSERT INTO users(phone_number, rid, created_at, email, name, picture_url) ".
+            "VALUES('$phone', '$rid', NOW(), '$email', '$name', '$picture_url')");
     	if($result) {
     		$uid = mysql_insert_id();
     		$result = mysql_query("SELECT * FROM users WHERE uid = $uid");
