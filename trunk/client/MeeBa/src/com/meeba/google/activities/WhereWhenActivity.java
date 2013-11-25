@@ -2,11 +2,13 @@ package com.meeba.google.activities;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
@@ -101,6 +103,11 @@ public class WhereWhenActivity extends SherlockActivity {
             Toast.makeText(getApplicationContext(), "You must input a location and a time", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        InputMethodManager imm = (InputMethodManager)getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editWhere.getWindowToken(), 0);
+
         //when we click on the button it will bring us to the contacts activity
         Intent i = new Intent(getApplicationContext(),
                 ContactsActivity.class);

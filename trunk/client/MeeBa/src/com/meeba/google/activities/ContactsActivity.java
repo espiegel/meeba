@@ -1,6 +1,5 @@
 package com.meeba.google.activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -71,16 +70,12 @@ public class ContactsActivity extends SherlockActivity {
                 //send details to server/dayana, kill activity
                 //when we click on this button (now that i'm checking) he will show us the user's input from the previous activity
                 // with getExtras we get the details from the previous activity
-
-
-                //show details as toast
-                //  Toast.makeText(getApplicationContext(),"when? "+bundle.getString("when")+ "  " +"where? "+bundle.getString("where"), Toast.LENGTH_SHORT).show();
-
                 mListUid = new ArrayList<String>();
 
                 mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
 
                 for(User user : mContactsAdapter.getList()) {
+                    Utils.LOGD("user= "+user.toString());
                     if(user.isSelected()) {
                         mListUid.add(String.valueOf(user.getUid()));
                     }
@@ -228,5 +223,11 @@ public class ContactsActivity extends SherlockActivity {
     {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        mContactsAdapter.onDestroy();
+        super.onDestroy();
     }
 }
