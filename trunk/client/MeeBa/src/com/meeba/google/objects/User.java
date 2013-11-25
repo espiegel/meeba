@@ -12,15 +12,15 @@ public class User {
     private String created_at;
     private int invite_status;
     private boolean selected;
+    private String picture_url;
 
-    public User(int uid, String email, String name, String phone_number, String rid, String created_at, int invite_status) {
+    public User(int uid, String email, String name, String phone_number, String rid, String created_at, String picture_url) {
         this.uid = uid;
         this.email = email;
         this.name = name;
         this.phone_number = phone_number;
         this.rid = rid;
         this.created_at = created_at;
-        this.invite_status = invite_status;
         this.selected = false;
     }
 
@@ -34,6 +34,13 @@ public class User {
         this.selected = false;
     }
 
+    public String getPicture_url() {
+        return picture_url;
+    }
+
+    public void setPicture_url(String picture_url) {
+        this.picture_url = picture_url;
+    }
 
     public int getInvite_status() {
         return invite_status;
@@ -101,7 +108,6 @@ public class User {
     }
 
 
-
     @Override
     public String toString() {
         return "User{" +
@@ -113,6 +119,7 @@ public class User {
                 ", created_at='" + created_at + '\'' +
                 ", invite_status=" + invite_status +
                 ", selected=" + selected +
+                ", picture_url='" + picture_url + '\'' +
                 '}';
     }
 }

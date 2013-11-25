@@ -48,9 +48,10 @@ public class UserFunctions {
      * @param name Name of the new user
      * @param phone Phone number of the new user
      * @param rid Registration ID of the new user (from GCM)
+     * @param pictureUrl Url of google plus picture
      * @return Returns a User object of the created user or null if user creation failed.
      */
-    public static User createUser(String email, String name, String phone, String rid) {
+    public static User createUser(String email, String name, String phone, String rid, String pictureUrl) {
         try {
             Gson lGson = new Gson();
 
@@ -60,6 +61,7 @@ public class UserFunctions {
             params.add(new BasicNameValuePair("name", name));
             params.add(new BasicNameValuePair("phone", phone));
             params.add(new BasicNameValuePair("rid", rid));
+            params.add(new BasicNameValuePair("picture_url", pictureUrl));
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "createUser", params);
 
