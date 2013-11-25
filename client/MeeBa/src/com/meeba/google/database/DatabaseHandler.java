@@ -32,6 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PHONE = "phone_number";
     private static final String KEY_RID = "rid";
     private static final String KEY_CREATED_AT = "created_at";
+    private static final String KEY_PICTURE_URL = "picture_url";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -46,7 +47,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_NAME + " TEXT,"                // 2
                 + KEY_PHONE + " TEXT,"               // 3
                 + KEY_RID + " TEXT,"                 // 4
-                + KEY_CREATED_AT + " TEXT" + ")";    // 5
+                + KEY_CREATED_AT + " TEXT,"          // 5
+                + KEY_PICTURE_URL + " TEXT" + ")";   // 6
         Utils.LOGD(CREATE_LOGIN_TABLE);
         db.execSQL(CREATE_LOGIN_TABLE);
     }
@@ -62,7 +64,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addUser(int uid, String phone, String rid, String created_at, String email, String name) {
+    public void addUser(int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -72,6 +74,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_CREATED_AT, created_at); // Created At
         values.put(KEY_EMAIL, email); // Email
         values.put(KEY_NAME, name); // uid
+        values.put(KEY_PICTURE_URL, picture_url); // uid
 
         // Inserting Row
         db.insert(TABLE_USER, null, values);
@@ -96,6 +99,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             userDetails.put(KEY_PHONE, cursor.getString(3));
             userDetails.put(KEY_RID, cursor.getString(4));
             userDetails.put(KEY_CREATED_AT, cursor.getString(5));
+            userDetails.put(KEY_PICTURE_URL, cursor.getString(6));
         }
         cursor.close();
         db.close();
@@ -105,8 +109,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         // return user
         User user = new User(Integer.valueOf(userDetails.get(KEY_UID)), userDetails.get(KEY_EMAIL),
-                userDetails.get(KEY_NAME), userDetails.get(KEY_PHONE),
-                userDetails.get(KEY_RID), userDetails.get(KEY_CREATED_AT));
+                userDetails.get(KEY_NAME), userDetails.get(KEY_PHONE), userDetails.get(KEY_RID),
+                userDetails.get(KEY_CREATED_AT), userDetails.get(KEY_PICTURE_URL));
         return user;
     }
 

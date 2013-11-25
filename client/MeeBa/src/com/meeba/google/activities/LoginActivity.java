@@ -23,6 +23,8 @@ import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallback
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
@@ -66,9 +68,10 @@ public class LoginActivity extends Activity implements OnClickListener,
       private Boolean isReisteredInOurDB, isRegisteredInPhone;
       private User user;
       private Context context;
+    private String pictureUrl;
 
 
-      @Override
+    @Override
       protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
@@ -114,6 +117,10 @@ public class LoginActivity extends Activity implements OnClickListener,
             } else {
                   Utils.LOGD("maxagi: mPlusClient.getCurrentPerson=  " + (mPlusClient.getCurrentPerson()));
                   String currentPersonName = mPlusClient.getCurrentPerson().getDisplayName();
+
+                  pictureUrl = mPlusClient.getCurrentPerson().getImage().getUrl();
+                  Utils.LOGD("pictureUrl = "+ pictureUrl);
+
                   // getString(R.string.unknown_person);
                   mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
 
@@ -288,7 +295,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                   @Override
                   protected Void doInBackground(Void... params) {
                         Utils.LOGD("maxagi:registering " + email);
-                        user = UserFunctions.createUser(email, name, phoneNumber, rid);
+                        user = UserFunctions.createUser(email, name, phoneNumber, rid, pictureUrl);
                         return null;
                   }
 

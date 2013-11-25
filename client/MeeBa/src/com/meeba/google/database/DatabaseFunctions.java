@@ -31,7 +31,7 @@ public class DatabaseFunctions {
             return;
         }
         DatabaseHandler db = getDatabase(context);
-        db.addUser(user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName());
+        db.addUser(user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName(), user.getPicture_url());
     }
 
     /**
