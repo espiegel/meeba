@@ -124,7 +124,7 @@ public class WhereWhenActivity extends SherlockActivity {
         switch (menuItem.getItemId()) {
             case R.id.action_next:
                 nextButton();
-                break;
+                return true;
 
             default:
                 break;
