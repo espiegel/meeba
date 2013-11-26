@@ -98,6 +98,8 @@ public class DashboardActivity extends SherlockActivity {
                 Utils.LOGD("doInBackground");
                 list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
 
+                  Utils.LOGD(" list =  " + list);
+
                 if (list == null) {
                     return new ArrayList<Event>();
                 } else {
@@ -158,4 +160,7 @@ public class DashboardActivity extends SherlockActivity {
                 .setNegativeButton("No", null)
                 .show();
     }
+
+
+
 }
