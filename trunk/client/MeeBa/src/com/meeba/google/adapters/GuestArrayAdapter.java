@@ -75,31 +75,7 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         Utils.LOGD("guest="+guest);
         if(!TextUtils.isEmpty(picture_url)) {
             Utils.LOGD("Changing image of pos="+position+", guest=" + holder.guestlist_name.getText());
-
-            final int pos = position;
-            mImageLoader.loadImage(picture_url, new ImageLoadingListener() {
-                ViewHolder curHolder;
-                @Override
-                public void onLoadingStarted(String s, View view) {
-                    curHolder = holder;
-                }
-
-                @Override
-                public void onLoadingFailed(String s, View view, FailReason failReason) {
-
-                }
-
-                @Override
-                public void onLoadingComplete(String s, View view, Bitmap bitmap) {
-                    Utils.LOGD("pos="+pos+", holder.position="+curHolder.position);
-                    curHolder.guestPicture.setImageBitmap(bitmap);
-                }
-
-                @Override
-                public void onLoadingCancelled(String s, View view) {
-
-                }
-            });
+            mImageLoader.displayImage(picture_url, holder.guestPicture);
         }
         return view;
     }

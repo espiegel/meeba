@@ -96,8 +96,6 @@ public class DashboardActivity extends SherlockActivity {
 
             protected List<Event> doInBackground(Void... params) {
                 Utils.LOGD("doInBackground");
-
-                Utils.LOGD("diana:uid=" + mCurrentUser.getUid());
                 list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
 
                 if (list == null) {
