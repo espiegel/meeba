@@ -275,12 +275,13 @@ class DB_Functions {
             $rids, //array($registrationId), 
             array(
                 'tag' => 'invite',
-                'where' => $event['where'],
+                'event' => $event
+                /*'where' => $event['where'],
                 'when' => $event['when'],
                 'hostName' => $host['name'],
                 'senderRid' => $host['rid'],
                 'senderUid' => $host['uid'],
-                'eid' => $event['eid']
+                'eid' => $event['eid']*/
                 )
             );
         
@@ -312,7 +313,7 @@ class DB_Functions {
         $response = $this->sendNotification(
                 $apiKey,
                 array($host_rid), //array($registrationId),
-                array('tag' => 'inviteResponse',
+                array('tag' => 'inviteResponse',                     
                       'eid' => $eid,
                       'uid' => $uid,
                       'hostUid' => $hostUid,
