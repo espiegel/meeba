@@ -30,6 +30,7 @@ public class EventPageActivity extends SherlockActivity {
     private TextView mTxtWhen;
     private ListView mListView;
     private Event mEvent;
+    private GuestArrayAdapter mGuestArrayAdapter = null;
 
     private int eid;
     private ImageView mImageHost;
@@ -62,15 +63,15 @@ public class EventPageActivity extends SherlockActivity {
 
         eid = mEvent.getEid();
 
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        mImageLoader = ImageLoader.getInstance();
+        mImageLoader.init(config);
+
         refreshHostPicture();
         refreshGuests();
     }
 
     private void refreshHostPicture() {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(EventPageActivity.this).build();
-        mImageLoader = ImageLoader.getInstance();
-        mImageLoader.init(config);
-
         refreshHostPicture = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -103,11 +104,11 @@ public class EventPageActivity extends SherlockActivity {
                     return null;
                 }
 
-                final GuestArrayAdapter adapter = new GuestArrayAdapter(EventPageActivity.this,  guestList);
+                mGuestArrayAdapter = new GuestArrayAdapter(EventPageActivity.this,  guestList);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mListView.setAdapter(adapter);
+                        mListView.setAdapter(mGuestArrayAdapter);
                     }
                 });
 
@@ -132,6 +133,7 @@ public class EventPageActivity extends SherlockActivity {
         if(mImageLoader != null) {
             mImageLoader.destroy();
         }
+
         super.onDestroy();
     }
 }
