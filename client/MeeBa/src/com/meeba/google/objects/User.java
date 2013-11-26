@@ -1,9 +1,11 @@
 package com.meeba.google.objects;
 
+import java.io.Serializable;
+
 /**
  * Created by Padi on 07/11/13.
  */
-public class User {
+public class User implements Serializable {
     private int uid;
     private String email;
     private String name;

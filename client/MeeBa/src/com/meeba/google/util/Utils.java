@@ -15,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class Utils {
 
+    public static final String BUNDLE_EVENT = "event";
     public static final boolean DEBUG = true;
     public static final String BASE_URL = "http://54.214.243.219/meeba/";
 

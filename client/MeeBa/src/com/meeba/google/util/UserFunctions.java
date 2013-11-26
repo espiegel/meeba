@@ -43,6 +43,27 @@ public class UserFunctions {
     }
 
     /**
+     * Get a user by his uid
+     * @param uid uid of the user
+     * @return Returns a User object of the user with the same uid or null if none was found.
+     */
+    public static User getUserByUid(int uid) {
+        try {
+            Gson lGson = new Gson();
+            JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getUserByUid/" + uid);
+
+            if(lJsonObject == null)
+                return null;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            return lGson.fromJson(lJsonObject.getString("user"), User.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Creates a new user
      * @param email Email of the new user
      * @param name Name of the new user

@@ -36,7 +36,6 @@ import java.util.List;
  */
 public class DashboardActivity extends SherlockActivity {
     private ListView mEventListView;
-    private Button mCreateEventBtn;
     private User mCurrentUser;
     private List<Event> list;
     private EventArrayAdapter mEventArrayAdapter;
@@ -69,18 +68,10 @@ public class DashboardActivity extends SherlockActivity {
                         return;
                     }
 
-                    int eid = event.getEid();
-                    String where = event.getWhere();
-                    String when = event.getWhen();
-                    String hostName = event.getHost_name();
-
                     Intent intent = new Intent(DashboardActivity.this, EventPageActivity.class);
                     Bundle extras = new Bundle();
 
-                    extras.putInt("eid", eid);
-                    extras.putString("where", where);
-                    extras.putString("when", when);
-                    extras.putString("hostName", hostName);
+                    extras.putSerializable(Utils.BUNDLE_EVENT, event);
 
                     intent.putExtras(extras);
                     startActivity(intent);
