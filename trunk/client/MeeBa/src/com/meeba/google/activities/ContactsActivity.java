@@ -115,7 +115,9 @@ public class ContactsActivity extends SherlockActivity {
                             extras.putSerializable(Utils.BUNDLE_EVENT, event);
 
                             i.putExtras(extras);
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(i);
+                            finish();
                         }
                     }
                 }.execute();
@@ -150,6 +152,7 @@ public class ContactsActivity extends SherlockActivity {
             protected void onPostExecute(List<User> list) {
                 if(list == null) {
                     Utils.LOGD("getUsersByPhones returned null!");
+                    progressDialog.dismiss();
                     return;
                 }
                 Utils.LOGD("onPostExecute");

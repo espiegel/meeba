@@ -1,5 +1,7 @@
 package com.meeba.google.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -63,10 +65,6 @@ public class EventPageActivity extends SherlockActivity {
 
         eid = mEvent.getEid();
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
-        mImageLoader = ImageLoader.getInstance();
-        mImageLoader.init(config);
-
         refreshHostPicture();
         refreshGuests();
     }
@@ -84,6 +82,9 @@ public class EventPageActivity extends SherlockActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(EventPageActivity.this).build();
+                        mImageLoader = ImageLoader.getInstance();
+                        mImageLoader.init(config);
                         mImageLoader.displayImage(host.getPicture_url(), mImageHost);
                     }
                 });
@@ -131,9 +132,18 @@ public class EventPageActivity extends SherlockActivity {
         }
 
         if(mImageLoader != null) {
+            mImageLoader.stop();
             mImageLoader.destroy();
         }
 
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, DashboardActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

@@ -40,6 +40,7 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
     }
 
     public void onDestroy() {
+        mImageLoader.stop();
         mImageLoader.destroy();
     }
 
