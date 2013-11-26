@@ -1,6 +1,8 @@
 package com.meeba.google.adapters;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,11 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.objects.User;
+import com.meeba.google.util.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 
 import java.util.List;
 
@@ -20,16 +27,24 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
 
     private final List<User> list;
     private final Activity context;
+    private ImageLoader mImageLoader;
 
     public GuestArrayAdapter(Activity context, List<User> list) {
         super(context, R.layout.guestlistlayout, list);
         this.context = context;
         this.list = list;
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).build();
+        mImageLoader = ImageLoader.getInstance();
+        mImageLoader.init(config);
     }
 
     static class ViewHolder {
         protected TextView guestlist_name;
         protected ImageView invite_status;
+        protected ImageView guestPicture;
+
+        protected int position;
     }
 
     @Override
@@ -41,18 +56,51 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.guestlist_name = (TextView) view.findViewById(R.id.guestlist_name);
             viewHolder.invite_status = (ImageView) view.findViewById(R.id.img_invite_status);
+            viewHolder.guestPicture = (ImageView) view.findViewById(R.id.guestPicture);
+            viewHolder.position = position;
 
             view.setTag(viewHolder);
         } else {
             view = convertView;
         }
-        ViewHolder holder = (ViewHolder) view.getTag();
+        final ViewHolder holder = (ViewHolder) view.getTag();
 
-        String name = list.get(position).getName();
-        // For now just show the name
+        User guest = list.get(position);
+        String name = guest.getName();
         holder.guestlist_name.setText(name);
+        holder.invite_status.setImageResource(getDrawable(guest.getInvite_status()));
 
-        holder.invite_status.setImageResource(getDrawable(list.get(position).getInvite_status()));
+        final String picture_url = guest.getPicture_url();
+
+        Utils.LOGD("guest="+guest);
+        if(!TextUtils.isEmpty(picture_url)) {
+            Utils.LOGD("Changing image of pos="+position+", guest=" + holder.guestlist_name.getText());
+
+            final int pos = position;
+            mImageLoader.loadImage(picture_url, new ImageLoadingListener() {
+                ViewHolder curHolder;
+                @Override
+                public void onLoadingStarted(String s, View view) {
+                    curHolder = holder;
+                }
+
+                @Override
+                public void onLoadingFailed(String s, View view, FailReason failReason) {
+
+                }
+
+                @Override
+                public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                    Utils.LOGD("pos="+pos+", holder.position="+curHolder.position);
+                    curHolder.guestPicture.setImageBitmap(bitmap);
+                }
+
+                @Override
+                public void onLoadingCancelled(String s, View view) {
+
+                }
+            });
+        }
         return view;
     }
 
@@ -69,4 +117,5 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
     public List<User> getList() {
         return list;
     }
+
 }
