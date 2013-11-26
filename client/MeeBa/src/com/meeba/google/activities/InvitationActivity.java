@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.objects.Event;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
@@ -32,6 +33,8 @@ public class InvitationActivity extends Activity {
     private String mWhen;
     private String mHostName;
 
+    private Event mEvent;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.invitation_activity);
@@ -46,17 +49,18 @@ public class InvitationActivity extends Activity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        Utils.LOGD("bundle hostName="+bundle.getString("hostName"));
-        mHostName = bundle.getString("hostName");
-        mWhere = bundle.getString("where");
-        mWhen = bundle.getString("when");
+        mEvent = (Event)bundle.getSerializable(Utils.BUNDLE_EVENT);
+        Utils.LOGD("mEvent="+mEvent);
+        mHostName = mEvent.getHost_name();
+        mWhere = mEvent.getWhere();
+        mWhen = mEvent.getWhen();
 
         mTxtHost.setText(mHostName);
         mTxtWhere.setText(mWhere);
         mTxtWhen.setText(mWhen);
+        eid = mEvent.getEid();
 
         uid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
-        eid = bundle.getInt("eid");
 
         mBtnAccept.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,12 +122,10 @@ public class InvitationActivity extends Activity {
     private void startEventPage() {
         Intent intent = new Intent(this, EventPageActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString("where", mWhere);
-        bundle.putString("when", mWhen);
-        bundle.putString("hostName", mHostName);
-        bundle.putInt("eid", eid);
+        bundle.putSerializable(Utils.BUNDLE_EVENT, mEvent);
         intent.putExtras(bundle);
         startActivity(intent);
+        finish();
     }
 
 }

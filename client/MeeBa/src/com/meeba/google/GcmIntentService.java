@@ -10,8 +10,13 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
 import com.meeba.google.activities.InvitationActivity;
+import com.meeba.google.objects.Event;
 import com.meeba.google.util.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class GcmIntentService extends IntentService {
@@ -49,18 +54,35 @@ public class GcmIntentService extends IntentService {
                 Utils.LOGD("GCM: Error sending a GCM message");
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                String tag = extras.getString("tag");
+
+
+                try {
+                    Utils.LOGD("extras="+extras.toString());
+                    String tag = extras.getString("tag");
+
+                    if(tag.equals(TAG_INVITE)) {
+                        String jsonEvent = extras.getString("event");
+                        Gson gson = new Gson();
+                        JSONObject json = new JSONObject(jsonEvent);
+
+                        Utils.LOGD(json.toString());
+                        Event event = gson.fromJson(json.toString(), Event.class);
+                        sendNotification(tag, event);
+                        Utils.LOGD("GCM: Received a message " + extras.toString());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                /*
                 String when = extras.getString("when");
                 String where = extras.getString("where");
                 String hostName = extras.getString("hostName");
 
                 Utils.LOGD("hostName="+hostName);
-                int eid = Integer.valueOf(extras.getString("eid"));
+                int eid = Integer.valueOf(extras.getString("eid"));*/
 
-                if(tag.equals(TAG_INVITE)) {
-                    sendNotification(tag, hostName, when, where, eid);
-                    Utils.LOGD("GCM: Received a message " + extras.toString());
-                }
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -70,7 +92,7 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String tag, String hostName, String when, String where, int eid) {
+    private void sendNotification(String tag, Event event) {
         if(tag.equals(TAG_INVITE)) {
             mNotificationManager = (NotificationManager)
                     this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -78,21 +100,18 @@ public class GcmIntentService extends IntentService {
             Intent intent = new Intent(this, InvitationActivity.class);
             Bundle bundle = new Bundle();
 
-            bundle.putString("hostName", hostName);
-            bundle.putString("when", when);
-            bundle.putString("where", where);
-            bundle.putInt("eid", eid);
+            bundle.putSerializable(Utils.BUNDLE_EVENT, event);
 
             intent.putExtras(bundle);
 
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     intent, 0);
 
-            String msg = where + " at " + when;
+            String msg = event.getWhere() + " at " + event.getWhen();
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(TITLE_INVITE+hostName)
+                            .setContentTitle(TITLE_INVITE+event.getHost_name())
                             .setStyle(new NotificationCompat.BigTextStyle()
                                     .bigText(msg))
                             .setContentText(msg);
