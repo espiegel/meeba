@@ -62,6 +62,24 @@ $app->get('/getUserByEmail/:email', function($email) use ($app, $db) {
 			));	
 });
 
+$app->get('/getUserByUid/:uid', function($uid) use ($app, $db) {
+	$user = $db->getUserByUid($uid);
+	if(!$user) {
+		echo json_encode(array(
+			'success' => 0,
+			'error' => "Couldn't find user with uid $uid",
+			'user' => null
+			));	
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'error' => null,
+			'user' => $user
+			));	
+});
+
 $app->post('/createUser', function() use ($app, $db) {
 	$email = $_POST['email'];
 	$name = $_POST['name'];
@@ -153,11 +171,13 @@ $app->post('/createEvent', function() use ($app, $db) {
 
 	// if the host is also invited then remove him from the guest array of uids
 	// shouldn't happen normally
-	$key = array_search($host_uid, $uid);
+
+	// We actually don't need this for debugging!
+	/*$key = array_search($host_uid, $uid);
 	if($key != false) { 
 		unset($uid[$key]);
 		$uid = array_values($uid);
-	}
+	}*/
 
 	// Create the event and send out invites
 	$event = $db->createEvent($host_uid, $where, $when, $uid);

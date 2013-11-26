@@ -182,7 +182,7 @@ class DB_Functions {
         $result['host'] = $host;
 
         // Now lets get all the guests
-        $guest_result = mysql_query("SELECT DISTINCT uid, email, name, phone_number, rid, created_at, invite_status FROM ".
+        $guest_result = mysql_query("SELECT DISTINCT uid, email, name, phone_number, rid, created_at, invite_status, picture_url FROM ".
             "`users`,`invites` WHERE `invites`.eid = $eid AND `invites`.guest_uid = `users`.uid");
 
         $no_of_rows = mysql_num_rows($guest_result);
