@@ -57,21 +57,21 @@ public class LoginActivity extends Activity implements OnClickListener,
 
       private ConnectionResult mConnectionResult;
       private TextView mSignInStatus;
-
+      ProgressDialog signingInProgressBar;
 
       private String email;
       private String phoneNumber;
       private String name;
       private String rid;
-     //private final  String SENDER_ID = "1023637778529"; //max's old value
+      //private final  String SENDER_ID = "1023637778529"; //max's old value
       private final String SENDER_ID = "266943873561";
       private Boolean isReisteredInOurDB, isRegisteredInPhone;
       private User user;
       private Context context;
-    private String pictureUrl;
+      private String pictureUrl;
 
 
-    @Override
+      @Override
       protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
@@ -81,7 +81,6 @@ public class LoginActivity extends Activity implements OnClickListener,
 
             Utils.LOGD("maxagi: mPlusClient = :" + mPlusClient);
 
-
             SignInButton mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
             mSignInButton.setOnClickListener(this);
             mSignInStatus = (TextView) findViewById(R.id.tvSignInStatus);
@@ -89,25 +88,22 @@ public class LoginActivity extends Activity implements OnClickListener,
             mSignOutButton.setOnClickListener(this);
             View mRevokeAccessButton = findViewById(R.id.revoke_access_button);
             mRevokeAccessButton.setOnClickListener(this);
+            context = getApplicationContext();
 
         /*check if google play services are available*/
             checkPlayServices();
 
-            context = getApplicationContext();
             Utils.LOGD("maxagi: onCreate finished");
-      }
 
+      }
 
       @Override
       public void onConnected(Bundle connectionHint) {
+
             Utils.LOGD("maxagi: onConnected started");
             Utils.LOGD("maxagi:mPlusClient in onConnected is =" + mPlusClient);
 
-            //other wise user can click sign in while sing in is in progress
-
-
         /* greet the user */
-
 
             if (mPlusClient.getCurrentPerson() == null) {
                   Utils.LOGD("maxagi: mPlusClient.getCurrentPerson is null ");
@@ -119,9 +115,8 @@ public class LoginActivity extends Activity implements OnClickListener,
                   String currentPersonName = mPlusClient.getCurrentPerson().getDisplayName();
 
                   pictureUrl = mPlusClient.getCurrentPerson().getImage().getUrl();
-                  Utils.LOGD("pictureUrl = "+ pictureUrl);
+                  Utils.LOGD("pictureUrl = " + pictureUrl);
 
-                  // getString(R.string.unknown_person);
                   mSignInStatus.setText(getString(R.string.signed_in_status, currentPersonName));
 
                   email = mPlusClient.getAccountName();
@@ -129,15 +124,9 @@ public class LoginActivity extends Activity implements OnClickListener,
 
                   /**
                    now :
-
-                   1) check if the user's google account is registered in the DB (in background) , then:
-                   2)if not ,get a regid from google(in background), then:
-                   3)ask his phone number, then:
-                   4) register him(in background)
+                   check if the user's google account is registered in the phone  DB , if yes , move to DashBoard
+                   if not  check (in background)  if his registed in our DB and register him if he isn't  and store user in phone DB.
                    **/
-
-                  /** this method starts the above chain of events  **/
-
 
                   isRegisteredInPhone = checkIfRegisteredInPhone();
                   if (isRegisteredInPhone) {
@@ -145,9 +134,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                   } else {
                         backgroundCheckIfRegistered();
                   }
-
             }
-
       }
 
       /**
@@ -156,13 +143,13 @@ public class LoginActivity extends Activity implements OnClickListener,
       private void backgroundCheckIfRegistered() {
             Utils.LOGD("maxagi: in backgroundCheckIfRegistered()");
             new AsyncTask<Void, Void, Void>() {
-                  ProgressDialog progressDialog;
+                  //  ProgressDialog progressDialog;
 
                   @Override
                   protected void onPreExecute() {
                         super.onPreExecute();
-                        progressDialog = ProgressDialog
-                                .show(LoginActivity.this, "checking if user is registered in our DB ", "wait !", true);
+                        //     progressDialog = ProgressDialog
+                        //        .show(LoginActivity.this, "checking if user is registered in our DB ", "wait !", true);
                         Utils.LOGD("maxagi:  onPreExecute CheckIfRegistered();");
                         Utils.LOGD("maxagi: user before backgroundCheckIfRegistered  = " + user);
                   }
@@ -180,12 +167,11 @@ public class LoginActivity extends Activity implements OnClickListener,
                   protected void onPostExecute(Void v) {
                         Utils.LOGD("maxagi: in background CheckIfRegistered();onPostExecute");
                         super.onPostExecute(v);
-                        progressDialog.dismiss();
+                        //         progressDialog.dismiss();
 
                         if (!isReisteredInOurDB) {
                               backgroundGetRegid();
                         } else {
-
                               //store user in phone DB
                               DatabaseFunctions.upgradeDatabase(context);
                               DatabaseFunctions.storeUserDetails(context, user);
@@ -204,15 +190,15 @@ public class LoginActivity extends Activity implements OnClickListener,
             final Context context = getApplicationContext();
             Utils.LOGD("maxagi: in backgroundGetRegid();");
             new AsyncTask<Void, Void, Object>() {
-                  ProgressDialog progressDialog;
+                  //ProgressDialog progressDialog;
 
                   @Override
                   protected void onPreExecute() {
                         Utils.LOGD("maxagi: in backgroundGetRegid();onPreExecute");
                         super.onPreExecute();
                         gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-                        progressDialog = ProgressDialog
-                                .show(LoginActivity.this, "getting  regID from google", "wait!", true);
+                        // progressDialog = ProgressDialog
+                        // .show(LoginActivity.this, "getting  regID from google", "wait!", true);
                   }
 
                   @Override
@@ -237,7 +223,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                               return;
                         }
                         Utils.LOGD("maxagi: in backgroundGetRegid();onPostExecute");
-                        progressDialog.dismiss();
+                        //  progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), rid, Toast.LENGTH_LONG).show();
                         askUserPhoneNumber();
                   }
@@ -321,7 +307,6 @@ public class LoginActivity extends Activity implements OnClickListener,
 
       @Override
       public void onClick(View view) {
-            Utils.LOGD("maxagi: onClick");
             Utils.LOGD("maxagi: onClick - View = " + view);
             Utils.LOGD("maxagi: FIRST mConnectionResult=" + mConnectionResult);
 
@@ -331,17 +316,14 @@ public class LoginActivity extends Activity implements OnClickListener,
                         Utils.LOGD("maxagi: onClick - mPlusClient is connected");
                         Toast.makeText(this, "you are already signed in!", Toast.LENGTH_LONG).show();
                   } else {
-
                         try {
                               Utils.LOGD("maxagi: mConnectionResult before trying to connect = " + mConnectionResult);
-                              Utils.LOGD("maxagi: trying to connect ");
-
-
                               if (mConnectionResult == null) {
                                     Toast.makeText(this, "can't connect\n you sure you have internet access?", Toast.LENGTH_LONG).show();
                                     return;
                               }
-
+                              signingInProgressBar = ProgressDialog.show(this, "signing in ...", "please wait ", true);
+                              //this method return immediately but works on background
                               mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
                               Utils.LOGD("maxagi: mConnectionResult AFTER  trying to connect = " + mConnectionResult);
 
@@ -352,7 +334,6 @@ public class LoginActivity extends Activity implements OnClickListener,
                               Utils.LOGD("maxagi:trying to connect again");
                         }
                   }
-
             } else if (view.getId() == R.id.sign_out_button) {
                   signoutAndDisconnect();
 
@@ -363,27 +344,28 @@ public class LoginActivity extends Activity implements OnClickListener,
             }
       }
 
-
       @Override
       public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
             Utils.LOGD("maxagi:onActivityResult : resultCode = " + resultCode);
             Utils.LOGD("maxagi:onActivityResult : mPlusClient.isConnected = " + mPlusClient.isConnected());
             Utils.LOGD("maxagi:onActivityResult :mPlusClient.isConnecting = " + mPlusClient.isConnecting());
-
             if (requestCode == REQUEST_CODE_SIGN_IN
                     || requestCode == REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES) {
 
                   if (resultCode == RESULT_OK && !mPlusClient.isConnected()
                           && !mPlusClient.isConnecting()) {
+
                         // This time, connect should succeed.
                         mPlusClient.connect();
+
+                        Utils.LOGD("maxagi: mConnectionResult AFTER  trying to connect = " + mConnectionResult);
                   }
             }
       }
 
       @Override
       public void onAccessRevoked(ConnectionResult status) {
+            Utils.LOGD("maxagi: onAccessRevoked ");
             if (status.isSuccess()) {
                   mSignInStatus.setText("access revoked");
             } else {
@@ -415,9 +397,12 @@ public class LoginActivity extends Activity implements OnClickListener,
 
       @Override
       public void onConnectionFailed(ConnectionResult result) {
+            if (signingInProgressBar != null) {
+                  signingInProgressBar.dismiss();
+            }
+
             Utils.LOGD("maxagi:onConnectionFailed ; result = " + result);
-            // Save the intent so that we can start an activity when the user clicks
-            // the sign-in button.
+            // Save the intent so that we can start an activity when the user clicks the sign-in button.
             mConnectionResult = result;
 
             if (mConnectionResult.getErrorCode() == ConnectionResult.INTERNAL_ERROR) {
@@ -440,7 +425,6 @@ public class LoginActivity extends Activity implements OnClickListener,
       }
 
       private boolean checkPlayServices() {
-
             int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
             if (resultCode != ConnectionResult.SUCCESS) {
                   if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
@@ -456,15 +440,15 @@ public class LoginActivity extends Activity implements OnClickListener,
       }
 
       private void moveToNextView() {
-
             Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
             Bundle bundle = new Bundle();
-
             /** pass the uid to the DashboardActivity **/
             bundle.putInt("uid", user.getUid());
             i.putExtras(bundle);
-           startActivity(i);
-
+            if (signingInProgressBar != null) {
+                  signingInProgressBar.dismiss();
+            }
+            startActivity(i);
       }
 
       private void signoutAndDisconnect() {
