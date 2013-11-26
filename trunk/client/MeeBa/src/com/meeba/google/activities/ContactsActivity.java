@@ -111,10 +111,9 @@ public class ContactsActivity extends SherlockActivity {
                             Utils.showToast(ContactsActivity.this, "Created event successfully!");
                             Intent i = new Intent(ContactsActivity.this, EventPageActivity.class);
                             Bundle extras = new Bundle();
-                            extras.putInt("eid", event.getEid());
-                            extras.putString("hostName", event.getHost_name());
-                            extras.putString("where", event.getWhere());
-                            extras.putString("when", event.getWhen());
+
+                            extras.putSerializable(Utils.BUNDLE_EVENT, event);
+
                             i.putExtras(extras);
                             startActivity(i);
                         }

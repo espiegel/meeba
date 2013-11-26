@@ -1,9 +1,11 @@
 package com.meeba.google.objects;
 
+import java.io.Serializable;
+
 /**
  * Created by Eidan on 11/8/13.
  */
-public class Event {
+public class Event implements Serializable {
     private int eid;
     private int host_uid;
     private String host_name;

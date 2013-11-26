@@ -1,9 +1,9 @@
 package com.meeba.google.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -12,9 +12,12 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
+import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.List;
 
@@ -26,8 +29,12 @@ public class EventPageActivity extends SherlockActivity {
     private TextView mTxtWhere;
     private TextView mTxtWhen;
     private ListView mListView;
+    private Event mEvent;
 
     private int eid;
+    private ImageView mImageHost;
+    private AsyncTask<Void, Void, Void> refreshHostPicture = null;
+    private ImageLoader mImageLoader;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,18 +49,47 @@ public class EventPageActivity extends SherlockActivity {
         mTxtWhere = (TextView)findViewById(R.id.txtWhere);
         mTxtWhen = (TextView)findViewById(R.id.txtWhen);
         mListView = (ListView)findViewById(R.id.listGuests);
+        mImageHost = (ImageView)findViewById(R.id.hostPicture);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        Utils.LOGD("bundle hostName=" + bundle.getString("hostName"));
-        mTxtHost.setText(bundle.getString("hostName"));
-        mTxtWhere.setText(bundle.getString("where"));
-        mTxtWhen.setText(bundle.getString("when"));
+        mEvent = (Event)bundle.getSerializable(Utils.BUNDLE_EVENT);
+        Utils.LOGD("bundle event=" + mEvent);
+        mTxtHost.setText(mEvent.getHost_name());
+        mTxtWhere.setText(mEvent.getWhere());
+        mTxtWhen.setText(mEvent.getWhen());
 
-        eid = bundle.getInt("eid");
+        eid = mEvent.getEid();
 
+        refreshHostPicture();
         refreshGuests();
+    }
+
+    private void refreshHostPicture() {
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(EventPageActivity.this).build();
+        mImageLoader = ImageLoader.getInstance();
+        mImageLoader.init(config);
+
+        refreshHostPicture = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                final User host = UserFunctions.getUserByUid(mEvent.getHost_uid());
+
+                if(host == null) {
+                    return null;
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mImageLoader.displayImage(host.getPicture_url(), mImageHost);
+                    }
+                });
+                return null;
+            }
+        };
+        refreshHostPicture.execute();
     }
 
     private void refreshGuests() {
@@ -85,5 +121,17 @@ public class EventPageActivity extends SherlockActivity {
     {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(refreshHostPicture != null) {
+            refreshHostPicture.cancel(true);
+        }
+
+        if(mImageLoader != null) {
+            mImageLoader.destroy();
+        }
+        super.onDestroy();
     }
 }
