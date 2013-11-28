@@ -276,12 +276,6 @@ class DB_Functions {
             array(
                 'tag' => 'invite',
                 'event' => $event
-                /*'where' => $event['where'],
-                'when' => $event['when'],
-                'hostName' => $host['name'],
-                'senderRid' => $host['rid'],
-                'senderUid' => $host['uid'],
-                'eid' => $event['eid']*/
                 )
             );
         
@@ -314,14 +308,9 @@ class DB_Functions {
                 $apiKey,
                 array($host_rid), //array($registrationId),
                 array('tag' => 'inviteResponse',                     
-                      'eid' => $eid,
-                      'uid' => $uid,
-                      'hostUid' => $hostUid,
-                      'guestName' => $guest['name'],
-                      'when' => $when,
-                      'where' => $where,
-                      'hostName' => $host['name'],
-                      'status' => $status,
+                      'event' => $event,
+                      'user' => $guest,
+                      'status' => $status
                       )
                 ); 
 
