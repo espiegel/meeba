@@ -7,13 +7,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.plus.model.people.Person;
 import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.w3c.dom.Text;
 
@@ -34,6 +39,9 @@ public class InvitationActivity extends Activity {
     private String mHostName;
 
     private Event mEvent;
+    private AsyncTask<Void, Void, Void> refreshHostPicture;
+    private ImageLoader mImageLoader;
+    private ImageView mImageHost;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +50,7 @@ public class InvitationActivity extends Activity {
         mTxtHost = (TextView)findViewById(R.id.txtHost);
         mTxtWhere = (TextView)findViewById(R.id.txtWhere);
         mTxtWhen = (TextView)findViewById(R.id.txtWhen);
+        mImageHost = (ImageView)findViewById(R.id.hostPicture);
 
         mBtnAccept = (Button)findViewById(R.id.btnAccept);
         mBtnDecline = (Button)findViewById(R.id.btnDecline);
@@ -117,6 +126,33 @@ public class InvitationActivity extends Activity {
                 }.execute();
             }
         });
+
+        refreshHostPicture();
+    }
+
+    private void refreshHostPicture() {
+        refreshHostPicture = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                final User host = UserFunctions.getUserByUid(mEvent.getHost_uid());
+
+                if(host == null) {
+                    return null;
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(InvitationActivity.this).build();
+                        mImageLoader = ImageLoader.getInstance();
+                        mImageLoader.init(config);
+                        mImageLoader.displayImage(host.getPicture_url(), mImageHost);
+                    }
+                });
+                return null;
+            }
+        };
+        refreshHostPicture.execute();
     }
 
     private void startEventPage() {
@@ -126,6 +162,20 @@ public class InvitationActivity extends Activity {
         intent.putExtras(bundle);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(refreshHostPicture != null) {
+            refreshHostPicture.cancel(true);
+        }
+
+        if(mImageLoader != null) {
+            mImageLoader.stop();
+            mImageLoader.destroy();
+        }
+
+        super.onDestroy();
     }
 
 }
