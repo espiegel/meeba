@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.meeba.google.R;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -34,7 +36,12 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         this.context = context;
         this.list = list;
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).build();
+        DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder().cacheInMemory(true).build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).denyCacheImageMultipleSizesInMemory()
+                .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
+                .memoryCacheSize(2 * 1024 * 1024)
+                .defaultDisplayImageOptions(mDisplayImageOptions)
+                .build();
         mImageLoader = ImageLoader.getInstance();
         mImageLoader.init(config);
     }
@@ -62,6 +69,7 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
             view.setTag(viewHolder);
         } else {
             view = convertView;
+            return view;
         }
         final ViewHolder holder = (ViewHolder) view.getTag();
 
