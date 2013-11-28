@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.plus.model.people.Person;
 import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
@@ -19,8 +18,6 @@ import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by Eidan on 11/19/13.
