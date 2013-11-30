@@ -29,7 +29,7 @@ public class DatabaseFunctions {
             return;
         }
         DatabaseHandler db = getDatabase(context);
-        db.addUser(user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName(), user.getPicture_url());
+        db.addUser_LoginTable(user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName(), user.getPicture_url());
     }
 
     /**
@@ -43,7 +43,7 @@ public class DatabaseFunctions {
                 return null ;
           }
 
-        return db.getUserDetails();
+        return db.getUserDetails_LoginTable();
     }
 
     public static void upgradeDatabase(Context context) {
