@@ -32,6 +32,8 @@ public class WhereWhenActivity extends SherlockActivity {
     EditText editWhere;
     EditText editWhen;
 
+    private String mDate = "";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.where_when_activity);
@@ -74,8 +76,7 @@ public class WhereWhenActivity extends SherlockActivity {
                         } else {
                             minutes = String.valueOf(selectedMinute);
                         }
-                        String date = editWhen.getText().toString();
-                        editWhen.setText(selectedHour + ":" + minutes + " " + date);
+                        editWhen.setText(selectedHour + ":" + minutes + " " + mDate);
                         editWhere.requestFocus();
                     }
                 }, hour, minute, true);//Yes 24 hour time
@@ -86,7 +87,8 @@ public class WhereWhenActivity extends SherlockActivity {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                         editWhen.setText("");
-                        editWhen.setText(day + "/" + (month+1) + "/" + year);
+                        mDate = day + "/" + (month+1) + "/" + year;
+                        editWhen.setText(mDate);
                         mTimePicker.show();
                     }
                 }, year, month, day);

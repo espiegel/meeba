@@ -103,6 +103,7 @@ public class GcmIntentService extends IntentService {
             bundle.putSerializable(Utils.BUNDLE_EVENT, event);
 
             intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     intent, 0);

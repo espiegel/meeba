@@ -129,10 +129,10 @@ public class EventPageActivity extends SherlockActivity {
             refreshHostPicture.cancel(true);
         }
 
-        if(mImageLoader != null) {
+        /*if(mImageLoader != null) {
             mImageLoader.stop();
             mImageLoader.destroy();
-        }
+        }*/
 
         super.onDestroy();
     }

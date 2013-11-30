@@ -195,7 +195,7 @@ public class ContactsActivity extends SherlockActivity {
                     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
                     // Filter out all the "-"'s and "*"'s from the phone number
-                    phoneNumber = phoneNumber.replaceAll("-","").replaceAll("\\*","");
+                    phoneNumber = phoneNumber.replaceAll("\\+972","05").replaceAll(" ", "").replaceAll("-","").replaceAll("\\*","").replaceAll("[)(]]","");
 
                     phonesMap.put(phoneNumber, contact);
                 }
@@ -229,7 +229,9 @@ public class ContactsActivity extends SherlockActivity {
 
     @Override
     protected void onDestroy() {
-        mContactsAdapter.onDestroy();
+        if(mContactsAdapter != null) {
+            mContactsAdapter.onDestroy();
+        }
         super.onDestroy();
     }
 }
