@@ -5,6 +5,7 @@ import android.content.Context;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,14 +20,20 @@ public class DatabaseFunctions {
             return db;
       }
 
-      public static void storeContacts(Context context, List<User> users) {
+      public static void storeContacts(Context context,  List<User> users) {
             for (User user : users) {
 
                   Utils.LOGD("maxagi: storing user in database +" + user  );
                   storeUserDetails(context, user, DatabaseHandler.TABLE_CONTACTS);
             }
-
       }
+
+      public static List<User> loadContacts(Context context) {
+            DatabaseHandler db = getDatabase(context);
+            List<User> users = db.getContacts();
+            return users;
+            }
+
       /**
        * Use this only once on login
        *
@@ -52,6 +59,7 @@ public class DatabaseFunctions {
       public static User getUserDetails(Context context, String tableName) {
             DatabaseHandler db = getDatabase(context);
             if (!userIsStored(context, tableName)) {
+                  Utils.LOGD(" getUserDetails error : user is not stored ! ");
                   return null;
             }
 
@@ -70,9 +78,10 @@ public class DatabaseFunctions {
       private static boolean userIsStored(Context context, String tableName) {
             if (tableName.equals(DatabaseHandler.TABLE_USER))
                   return (getDatabase(context).getRowCount(DatabaseHandler.TABLE_USER) > 0);
+
             else if (tableName.equals(DatabaseHandler.TABLE_CONTACTS))
                   return (getDatabase(context).getRowCount(DatabaseHandler.TABLE_CONTACTS) > 0);
-            else return false;
+            else   return false;
       }
 
 }

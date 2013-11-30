@@ -157,10 +157,11 @@ public class LoginActivity extends Activity implements OnClickListener,
                   protected Void doInBackground(Void... params) {
                         Utils.LOGD("maxagi: in backgroundCheckIfRegistered();doInBackground");
                         user = UserFunctions.getUserByEmail(email);
-                        Utils.LOGD("maxagi: user retrieved from phone DB= " + user);
+                        Utils.LOGD("maxagi: user retrieved from network DB= " + user);
                         isReisteredInOurDB = (user != null);
                         return null;
                   }
+
 
                   @Override
                   protected void onPostExecute(Void v) {
@@ -174,6 +175,10 @@ public class LoginActivity extends Activity implements OnClickListener,
                               //store user in phone DB
                               DatabaseFunctions.upgradeDatabase(context);
                               DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
+
+                              Utils.LOGD("maxagi:storring in phone DB user = " + user);
+                              User debug = DatabaseFunctions.getUserDetails( getApplicationContext() ,  DatabaseHandler.TABLE_USER);
+                              Utils.LOGD("maxagi: user stored in phone DB = " + debug);
                               moveToNextView();
                         }
 
@@ -449,7 +454,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             if (signingInProgressBar != null) {
                   signingInProgressBar.dismiss();
             }
-            //startActivity(i);
+            startActivity(i);
       }
 
       private void signoutAndDisconnect() {

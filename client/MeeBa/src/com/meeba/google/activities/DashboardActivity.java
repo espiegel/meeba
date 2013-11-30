@@ -44,6 +44,7 @@ public class DashboardActivity extends SherlockActivity {
 
       @Override
       public void onCreate(Bundle savedInstanceState) {
+            Utils.LOGD( "Dashboard activity started  " );
             super.onCreate(savedInstanceState);
             setContentView(R.layout.dashboard_activity);
 

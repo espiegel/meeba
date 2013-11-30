@@ -9,7 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Eidan on 11/16/13.
@@ -85,7 +87,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
        */
       public void addUser(String tableName, int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
             SQLiteDatabase db = this.getWritableDatabase();
-
             ContentValues values = new ContentValues();
             values.put(KEY_UID, uid); // uid
             values.put(KEY_PHONE, phone); // phone
@@ -99,8 +100,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.insert(tableName, null, values);
             db.close(); // Closing database connection
       }
-
-
 
       /**
        * Getting user data from  Login database
@@ -135,6 +134,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return user;
       }
 
+      public List< User> getContacts() {
+            List< User> contacts = new ArrayList<User>();
+            HashMap<String, String> contactDetails = new HashMap<String, String>();
+            String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
+
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            // Move to first row
+
+            cursor.moveToFirst();
+            for (int i = 0; i < cursor.getCount(); i++) {
+                  if (cursor.getCount() > 0) {
+                        contactDetails.put(KEY_UID, cursor.getString(0));
+                        contactDetails.put(KEY_EMAIL, cursor.getString(1));
+                        contactDetails.put(KEY_NAME, cursor.getString(2));
+                        contactDetails.put(KEY_PHONE, cursor.getString(3));
+                        contactDetails.put(KEY_RID, cursor.getString(4));
+                        contactDetails.put(KEY_CREATED_AT, cursor.getString(5));
+                        contactDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+
+                        User contact = new User(Integer.valueOf(contactDetails.get(KEY_UID)), contactDetails.get(KEY_EMAIL),
+                                contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
+                                contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
+
+                        contacts.add(contact);
+
+                  }
+                  cursor.moveToNext();
+            }
+
+            cursor.close();
+            db.close();
+
+            for (String s : contactDetails.values()) {
+                  Utils.LOGD("maxagi : " + s);
+            }
+
+            return contacts;
+      }
+
       /**
        * Re crate database
        * Delete all tables and create them again
@@ -153,9 +192,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                   db.delete(TABLE_CONTACTS, null, null);
 
             db.close();
-
       }
-
       /**
        * @param tableName
        * @return true iff the table exists
@@ -187,7 +224,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
        * @param tableName table to check
        */
       public int getRowCount(String tableName) {
-            if (!tableName.equals(TABLE_USER)   || !tableName.equals(TABLE_CONTACTS)      )
+            if (!tableName.equals(TABLE_USER)   &&  !tableName.equals(TABLE_CONTACTS)      )
                   return -1;
 
             String countQuery = "SELECT  * FROM " + tableName;
