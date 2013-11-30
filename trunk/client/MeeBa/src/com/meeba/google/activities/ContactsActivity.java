@@ -162,6 +162,8 @@ public class ContactsActivity extends SherlockActivity {
                 for(User u : list) {
                     Utils.LOGD(u.toString());
                 }
+
+                DatabaseFunctions.storeContacts(getApplicationContext() ,list);
                 mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, list);
                 mUserListView.setAdapter(mContactsAdapter);
                 progressDialog.dismiss();
