@@ -18,6 +18,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.database.DatabaseHandler;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
@@ -49,7 +50,7 @@ public class DashboardActivity extends SherlockActivity {
             ActionBar ab = getSupportActionBar();
             ab.setTitle("Events");
 
-            mCurrentUser = DatabaseFunctions.getUserDetails_LoginTable(getApplicationContext());
+            mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext() , DatabaseHandler.TABLE_USER );
             if (mCurrentUser == null) {
                   // We aren't registered so go back to login screen
                   Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);

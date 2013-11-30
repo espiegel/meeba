@@ -16,6 +16,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.ContactsArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.database.DatabaseHandler;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
@@ -61,7 +62,7 @@ public class ContactsActivity extends SherlockActivity {
         mWhen = bundle.getString("when");
         mWhere = bundle.getString("where");
 
-        mHostUid = DatabaseFunctions.getUserDetails_LoginTable(getApplicationContext()).getUid();
+        mHostUid = DatabaseFunctions.getUserDetails (getApplicationContext()  , DatabaseHandler.TABLE_USER).getUid();
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
