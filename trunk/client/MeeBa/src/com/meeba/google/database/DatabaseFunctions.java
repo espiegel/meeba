@@ -19,23 +19,14 @@ public class DatabaseFunctions {
             return db;
       }
 
-
-
-
-
       public static void storeContacts(Context context, List<User> users) {
+            for (User user : users) {
 
-            for (User user : users ){
-
-                  storeUserDetails( context,user , DatabaseHandler.TABLE_CONTACTS  );
+                  Utils.LOGD("maxagi: storing user in database +" + user  );
+                  storeUserDetails(context, user, DatabaseHandler.TABLE_CONTACTS);
             }
 
       }
-
-
-
-
-
       /**
        * Use this only once on login
        *
@@ -49,7 +40,7 @@ public class DatabaseFunctions {
                   return;
             }
             DatabaseHandler db = getDatabase(context);
-            db.addUser( DatabaseHandler.TABLE_USER,user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName(), user.getPicture_url());
+            db.addUser(DatabaseHandler.TABLE_USER, user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName(), user.getPicture_url());
       }
 
       /**
@@ -64,22 +55,17 @@ public class DatabaseFunctions {
                   return null;
             }
 
-            return db.getUserDetails_LoginTable();
+            return db.getUserDetails(tableName);
       }
 
       public static void upgradeDatabase(Context context) {
             DatabaseHandler db = getDatabase(context);
-
-
             db.onUpgrade(db.getWritableDatabase(), 1, 1);
-
-
       }
 
       public static void resetTables(Context context) {
             getDatabase(context).resetTables();
       }
-
 
       private static boolean userIsStored(Context context, String tableName) {
             if (tableName.equals(DatabaseHandler.TABLE_USER))
@@ -88,6 +74,5 @@ public class DatabaseFunctions {
                   return (getDatabase(context).getRowCount(DatabaseHandler.TABLE_CONTACTS) > 0);
             else return false;
       }
-
 
 }
