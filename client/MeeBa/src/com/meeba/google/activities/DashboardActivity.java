@@ -34,133 +34,138 @@ import java.util.List;
 /**
  * Created by Padi on 07/11/13.
  */
+
+
 public class DashboardActivity extends SherlockActivity {
-    private ListView mEventListView;
-    private User mCurrentUser;
-    private List<Event> list;
-    private EventArrayAdapter mEventArrayAdapter;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.dashboard_activity);
 
-        ActionBar ab = getSupportActionBar();
-        ab.setTitle("Events");
+      private ListView mEventListView;
+      private User mCurrentUser;
+      private List<Event> list;
+      private EventArrayAdapter mEventArrayAdapter;
 
-        mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
-        if (mCurrentUser == null) {
-            // We aren't registered so go back to login screen
-            Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        } else {
-            mEventListView = (ListView) findViewById(R.id.listViewDashboard);
-            mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    Event event = ((Event) mEventListView.getAdapter().getItem(position));
+      @Override
+      public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.dashboard_activity);
 
-                    if (event == null) {
-                        Utils.LOGD("event is null!");
-                        return;
-                    }
+            ActionBar ab = getSupportActionBar();
+            ab.setTitle("Events");
 
-                    Intent intent = new Intent(DashboardActivity.this, EventPageActivity.class);
-                    Bundle extras = new Bundle();
+            mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
+            if (mCurrentUser == null) {
+                  // We aren't registered so go back to login screen
+                  Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
+                  intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                  startActivity(intent);
+                  finish();
+                  return;
+            } else {
+                  mEventListView = (ListView) findViewById(R.id.listViewDashboard);
+                  mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                              Event event = ((Event) mEventListView.getAdapter().getItem(position));
 
-                    extras.putSerializable(Utils.BUNDLE_EVENT, event);
+                              if (event == null) {
+                                    Utils.LOGD("event is null!");
+                                    return;
+                              }
 
-                    intent.putExtras(extras);
-                    startActivity(intent);
+                              Intent intent = new Intent(DashboardActivity.this, EventPageActivity.class);
+                              Bundle extras = new Bundle();
 
-                }
-            });
-            asyncRefresh();
-        }
-    }
+                              extras.putSerializable(Utils.BUNDLE_EVENT, event);
 
-    private void asyncRefresh() {
-        final Activity dashboard = this;
-        AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
-            ProgressDialog progressDialog;
+                              intent.putExtras(extras);
+                              startActivity(intent);
 
-            protected void onPreExecute() {
-                Utils.LOGD("onPreExecute");
-                super.onPreExecute();
-                progressDialog = ProgressDialog
-                        .show(DashboardActivity.this, "Getting your events ", "please wait !", true);
+                        }
+                  });
+
+
+                        asyncRefresh();
+            }
+      }
+
+      private void asyncRefresh() {
+            final Activity dashboard = this;
+            AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
+                  ProgressDialog progressDialog;
+
+                  protected void onPreExecute() {
+                        Utils.LOGD("onPreExecute");
+                        super.onPreExecute();
+                        progressDialog = ProgressDialog
+                                .show(DashboardActivity.this, "Getting your events ", "please wait !", true);
+                  }
+
+                  protected List<Event> doInBackground(Void... params) {
+                        Utils.LOGD("doInBackground");
+                        list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
+
+                        Utils.LOGD(" list =  " + list);
+
+                        if (list == null) {
+                              return new ArrayList<Event>();
+                        } else {
+                              return list;
+                        }
+                  }
+
+                  protected void onPostExecute(List<Event> events) {
+                        Utils.LOGD("onPostExecute");
+
+                        // update the event list view
+                        mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
+                        mEventListView.setAdapter(mEventArrayAdapter);
+                        progressDialog.dismiss();
+                  }
+            };
+            task.execute();
+
+      }
+
+      @Override
+      public boolean onCreateOptionsMenu(Menu menu) {
+            MenuInflater inflater = getSupportMenuInflater();
+            inflater.inflate(R.menu.dashboard, menu);
+            return true;
+      }
+
+      @Override
+      public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                  case R.id.action_create_event:
+                        createEvent();
+                        break;
+
+                  default:
+                        break;
             }
 
-            protected List<Event> doInBackground(Void... params) {
-                Utils.LOGD("doInBackground");
-                list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
+            return true;
+      }
 
-                  Utils.LOGD(" list =  " + list);
+      private void createEvent() {
+            Intent i = new Intent(getApplicationContext(),
+                    WhereWhenActivity.class);
+            startActivity(i);
+      }
 
-                if (list == null) {
-                    return new ArrayList<Event>();
-                } else {
-                    return list;
-                }
-            }
-
-            protected void onPostExecute(List<Event> events) {
-                Utils.LOGD("onPostExecute");
-
-                // update the event list view
-                mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
-                mEventListView.setAdapter(mEventArrayAdapter);
-                progressDialog.dismiss();
-            }
-        };
-        task.execute();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.dashboard, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_create_event:
-                createEvent();
-                break;
-
-            default:
-                break;
-        }
-
-        return true;
-    }
-
-    private void createEvent() {
-        Intent i = new Intent(getApplicationContext(),
-                WhereWhenActivity.class);
-        startActivity(i);
-    }
-
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setMessage("Are you sure you want to exit?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        DashboardActivity.this.finish();
-                    }
-                })
-                .setNegativeButton("No", null)
-                .show();
-    }
-
+      @Override
+      public void onBackPressed() {
+            new AlertDialog.Builder(this)
+                    .setMessage("Are you sure you want to exit?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                          public void onClick(DialogInterface dialog, int id) {
+                                DashboardActivity.this.finish();
+                          }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+      }
 
 
 }
