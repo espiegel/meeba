@@ -5,8 +5,6 @@ import android.content.Context;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 
-import java.util.HashMap;
-
 /**
  * Created by Eidan on 11/16/13.
  */
@@ -58,6 +56,6 @@ public class DatabaseFunctions {
     }
 
     private static boolean userIsStored(Context context) {
-        return (getDatabase(context).getRowCount(DatabaseHandler.TABLE_USER) > 0);
+        return (getDatabase(context).getRowCountLoginTable(DatabaseHandler.TABLE_USER) > 0);
     }
 }

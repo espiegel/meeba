@@ -448,7 +448,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             if (signingInProgressBar != null) {
                   signingInProgressBar.dismiss();
             }
-            startActivity(i);
+           //startActivity(i);
       }
 
       private void signoutAndDisconnect() {
@@ -465,7 +465,6 @@ public class LoginActivity extends Activity implements OnClickListener,
             } else {
                   Toast.makeText(getApplicationContext(), "user is  not connected / connecting ", Toast.LENGTH_LONG).show();
             }
-
       }
 
       private boolean checkIfRegisteredInPhone() {
