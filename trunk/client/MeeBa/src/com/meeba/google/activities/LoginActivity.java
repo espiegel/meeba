@@ -24,6 +24,7 @@ import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailed
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.database.DatabaseHandler;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
 import com.meeba.google.util.UserFunctions;
@@ -172,7 +173,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                         } else {
                               //store user in phone DB
                               DatabaseFunctions.upgradeDatabase(context);
-                              DatabaseFunctions.storeUserDetails_LoginTable(context, user);
+                              DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
                               moveToNextView();
                         }
 
@@ -294,9 +295,9 @@ public class LoginActivity extends Activity implements OnClickListener,
                         context = getApplicationContext();
                         // Store the user's details inside our local database for later use
                         DatabaseFunctions.upgradeDatabase(context);
-                        DatabaseFunctions.storeUserDetails_LoginTable(context, user);
+                        DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
                         Utils.LOGD("eidan: testing if we stored user details successfully");
-                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails_LoginTable(context));
+                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(context, DatabaseHandler.TABLE_USER));
                         moveToNextView();
                   }
             };
@@ -320,7 +321,9 @@ public class LoginActivity extends Activity implements OnClickListener,
                                     Toast.makeText(this, "can't connect\n you sure you have internet access?", Toast.LENGTH_LONG).show();
                                     return;
                               }
-                              signingInProgressBar = ProgressDialog.show(this, "signing in ...", "please wait ", true);
+
+                              if (signingInProgressBar!=null )
+                                    signingInProgressBar = ProgressDialog.show(this, "signing in ...", "please wait ", true);
                               //this method return immediately but works on background
                               mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
                               Utils.LOGD("maxagi: mConnectionResult AFTER  trying to connect = " + mConnectionResult);
@@ -446,7 +449,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             if (signingInProgressBar != null) {
                   signingInProgressBar.dismiss();
             }
-           //startActivity(i);
+            //startActivity(i);
       }
 
       private void signoutAndDisconnect() {
@@ -466,7 +469,7 @@ public class LoginActivity extends Activity implements OnClickListener,
       }
 
       private boolean checkIfRegisteredInPhone() {
-            user = DatabaseFunctions.getUserDetails_LoginTable(context);
+            user = DatabaseFunctions.getUserDetails(context, DatabaseHandler.TABLE_USER);
             Utils.LOGD("maxagi: user retrieved from phone DB= " + user);
             return (user != null);
 

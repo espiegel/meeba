@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.database.DatabaseHandler;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
@@ -66,7 +67,7 @@ public class InvitationActivity extends Activity {
         mTxtWhen.setText(mWhen);
         eid = mEvent.getEid();
 
-        uid = DatabaseFunctions.getUserDetails_LoginTable(getApplicationContext()).getUid();
+        uid = DatabaseFunctions.getUserDetails(getApplicationContext() , DatabaseHandler.TABLE_USER ).getUid();
 
         mBtnAccept.setOnClickListener(new View.OnClickListener() {
             @Override

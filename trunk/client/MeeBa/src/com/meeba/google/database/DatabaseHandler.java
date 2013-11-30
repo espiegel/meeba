@@ -205,8 +205,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
        *
        * @param tableName table to check
        */
-      public int getRowCountLoginTable(String tableName) {
-            if (!tableName.equals(TABLE_USER))
+      public int getRowCount(String tableName) {
+            if (!tableName.equals(TABLE_USER)   || !tableName.equals(TABLE_CONTACTS)      )
                   return -1;
 
             String countQuery = "SELECT  * FROM " + tableName;
