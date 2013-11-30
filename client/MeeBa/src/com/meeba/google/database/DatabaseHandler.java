@@ -83,7 +83,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
       /**
        * Storing user details in  Login database
        */
-      public void addUser(int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
+      public void addUser_LoginTable(int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -100,10 +100,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.close(); // Closing database connection
       }
 
+
+
       /**
        * Getting user data from  Login database
        */
-      public User getUserDetails() {
+      public User getUserDetails_LoginTable() {
             HashMap<String, String> userDetails = new HashMap<String, String>();
             String selectQuery = "SELECT * FROM " + TABLE_USER;
 
@@ -152,27 +154,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             db.close();
 
-
-
       }
-      /***
-       SQLiteDatabase mDatabase = openOrCreateDatabase("exampleDb.db", SQLiteDatabase.CREATE_IF_NECESSARY,null);
 
-       Cursor c = null;
-       boolean tableExists = false;
-
-       try
-       {
-       c = mDatabase.query("tbl_example", null,
-       null, null, null, null, null);
-       tableExists = true;
-       }
-       catch (Exception e) {
-
-       Log.d(TAG, tblNameIn+" doesn't exist :(((");
-       }
-
-       return tableExists;
+      /**
+       * @param tableName
+       * @return true iff the table exists
        */
       private boolean tableExists(String tableName) {
             SQLiteDatabase mDatabase = this.getWritableDatabase();
