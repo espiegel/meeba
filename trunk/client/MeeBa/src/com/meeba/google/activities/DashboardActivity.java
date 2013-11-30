@@ -25,9 +25,6 @@ import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.meeba.google.adapters.EventArrayAdapter;
 
-import android.widget.Button;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +49,7 @@ public class DashboardActivity extends SherlockActivity {
             ActionBar ab = getSupportActionBar();
             ab.setTitle("Events");
 
-            mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
+            mCurrentUser = DatabaseFunctions.getUserDetails_LoginTable(getApplicationContext());
             if (mCurrentUser == null) {
                   // We aren't registered so go back to login screen
                   Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);

@@ -23,8 +23,6 @@ import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallback
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.User;
 import com.meeba.google.R;
@@ -174,7 +172,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                         } else {
                               //store user in phone DB
                               DatabaseFunctions.upgradeDatabase(context);
-                              DatabaseFunctions.storeUserDetails(context, user);
+                              DatabaseFunctions.storeUserDetails_LoginTable(context, user);
                               moveToNextView();
                         }
 
@@ -296,9 +294,9 @@ public class LoginActivity extends Activity implements OnClickListener,
                         context = getApplicationContext();
                         // Store the user's details inside our local database for later use
                         DatabaseFunctions.upgradeDatabase(context);
-                        DatabaseFunctions.storeUserDetails(context, user);
+                        DatabaseFunctions.storeUserDetails_LoginTable(context, user);
                         Utils.LOGD("eidan: testing if we stored user details successfully");
-                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(context));
+                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails_LoginTable(context));
                         moveToNextView();
                   }
             };
@@ -468,7 +466,7 @@ public class LoginActivity extends Activity implements OnClickListener,
       }
 
       private boolean checkIfRegisteredInPhone() {
-            user = DatabaseFunctions.getUserDetails(context);
+            user = DatabaseFunctions.getUserDetails_LoginTable(context);
             Utils.LOGD("maxagi: user retrieved from phone DB= " + user);
             return (user != null);
 
