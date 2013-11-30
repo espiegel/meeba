@@ -22,9 +22,9 @@ public class DatabaseFunctions {
      * @param context Application context
      * @param user User to be stored
      */
-    public static void storeUserDetails(Context context, User user) {
+    public static void storeUserDetails_LoginTable(Context context, User user) {
         // Store only if there isn't a user stored already
-        if(userIsStored(context)) {
+        if(userIsStored_LoginTable(context)) {
             Utils.LOGD("user already stored here");
             return;
         }
@@ -37,9 +37,9 @@ public class DatabaseFunctions {
      * @param context Application context
      * @return Returns user object
      */
-    public static User getUserDetails(Context context) {
+    public static User getUserDetails_LoginTable(Context context) {
         DatabaseHandler db = getDatabase(context);
-          if(!userIsStored(context) ){
+          if(!userIsStored_LoginTable(context) ){
                 return null ;
           }
 
@@ -55,7 +55,7 @@ public class DatabaseFunctions {
         getDatabase(context).resetTables();
     }
 
-    private static boolean userIsStored(Context context) {
+    private static boolean userIsStored_LoginTable(Context context) {
         return (getDatabase(context).getRowCountLoginTable(DatabaseHandler.TABLE_USER) > 0);
     }
 }

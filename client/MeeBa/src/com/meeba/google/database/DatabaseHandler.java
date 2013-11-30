@@ -101,6 +101,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
       }
 
 
+      public void addUser_ContactsTable(int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_UID, uid); // uid
+            values.put(KEY_PHONE, phone); // phone
+            values.put(KEY_RID, rid); // rid
+            values.put(KEY_CREATED_AT, created_at); // Created At
+            values.put(KEY_EMAIL, email); // Email
+            values.put(KEY_NAME, name); // uid
+            values.put(KEY_PICTURE_URL, picture_url); // uid
+
+            // Inserting Row
+            db.insert(TABLE_CONTACTS, null, values);
+            db.close(); // Closing database connection
+      }
+
+
+
 
       /**
        * Getting user data from  Login database
