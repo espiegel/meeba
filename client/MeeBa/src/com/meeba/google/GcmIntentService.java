@@ -106,7 +106,7 @@ public class GcmIntentService extends IntentService {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                    intent, 0);
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             String msg = event.getWhere() + " at " + event.getWhen();
             NotificationCompat.Builder mBuilder =

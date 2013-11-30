@@ -153,12 +153,13 @@ public class InvitationActivity extends Activity {
     }
 
     private void startEventPage() {
-        Intent intent = new Intent(this, EventPageActivity.class);
+        finish();
+        Intent intent = new Intent(getApplicationContext(), EventPageActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(Utils.BUNDLE_EVENT, mEvent);
         intent.putExtras(bundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        finish();
     }
 
     @Override
