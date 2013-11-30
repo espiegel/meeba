@@ -83,7 +83,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
       /**
        * Storing user details in  Login database
        */
-      public void addUser_LoginTable(int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
+      public void addUser(String tableName, int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -96,28 +96,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_PICTURE_URL, picture_url); // uid
 
             // Inserting Row
-            db.insert(TABLE_USER, null, values);
+            db.insert(tableName, null, values);
             db.close(); // Closing database connection
       }
-
-
-      public void addUser_ContactsTable(int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            values.put(KEY_UID, uid); // uid
-            values.put(KEY_PHONE, phone); // phone
-            values.put(KEY_RID, rid); // rid
-            values.put(KEY_CREATED_AT, created_at); // Created At
-            values.put(KEY_EMAIL, email); // Email
-            values.put(KEY_NAME, name); // uid
-            values.put(KEY_PICTURE_URL, picture_url); // uid
-
-            // Inserting Row
-            db.insert(TABLE_CONTACTS, null, values);
-            db.close(); // Closing database connection
-      }
-
 
 
 
