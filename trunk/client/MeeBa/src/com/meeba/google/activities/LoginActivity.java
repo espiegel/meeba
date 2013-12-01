@@ -312,7 +312,6 @@ public class LoginActivity extends Activity implements OnClickListener,
       @Override
       public void onClick(View view) {
             Utils.LOGD("maxagi: onClick - View = " + view);
-            Utils.LOGD("maxagi: FIRST mConnectionResult=" + mConnectionResult);
 
             if (view.getId() == R.id.sign_in_button) {
                   Utils.LOGD("maxagi: onClick  : mPlusClient status  = " + mPlusClient);
@@ -327,8 +326,8 @@ public class LoginActivity extends Activity implements OnClickListener,
                                     return;
                               }
 
-                              if (signingInProgressBar!=null )
-                                    signingInProgressBar = ProgressDialog.show(this, "signing in ...", "please wait ", true);
+                            //  signingInProgressBar = ProgressDialog.show(LoginActivity.this, "signing in ...", "please wait ", true);
+
                               //this method return immediately but works on background
                               mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
                               Utils.LOGD("maxagi: mConnectionResult AFTER  trying to connect = " + mConnectionResult);
@@ -364,7 +363,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                         // This time, connect should succeed.
                         mPlusClient.connect();
 
-                        Utils.LOGD("maxagi: mConnectionResult AFTER  trying to connect = " + mConnectionResult);
+                        Utils.LOGD("maxagi: onActivityResult : mConnectionResult AFTER  trying to connect = " + mConnectionResult);
                   }
             }
       }
@@ -385,14 +384,36 @@ public class LoginActivity extends Activity implements OnClickListener,
       protected void onStart() {
             Utils.LOGD("onStart");
             super.onStart();
-            mPlusClient.connect();
+            if (!mPlusClient.isConnected() && !mPlusClient.isConnecting())
+                  mPlusClient.connect();
       }
 
       @Override
       protected void onStop() {
+            Utils.LOGD("onStop");
+            if ( signingInProgressBar!=null )
+            signingInProgressBar.dismiss();
             super.onStop();
             mPlusClient.disconnect();
+
       }
+
+      @Override
+      public void onDestroy() {
+            Utils.LOGD("onDestroy");
+            if ( signingInProgressBar!=null )
+            signingInProgressBar.dismiss();
+            super.onDestroy();
+
+      }
+
+      @Override
+      public void onPause()
+      {
+            Utils.LOGD("onPause");
+            super.onPause();
+      }
+
 
       @Override
       public boolean onCreateOptionsMenu(Menu menu) {
@@ -426,7 +447,12 @@ public class LoginActivity extends Activity implements OnClickListener,
 
       @Override
       protected void onResume() {
+            Utils.LOGD("maxagi :onResume");
             super.onResume();
+            if(!mPlusClient.isConnected()  && !mPlusClient.isConnecting() ){
+                  Utils.LOGD("maxagi :onResume reconnecting ");
+                  mPlusClient.connect();
+            }
             checkPlayServices();
       }
 
@@ -440,20 +466,23 @@ public class LoginActivity extends Activity implements OnClickListener,
                         Log.i("MeeBa", "This device is not supported.");
                         finish();
                   }
+                  Utils.LOGD("maxagi :checkPlayServices : false");
                   return false;
             }
             return true;
       }
 
       private void moveToNextView() {
+            if (signingInProgressBar != null && signingInProgressBar.isShowing() ) {
+                  signingInProgressBar.dismiss();
+            }
+            signingInProgressBar=null;
             Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
             Bundle bundle = new Bundle();
             /** pass the uid to the DashboardActivity **/
             bundle.putInt("uid", user.getUid());
             i.putExtras(bundle);
-            if (signingInProgressBar != null) {
-                  signingInProgressBar.dismiss();
-            }
+
             startActivity(i);
       }
 
