@@ -10,7 +10,6 @@ import android.content.IntentSender;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,15 +17,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.*;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.plus.PlusClient;
+import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.database.DatabaseHandler;
 import com.meeba.google.objects.User;
-import com.meeba.google.R;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
@@ -48,7 +49,7 @@ public class LoginActivity extends Activity implements OnClickListener,
        * API KEY= AIzaSyB7uaYL60o0MJtTs18_G0mspWWXOlUybzk
        */
       private static final int DIALOG_GET_GOOGLE_PLAY_SERVICES = 1;
-      private static final int REQUEST_CODE_SIGN_IN = 1;
+      private static final int REQUEST_CODE_SIGN_IN = 4; // For some reason 4 works instead of 1. Will keep it at 4 for now.
       private static final int REQUEST_CODE_GET_GOOGLE_PLAY_SERVICES = 2;
 
       private GoogleCloudMessaging gcm;

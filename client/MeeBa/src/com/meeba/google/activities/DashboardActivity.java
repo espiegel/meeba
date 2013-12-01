@@ -57,7 +57,6 @@ public class DashboardActivity extends SherlockActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
-            return;
         } else {
             mEventListView = (ListView) findViewById(R.id.listViewDashboard);
             mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -143,10 +142,9 @@ public class DashboardActivity extends SherlockActivity {
                 }
 
                 ListOfAppContacts = UserFunctions.getUsersByPhones(Utils.phoneList(phoneMap));
-                for (User user : ListOfAppContacts) {
-                    Utils.LOGD("contact to store =   " + user);
+                if(ListOfAppContacts != null) {
+                    DatabaseFunctions.storeContacts(getApplicationContext(), ListOfAppContacts);
                 }
-                DatabaseFunctions.storeContacts(getApplicationContext(), ListOfAppContacts);
 
                 return null;
             }

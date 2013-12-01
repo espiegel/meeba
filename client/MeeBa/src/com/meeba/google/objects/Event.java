@@ -9,6 +9,7 @@ public class Event implements Serializable {
     private int eid;
     private int host_uid;
     private String host_name;
+    private String host_picture_url;
     private String where;
     private String when;
     private String created_at;
@@ -19,6 +20,14 @@ public class Event implements Serializable {
         this.where = where;
         this.when = when;
         this.host_name = host_name;
+    }
+
+    public String getHost_picture_url() {
+        return host_picture_url;
+    }
+
+    public void setHost_picture_url(String host_picture_url) {
+        this.host_picture_url = host_picture_url;
     }
 
     public String getHost_name() {
@@ -75,6 +84,7 @@ public class Event implements Serializable {
                 "eid=" + eid +
                 ", host_uid=" + host_uid +
                 ", host_name='" + host_name + '\'' +
+                ", host_picture_url='" + host_picture_url + '\'' +
                 ", where='" + where + '\'' +
                 ", when='" + when + '\'' +
                 ", created_at='" + created_at + '\'' +
