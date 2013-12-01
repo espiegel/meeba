@@ -64,18 +64,17 @@ public class DatabaseFunctions {
 
       /**
        * Get the current user using this application
-       *@param tableName  table's  name
        * @param context Application context
        * @return Returns user object
        */
-      public static User getUserDetails(Context context, String tableName) {
+      public static User getUserDetails(Context context) {
             DatabaseHandler db = getDatabase(context);
             if (!userIsStored(context)) {
                   Utils.LOGD(" getUserDetails error : user is not stored ! ");
                   return null;
             }
 
-            return db.getUserDetails(tableName);
+            return db.getUserDetails();
       }
 
       public static void upgradeDatabase(Context context) {

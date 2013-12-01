@@ -105,9 +105,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
       /**
        * Getting user data from  Login database
        */
-      public User getUserDetails(String tableName) {
+      public User getUserDetails() {
             HashMap<String, String> userDetails = new HashMap<String, String>();
-            String selectQuery = "SELECT * FROM " + tableName;
+            String selectQuery = "SELECT * FROM " + TABLE_USER;
 
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);

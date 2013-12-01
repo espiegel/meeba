@@ -67,7 +67,7 @@ public class InvitationActivity extends Activity {
         mTxtWhen.setText(mWhen);
         eid = mEvent.getEid();
 
-        uid = DatabaseFunctions.getUserDetails(getApplicationContext() , DatabaseHandler.TABLE_USER ).getUid();
+        uid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
         mBtnAccept.setOnClickListener(new View.OnClickListener() {
             @Override

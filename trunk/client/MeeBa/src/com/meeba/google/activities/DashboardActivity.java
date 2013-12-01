@@ -56,7 +56,7 @@ public class DashboardActivity extends SherlockActivity {
             ActionBar ab = getSupportActionBar();
             ab.setTitle("Events");
 
-            mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext() , DatabaseHandler.TABLE_USER );
+            mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
             if (mCurrentUser == null) {
                   // We aren't registered so go back to login screen
                   Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);

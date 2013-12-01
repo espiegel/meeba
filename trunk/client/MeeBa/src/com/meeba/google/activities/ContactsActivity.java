@@ -60,7 +60,7 @@ public class ContactsActivity extends SherlockActivity {
         mWhen = bundle.getString("when");
         mWhere = bundle.getString("where");
 
-        mHostUid = DatabaseFunctions.getUserDetails (getApplicationContext()  , DatabaseHandler.TABLE_USER).getUid();
+        mHostUid = DatabaseFunctions.getUserDetails (getApplicationContext()).getUid();
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
