@@ -45,19 +45,19 @@ public class InvitationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.invitation_activity);
 
-        mTxtHost = (TextView)findViewById(R.id.txtHost);
-        mTxtWhere = (TextView)findViewById(R.id.txtWhere);
-        mTxtWhen = (TextView)findViewById(R.id.txtWhen);
-        mImageHost = (ImageView)findViewById(R.id.hostPicture);
+        mTxtHost = (TextView) findViewById(R.id.txtHost);
+        mTxtWhere = (TextView) findViewById(R.id.txtWhere);
+        mTxtWhen = (TextView) findViewById(R.id.txtWhen);
+        mImageHost = (ImageView) findViewById(R.id.hostPicture);
 
-        mBtnAccept = (Button)findViewById(R.id.btnAccept);
-        mBtnDecline = (Button)findViewById(R.id.btnDecline);
+        mBtnAccept = (Button) findViewById(R.id.btnAccept);
+        mBtnDecline = (Button) findViewById(R.id.btnDecline);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        mEvent = (Event)bundle.getSerializable(Utils.BUNDLE_EVENT);
-        Utils.LOGD("mEvent="+mEvent);
+        mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
+        Utils.LOGD("mEvent=" + mEvent);
         mHostName = mEvent.getHost_name();
         mWhere = mEvent.getWhere();
         mWhen = mEvent.getWhen();
@@ -74,18 +74,21 @@ public class InvitationActivity extends Activity {
             public void onClick(View view) {
                 new AsyncTask<Void, Void, Void>() {
                     ProgressDialog dialog;
+
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
                         dialog = ProgressDialog.show(InvitationActivity.this, "Accepting...", "wait", true);
 
                     }
+
                     @Override
                     protected Void doInBackground(Void... voids) {
                         UserFunctions.acceptInvite(uid, eid);
 
                         return null;
                     }
+
                     @Override
                     protected void onPostExecute(Void v) {
                         super.onPostExecute(v);
@@ -102,18 +105,21 @@ public class InvitationActivity extends Activity {
             public void onClick(View view) {
                 new AsyncTask<Void, Void, Void>() {
                     ProgressDialog dialog;
+
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
                         dialog = ProgressDialog.show(InvitationActivity.this, "Declining...", "wait", true);
 
                     }
+
                     @Override
                     protected Void doInBackground(Void... voids) {
                         UserFunctions.declineInvite(uid, eid);
 
                         return null;
                     }
+
                     @Override
                     protected void onPostExecute(Void v) {
                         super.onPostExecute(v);
@@ -134,7 +140,7 @@ public class InvitationActivity extends Activity {
             protected Void doInBackground(Void... voids) {
                 final User host = UserFunctions.getUserByUid(mEvent.getHost_uid());
 
-                if(host == null) {
+                if (host == null) {
                     return null;
                 }
 
@@ -165,11 +171,11 @@ public class InvitationActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if(refreshHostPicture != null) {
+        if (refreshHostPicture != null) {
             refreshHostPicture.cancel(true);
         }
 
-        if(mImageLoader != null) {
+        if (mImageLoader != null) {
             mImageLoader.stop();
             mImageLoader.destroy();
         }

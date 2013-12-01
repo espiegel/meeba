@@ -46,16 +46,16 @@ public class EventPageActivity extends SherlockActivity {
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        mTxtHost = (TextView)findViewById(R.id.txtHost);
-        mTxtWhere = (TextView)findViewById(R.id.txtWhere);
-        mTxtWhen = (TextView)findViewById(R.id.txtWhen);
-        mListView = (ListView)findViewById(R.id.listGuests);
-        mImageHost = (ImageView)findViewById(R.id.hostPicture);
+        mTxtHost = (TextView) findViewById(R.id.txtHost);
+        mTxtWhere = (TextView) findViewById(R.id.txtWhere);
+        mTxtWhen = (TextView) findViewById(R.id.txtWhen);
+        mListView = (ListView) findViewById(R.id.listGuests);
+        mImageHost = (ImageView) findViewById(R.id.hostPicture);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        mEvent = (Event)bundle.getSerializable(Utils.BUNDLE_EVENT);
+        mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
         Utils.LOGD("bundle event=" + mEvent);
         mTxtHost.setText(mEvent.getHost_name());
         mTxtWhere.setText(mEvent.getWhere());
@@ -73,7 +73,7 @@ public class EventPageActivity extends SherlockActivity {
             protected Void doInBackground(Void... voids) {
                 final User host = UserFunctions.getUserByUid(mEvent.getHost_uid());
 
-                if(host == null) {
+                if (host == null) {
                     return null;
                 }
 
@@ -99,11 +99,11 @@ public class EventPageActivity extends SherlockActivity {
             protected Void doInBackground(Void... voids) {
 
                 List<User> guestList = UserFunctions.getUsersByEvent(eid);
-                if(guestList == null) {
+                if (guestList == null) {
                     return null;
                 }
 
-                mGuestArrayAdapter = new GuestArrayAdapter(EventPageActivity.this,  guestList);
+                mGuestArrayAdapter = new GuestArrayAdapter(EventPageActivity.this, guestList);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -117,15 +117,14 @@ public class EventPageActivity extends SherlockActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem)
-    {
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
         onBackPressed();
         return true;
     }
 
     @Override
     protected void onDestroy() {
-        if(refreshHostPicture != null) {
+        if (refreshHostPicture != null) {
             refreshHostPicture.cancel(true);
         }
 

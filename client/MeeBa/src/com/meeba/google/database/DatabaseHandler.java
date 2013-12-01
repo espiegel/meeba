@@ -17,220 +17,221 @@ import java.util.List;
  * Created by Eidan on 11/16/13.
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
-      // All Static variables
-      // Database Version
-      private static final int DATABASE_VERSION = 1;
+    // All Static variables
+    // Database Version
+    private static final int DATABASE_VERSION = 1;
 
-      // Database Name
-      private static final String DATABASE_NAME = "meeba_db";
+    // Database Name
+    private static final String DATABASE_NAME = "meeba_db";
 
-      // Login table name
-      public static final String TABLE_USER = "user";
+    // Login table name
+    public static final String TABLE_USER = "user";
 
-      // Contacts  table name
-      public static final String TABLE_CONTACTS = "contacts";
+    // Contacts  table name
+    public static final String TABLE_CONTACTS = "contacts";
 
-      // Login Table & Contacts Table  Columns names
-      private static final String KEY_UID = "uid";
-      private static final String KEY_EMAIL = "email";
-      private static final String KEY_NAME = "name";
-      private static final String KEY_PHONE = "phone_number";
-      private static final String KEY_RID = "rid";
-      private static final String KEY_CREATED_AT = "created_at";
-      private static final String KEY_PICTURE_URL = "picture_url";
+    // Login Table & Contacts Table  Columns names
+    private static final String KEY_UID = "uid";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_PHONE = "phone_number";
+    private static final String KEY_RID = "rid";
+    private static final String KEY_CREATED_AT = "created_at";
+    private static final String KEY_PICTURE_URL = "picture_url";
 
-      public DatabaseHandler(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-      }
+    public DatabaseHandler(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
 
-      // Creating Tables
-      @Override
-      public void onCreate(SQLiteDatabase db) {
+    // Creating Tables
+    @Override
+    public void onCreate(SQLiteDatabase db) {
 
-            //create the Login table :
-            String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
-                    + KEY_UID + " INTEGER PRIMARY KEY,"  // 0
-                    + KEY_EMAIL + " TEXT UNIQUE,"        // 1
-                    + KEY_NAME + " TEXT,"                // 2
-                    + KEY_PHONE + " TEXT,"               // 3
-                    + KEY_RID + " TEXT,"                 // 4
-                    + KEY_CREATED_AT + " TEXT,"          // 5
-                    + KEY_PICTURE_URL + " TEXT" + ")";   // 6
-            Utils.LOGD(CREATE_LOGIN_TABLE);
-            db.execSQL(CREATE_LOGIN_TABLE);
+        //create the Login table :
+        String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
+                + KEY_UID + " INTEGER PRIMARY KEY,"  // 0
+                + KEY_EMAIL + " TEXT UNIQUE,"        // 1
+                + KEY_NAME + " TEXT,"                // 2
+                + KEY_PHONE + " TEXT,"               // 3
+                + KEY_RID + " TEXT,"                 // 4
+                + KEY_CREATED_AT + " TEXT,"          // 5
+                + KEY_PICTURE_URL + " TEXT" + ")";   // 6
+        Utils.LOGD(CREATE_LOGIN_TABLE);
+        db.execSQL(CREATE_LOGIN_TABLE);
 
-            //create the Contacts  table :
-            String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
-                    + KEY_UID + " INTEGER PRIMARY KEY,"  // 0
-                    + KEY_EMAIL + " TEXT UNIQUE,"        // 1
-                    + KEY_NAME + " TEXT,"                // 2
-                    + KEY_PHONE + " TEXT,"               // 3
-                    + KEY_RID + " TEXT,"                 // 4
-                    + KEY_CREATED_AT + " TEXT,"          // 5
-                    + KEY_PICTURE_URL + " TEXT" + ")";   // 6
-            Utils.LOGD(CREATE_CONTACTS_TABLE);
-            db.execSQL(CREATE_CONTACTS_TABLE);
-      }
+        //create the Contacts  table :
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
+                + KEY_UID + " INTEGER PRIMARY KEY,"  // 0
+                + KEY_EMAIL + " TEXT UNIQUE,"        // 1
+                + KEY_NAME + " TEXT,"                // 2
+                + KEY_PHONE + " TEXT,"               // 3
+                + KEY_RID + " TEXT,"                 // 4
+                + KEY_CREATED_AT + " TEXT,"          // 5
+                + KEY_PICTURE_URL + " TEXT" + ")";   // 6
+        Utils.LOGD(CREATE_CONTACTS_TABLE);
+        db.execSQL(CREATE_CONTACTS_TABLE);
+    }
 
-      // Upgrading database
-      @Override
-      public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
-            // Create tables again
+    // Upgrading database
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        // Create tables again
 
-            onCreate(db);
-      }
+        onCreate(db);
+    }
 
-      /**
-       * Storing user details in  Login database
-       */
-      public void addUser(String tableName, int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
-            Utils.LOGD("adding to  " + tableName + " user  with name : " + name  );
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(KEY_UID, uid); // uid
-            values.put(KEY_PHONE, phone); // phone
-            values.put(KEY_RID, rid); // rid
-            values.put(KEY_CREATED_AT, created_at); // Created At
-            values.put(KEY_EMAIL, email); // Email
-            values.put(KEY_NAME, name); // uid
-            values.put(KEY_PICTURE_URL, picture_url); // uid
+    /**
+     * Storing user details in  Login database
+     */
+    public void addUser(String tableName, int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
+        Utils.LOGD("adding to  " + tableName + " user  with name : " + name);
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_UID, uid); // uid
+        values.put(KEY_PHONE, phone); // phone
+        values.put(KEY_RID, rid); // rid
+        values.put(KEY_CREATED_AT, created_at); // Created At
+        values.put(KEY_EMAIL, email); // Email
+        values.put(KEY_NAME, name); // uid
+        values.put(KEY_PICTURE_URL, picture_url); // uid
 
-            // Inserting Row
-            db.insert(tableName, null, values);
-            db.close(); // Closing database connection
-      }
+        // Inserting Row
+        db.insert(tableName, null, values);
+        db.close(); // Closing database connection
+    }
 
-      /**
-       * Getting user data from  Login database
-       */
-      public User getUserDetails() {
-            HashMap<String, String> userDetails = new HashMap<String, String>();
-            String selectQuery = "SELECT * FROM " + TABLE_USER;
+    /**
+     * Getting user data from  Login database
+     */
+    public User getUserDetails() {
+        HashMap<String, String> userDetails = new HashMap<String, String>();
+        String selectQuery = "SELECT * FROM " + TABLE_USER;
 
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(selectQuery, null);
-            // Move to first row
-            cursor.moveToFirst();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        // Move to first row
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            userDetails.put(KEY_UID, cursor.getString(0));
+            userDetails.put(KEY_EMAIL, cursor.getString(1));
+            userDetails.put(KEY_NAME, cursor.getString(2));
+            userDetails.put(KEY_PHONE, cursor.getString(3));
+            userDetails.put(KEY_RID, cursor.getString(4));
+            userDetails.put(KEY_CREATED_AT, cursor.getString(5));
+            userDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+        }
+        cursor.close();
+        db.close();
+
+        for (String s : userDetails.values()) {
+            Utils.LOGD("DB: " + s);
+        }
+        // return user
+        User user = new User(Integer.valueOf(userDetails.get(KEY_UID)), userDetails.get(KEY_EMAIL),
+                userDetails.get(KEY_NAME), userDetails.get(KEY_PHONE), userDetails.get(KEY_RID),
+                userDetails.get(KEY_CREATED_AT), userDetails.get(KEY_PICTURE_URL));
+        return user;
+    }
+
+    /**
+     * @return a list of all the users stored in contacts table
+     */
+    public List<User> getContacts() {
+        List<User> contacts = new ArrayList<User>();
+        HashMap<String, String> contactDetails = new HashMap<String, String>();
+        String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // Move to first row
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
             if (cursor.getCount() > 0) {
-                  userDetails.put(KEY_UID, cursor.getString(0));
-                  userDetails.put(KEY_EMAIL, cursor.getString(1));
-                  userDetails.put(KEY_NAME, cursor.getString(2));
-                  userDetails.put(KEY_PHONE, cursor.getString(3));
-                  userDetails.put(KEY_RID, cursor.getString(4));
-                  userDetails.put(KEY_CREATED_AT, cursor.getString(5));
-                  userDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+                contactDetails.put(KEY_UID, cursor.getString(0));
+                contactDetails.put(KEY_EMAIL, cursor.getString(1));
+                contactDetails.put(KEY_NAME, cursor.getString(2));
+                contactDetails.put(KEY_PHONE, cursor.getString(3));
+                contactDetails.put(KEY_RID, cursor.getString(4));
+                contactDetails.put(KEY_CREATED_AT, cursor.getString(5));
+                contactDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+
+                User contact = new User(Integer.valueOf(contactDetails.get(KEY_UID)), contactDetails.get(KEY_EMAIL),
+                        contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
+                        contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
+
+                contacts.add(contact);
             }
-            cursor.close();
-            db.close();
+            cursor.moveToNext();
+        }
 
-            for (String s : userDetails.values()) {
-                  Utils.LOGD("DB: " + s);
-            }
-            // return user
-            User user = new User(Integer.valueOf(userDetails.get(KEY_UID)), userDetails.get(KEY_EMAIL),
-                    userDetails.get(KEY_NAME), userDetails.get(KEY_PHONE), userDetails.get(KEY_RID),
-                    userDetails.get(KEY_CREATED_AT), userDetails.get(KEY_PICTURE_URL));
-            return user;
-      }
+        cursor.close();
+        db.close();
 
-      /**
-       * @return a list of all the users stored in contacts table
-       */
-      public List<User> getContacts() {
-            List<User> contacts = new ArrayList<User>();
-            HashMap<String, String> contactDetails = new HashMap<String, String>();
-            String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
+        return contacts;
+    }
 
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(selectQuery, null);
+    /**
+     * Re crate database
+     * Delete all tables and create them again
+     */
+    public void resetTables() {
 
-            // Move to first row
-            cursor.moveToFirst();
-            for (int i = 0; i < cursor.getCount(); i++) {
-                  if (cursor.getCount() > 0) {
-                        contactDetails.put(KEY_UID, cursor.getString(0));
-                        contactDetails.put(KEY_EMAIL, cursor.getString(1));
-                        contactDetails.put(KEY_NAME, cursor.getString(2));
-                        contactDetails.put(KEY_PHONE, cursor.getString(3));
-                        contactDetails.put(KEY_RID, cursor.getString(4));
-                        contactDetails.put(KEY_CREATED_AT, cursor.getString(5));
-                        contactDetails.put(KEY_PICTURE_URL, cursor.getString(6));
-
-                        User contact = new User(Integer.valueOf(contactDetails.get(KEY_UID)), contactDetails.get(KEY_EMAIL),
-                                contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
-                                contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
-
-                        contacts.add(contact);
-                  }
-                  cursor.moveToNext();
-            }
-
-            cursor.close();
-            db.close();
-
-            return contacts;
-      }
-
-      /**
-       * Re crate database
-       * Delete all tables and create them again
-       */
-      public void resetTables() {
-
-            Utils.LOGD("resetting tables");
-            SQLiteDatabase db = this.getWritableDatabase();
-            // Delete All Rows
+        Utils.LOGD("resetting tables");
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Delete All Rows
 
 
-            if (tableExists(TABLE_USER))
-                  db.delete(TABLE_USER, null, null);
+        if (tableExists(TABLE_USER))
+            db.delete(TABLE_USER, null, null);
 
-            if (tableExists(TABLE_CONTACTS))
-                  db.delete(TABLE_CONTACTS, null, null);
+        if (tableExists(TABLE_CONTACTS))
+            db.delete(TABLE_CONTACTS, null, null);
 
-            db.close();
-      }
-      /**
-       * @param tableName the table's name
-       * @return true iff the table exists
-       */
-      private boolean tableExists(String tableName) {
-            SQLiteDatabase mDatabase = this.getWritableDatabase();
-            boolean tableExists = false;
+        db.close();
+    }
 
-            try {
-                  assert mDatabase != null;
-                  mDatabase.query(tableName, null,
-                          null, null, null, null, null);
-                  tableExists = true;
-            } catch (Exception e) {
+    /**
+     * @param tableName the table's name
+     * @return true iff the table exists
+     */
+    private boolean tableExists(String tableName) {
+        SQLiteDatabase mDatabase = this.getWritableDatabase();
+        boolean tableExists = false;
 
-                  Utils.LOGD(tableName + " doesn't exist :(((");
-            }
-            return tableExists;
-      }
+        try {
+            assert mDatabase != null;
+            mDatabase.query(tableName, null,
+                    null, null, null, null, null);
+            tableExists = true;
+        } catch (Exception e) {
 
-      /**
-       * Getting user login status
-       * return no. of rows in the table
-       *
-       * @param tableName name of table to check
-       */
-      public int getRowCount(String tableName) {
-            if (!tableName.equals(TABLE_USER)   &&  !tableName.equals(TABLE_CONTACTS)      )
-                  return -1;
+            Utils.LOGD(tableName + " doesn't exist :(((");
+        }
+        return tableExists;
+    }
 
-            String countQuery = "SELECT  * FROM " + tableName;
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(countQuery, null);
-            int rowCount = cursor.getCount();
-            db.close();
-            cursor.close();
+    /**
+     * Getting user login status
+     * return no. of rows in the table
+     *
+     * @param tableName name of table to check
+     */
+    public int getRowCount(String tableName) {
+        if (!tableName.equals(TABLE_USER) && !tableName.equals(TABLE_CONTACTS))
+            return -1;
 
-            // return row count
-            Utils.LOGD(  tableName+" row count is " + rowCount);
-            return rowCount;
-      }
+        String countQuery = "SELECT  * FROM " + tableName;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int rowCount = cursor.getCount();
+        db.close();
+        cursor.close();
+
+        // return row count
+        Utils.LOGD(tableName + " row count is " + rowCount);
+        return rowCount;
+    }
 }
