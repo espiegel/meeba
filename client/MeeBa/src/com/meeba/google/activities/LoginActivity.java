@@ -177,7 +177,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                               DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
 
                               Utils.LOGD("maxagi:storring in phone DB user = " + user);
-                              User debug = DatabaseFunctions.getUserDetails( getApplicationContext() ,  DatabaseHandler.TABLE_USER);
+                              User debug = DatabaseFunctions.getUserDetails( getApplicationContext());
                               Utils.LOGD("maxagi: user stored in phone DB = " + debug);
                               moveToNextView();
                         }
@@ -302,7 +302,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                         DatabaseFunctions.upgradeDatabase(context);
                         DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
                         Utils.LOGD("eidan: testing if we stored user details successfully");
-                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(context, DatabaseHandler.TABLE_USER));
+                        Utils.LOGD("eidan: user=" + DatabaseFunctions.getUserDetails(context));
                         moveToNextView();
                   }
             };
@@ -503,7 +503,7 @@ public class LoginActivity extends Activity implements OnClickListener,
       }
 
       private boolean checkIfRegisteredInPhone() {
-            user = DatabaseFunctions.getUserDetails(context, DatabaseHandler.TABLE_USER);
+            user = DatabaseFunctions.getUserDetails(context);
             Utils.LOGD("maxagi: user retrieved from phone DB= " + user);
             return (user != null);
 
