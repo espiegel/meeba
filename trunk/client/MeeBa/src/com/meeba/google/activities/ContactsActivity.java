@@ -60,7 +60,7 @@ public class ContactsActivity extends SherlockActivity {
         mWhen = bundle.getString("when");
         mWhere = bundle.getString("where");
 
-        mHostUid = DatabaseFunctions.getUserDetails (getApplicationContext()).getUid();
+        mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,20 +73,21 @@ public class ContactsActivity extends SherlockActivity {
 
                 mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
 
-                for(User user : mContactsAdapter.getList()) {
-                    Utils.LOGD("user= "+user.toString());
-                    if(user.isSelected()) {
+                for (User user : mContactsAdapter.getList()) {
+                    Utils.LOGD("user= " + user.toString());
+                    if (user.isSelected()) {
                         mListUid.add(String.valueOf(user.getUid()));
                     }
                 }
 
-                if(mListUid.isEmpty()) {
+                if (mListUid.isEmpty()) {
                     Utils.showToast(ContactsActivity.this, "You must select users to invite");
                     return;
                 }
 
                 new AsyncTask<Void, Void, Event>() {
                     ProgressDialog progressDialog;
+
                     @Override
                     protected void onPreExecute() {
                         Utils.LOGD("onPreExecute");
@@ -104,7 +105,7 @@ public class ContactsActivity extends SherlockActivity {
                     protected void onPostExecute(Event event) {
                         progressDialog.dismiss();
 
-                        if(event == null) {
+                        if (event == null) {
                             Utils.showToast(ContactsActivity.this, "Failed to create event");
                         } else {
                             Utils.showToast(ContactsActivity.this, "Created event successfully!");
@@ -138,11 +139,11 @@ public class ContactsActivity extends SherlockActivity {
             }
 
             protected List<User> doInBackground(Void... params) {
-               return  DatabaseFunctions.loadContacts(getApplicationContext()) ;
+                return DatabaseFunctions.loadContacts(getApplicationContext());
             }
 
             protected void onPostExecute(List<User> list) {
-                if(list == null) {
+                if (list == null) {
                     Utils.LOGD("getUsersByPhones returned null!");
                     progressDialog.dismiss();
                     return;
@@ -150,27 +151,26 @@ public class ContactsActivity extends SherlockActivity {
                 Utils.LOGD("onPostExecute");
 
                 Utils.LOGD("list=...");
-                  for (User u : list) {
-                        Utils.LOGD(u.toString());
-                  }
-                  mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, list);
-                  mUserListView.setAdapter(mContactsAdapter);
-                  progressDialog.dismiss();
+                for (User u : list) {
+                    Utils.LOGD(u.toString());
+                }
+                mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, list);
+                mUserListView.setAdapter(mContactsAdapter);
+                progressDialog.dismiss();
 
             }
         }.execute();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem)
-    {
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
         onBackPressed();
         return true;
     }
 
     @Override
     protected void onDestroy() {
-        if(mContactsAdapter != null) {
+        if (mContactsAdapter != null) {
             mContactsAdapter.onDestroy();
         }
         super.onDestroy();
