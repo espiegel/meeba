@@ -86,6 +86,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
        * Storing user details in  Login database
        */
       public void addUser(String tableName, int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
+            Utils.LOGD("adding to  " + tableName + " user  with name : " + name  );
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(KEY_UID, uid); // uid
@@ -134,15 +135,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return user;
       }
 
-      public List< User> getContacts() {
-            List< User> contacts = new ArrayList<User>();
+      /**
+       * @return a list of all the users stored in contacts table
+       */
+      public List<User> getContacts() {
+            List<User> contacts = new ArrayList<User>();
             HashMap<String, String> contactDetails = new HashMap<String, String>();
             String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
 
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);
-            // Move to first row
 
+            // Move to first row
             cursor.moveToFirst();
             for (int i = 0; i < cursor.getCount(); i++) {
                   if (cursor.getCount() > 0) {
@@ -159,17 +163,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
 
                         contacts.add(contact);
-
                   }
                   cursor.moveToNext();
             }
 
             cursor.close();
             db.close();
-
-            for (String s : contactDetails.values()) {
-                  Utils.LOGD("maxagi : " + s);
-            }
 
             return contacts;
       }
@@ -194,26 +193,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.close();
       }
       /**
-       * @param tableName
+       * @param tableName the table's name
        * @return true iff the table exists
        */
       private boolean tableExists(String tableName) {
             SQLiteDatabase mDatabase = this.getWritableDatabase();
-            Cursor c = null;
-
             boolean tableExists = false;
 
-            try
-            {
-                  c = mDatabase.query(tableName, null,
+            try {
+                  assert mDatabase != null;
+                  mDatabase.query(tableName, null,
                           null, null, null, null, null);
                   tableExists = true;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
 
-                  Utils.LOGD(  tableName+" doesn't exist :(((");
+                  Utils.LOGD(tableName + " doesn't exist :(((");
             }
-
             return tableExists;
       }
 
@@ -221,7 +216,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
        * Getting user login status
        * return no. of rows in the table
        *
-       * @param tableName table to check
+       * @param tableName name of table to check
        */
       public int getRowCount(String tableName) {
             if (!tableName.equals(TABLE_USER)   &&  !tableName.equals(TABLE_CONTACTS)      )
@@ -235,6 +230,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
 
             // return row count
+            Utils.LOGD(  tableName+" row count is " + rowCount);
             return rowCount;
       }
 }

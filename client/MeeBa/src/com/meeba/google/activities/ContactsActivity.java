@@ -33,8 +33,6 @@ import java.util.Map;
  */
 public class ContactsActivity extends SherlockActivity {
     private Button next;
-    private List<User> ListOfAppContacts;
-    private Cursor cursor;
     private ListView mUserListView;
 
     private ContactsArrayAdapter mContactsAdapter;
@@ -128,7 +126,6 @@ public class ContactsActivity extends SherlockActivity {
         asyncRefresh();
     }
 
-
     private void asyncRefresh() {
         new AsyncTask<Void, Void, List<User>>() {
             ProgressDialog progressDialog;
@@ -141,13 +138,7 @@ public class ContactsActivity extends SherlockActivity {
             }
 
             protected List<User> doInBackground(Void... params) {
-                Utils.LOGD("doInBackground");
-                HashMap<String, String> phoneMap = allPhoneNumbersAndName();
-                for(Map.Entry<String, String> entry : phoneMap.entrySet()) {
-                    Utils.LOGD(entry.getKey()+", "+entry.getValue());
-                }
-                ListOfAppContacts = UserFunctions.getUsersByPhones(phoneList(phoneMap));
-                return ListOfAppContacts;
+               return  DatabaseFunctions.loadContacts(getApplicationContext()) ;
             }
 
             protected void onPostExecute(List<User> list) {
@@ -159,68 +150,15 @@ public class ContactsActivity extends SherlockActivity {
                 Utils.LOGD("onPostExecute");
 
                 Utils.LOGD("list=...");
-                for(User u : list) {
-                    Utils.LOGD(u.toString());
-                }
-
-                DatabaseFunctions.storeContacts(getApplicationContext() ,list);
-                mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, list);
-                mUserListView.setAdapter(mContactsAdapter);
-                progressDialog.dismiss();
+                  for (User u : list) {
+                        Utils.LOGD(u.toString());
+                  }
+                  mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, list);
+                  mUserListView.setAdapter(mContactsAdapter);
+                  progressDialog.dismiss();
 
             }
         }.execute();
-    }
-
-
-    /**
-     * Returns all people from contact list
-     *
-     * @return HashMap<phoneNumber,Name> : {"0545356070":"eidan", ... etc }
-     */
-
-    private HashMap<String, String> allPhoneNumbersAndName() {
-        HashMap<String, String> phonesMap = new HashMap<String, String>();
-
-        cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        while (cursor.moveToNext()) {
-            String contactId = cursor.getString(cursor.getColumnIndex(
-                    ContactsContract.Contacts._ID));
-            String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-
-            if (Integer.parseInt(hasPhone) == 1) {
-                int nameFieldColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
-                String contact = cursor.getString(nameFieldColumnIndex);
-
-                // You know it has a number so now query it like this
-                Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
-                while (phones.moveToNext()) {
-                    String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-                    // Filter out all the "-"'s and "*"'s from the phone number
-                    phoneNumber = phoneNumber.replaceAll("\\+972","05").replaceAll(" ", "").replaceAll("-","").replaceAll("\\*","").replaceAll("[)(]]","");
-
-                    phonesMap.put(phoneNumber, contact);
-                }
-                phones.close();
-            }
-        }
-        cursor.close();
-
-        return phonesMap;
-    }
-
-    /**
-     * @param hashlist
-     * @return List of phone numbers from HashMap so we can use UserFunction function "getUsersByPhones"
-     */
-
-    private List<String> phoneList(HashMap<String, String> hashlist) {
-        List<String> phoneList = new ArrayList<String>();
-        for (String s : hashlist.keySet()) {
-            phoneList.add(s);
-        }
-        return phoneList;
     }
 
     @Override
