@@ -4,28 +4,25 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.database.Cursor;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.content.Intent;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.meeba.google.R;
+import com.meeba.google.adapters.EventArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
-import com.meeba.google.R;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
-import com.meeba.google.adapters.EventArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,8 +35,6 @@ import java.util.Map;
 
 
 public class DashboardActivity extends SherlockActivity {
-
-    private Cursor cursor;
     private ListView mEventListView;
     private User mCurrentUser;
     private List<Event> list;
@@ -48,7 +43,7 @@ public class DashboardActivity extends SherlockActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Utils.LOGD("Dashboard activity started  ");
+        Utils.LOGD("Dashboard activity onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_activity);
 
@@ -99,14 +94,14 @@ public class DashboardActivity extends SherlockActivity {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
                 progressDialog = ProgressDialog
-                        .show(DashboardActivity.this, "Getting your events ", "please wait !", true);
+                        .show(DashboardActivity.this, getString(R.string.refreshing_events), getString(R.string.please_wait), true);
             }
 
             protected List<Event> doInBackground(Void... params) {
                 Utils.LOGD("doInBackground");
                 list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
 
-                Utils.LOGD(" list =  " + list);
+                Utils.LOGD("list =  " + list);
 
                 if (list == null) {
                     return new ArrayList<Event>();
@@ -142,16 +137,16 @@ public class DashboardActivity extends SherlockActivity {
 
             protected Void doInBackground(Void... params) {
                 Utils.LOGD("asyncUpdateContacts  doInBackground");
-                HashMap<String, String> phoneMap = allPhoneNumbersAndName();
+                HashMap<String, String> phoneMap = Utils.allPhoneNumbersAndName(getContentResolver());
                 for (Map.Entry<String, String> entry : phoneMap.entrySet()) {
                     Utils.LOGD(entry.getKey() + ", " + entry.getValue());
                 }
 
-                for (User user : DatabaseFunctions.loadContacts(getApplicationContext()))
-                    Utils.LOGD("contact loaded before update :  " + user);
-                ListOfAppContacts = UserFunctions.getUsersByPhones(phoneList(phoneMap));
+                ListOfAppContacts = UserFunctions.getUsersByPhones(Utils.phoneList(phoneMap));
+                for (User user : ListOfAppContacts) {
+                    Utils.LOGD("contact to store =   " + user);
+                }
                 DatabaseFunctions.storeContacts(getApplicationContext(), ListOfAppContacts);
-                for (User user : ListOfAppContacts) Utils.LOGD(" contact to store =   " + user);
 
                 return null;
             }
@@ -161,14 +156,6 @@ public class DashboardActivity extends SherlockActivity {
                     Utils.LOGD("contact loaded :  " + user);
             }
         }.execute();
-    }
-
-
-    @Override
-    protected void onResume() {
-        Utils.LOGD("Dashboard:onResume");
-        super.onResume();
-        asyncUpdateContacts();
     }
 
     @Override
@@ -211,44 +198,4 @@ public class DashboardActivity extends SherlockActivity {
                 .setNegativeButton("No", null)
                 .show();
     }
-
-    private HashMap<String, String> allPhoneNumbersAndName() {
-        HashMap<String, String> phonesMap = new HashMap<String, String>();
-
-        cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        while (cursor.moveToNext()) {
-            String contactId = cursor.getString(cursor.getColumnIndex(
-                    ContactsContract.Contacts._ID));
-            String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-
-            if (Integer.parseInt(hasPhone) == 1) {
-                int nameFieldColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
-                String contact = cursor.getString(nameFieldColumnIndex);
-
-                // You know it has a number so now query it like this
-                Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
-                while (phones.moveToNext()) {
-                    String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-                    // Filter out all the "-"'s and "*"'s from the phone number
-                    phoneNumber = phoneNumber.replaceAll("\\+972", "05").replaceAll(" ", "").replaceAll("-", "").replaceAll("\\*", "").replaceAll("[)(]]", "");
-
-                    phonesMap.put(phoneNumber, contact);
-                }
-                phones.close();
-            }
-        }
-        cursor.close();
-
-        return phonesMap;
-    }
-
-    private List<String> phoneList(HashMap<String, String> hashlist) {
-        List<String> phoneList = new ArrayList<String>();
-        for (String s : hashlist.keySet()) {
-            phoneList.add(s);
-        }
-        return phoneList;
-    }
-
 }

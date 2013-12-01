@@ -1,7 +1,10 @@
 package com.meeba.google.util;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +15,10 @@ import android.widget.Toast;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Utils {
 
@@ -76,5 +83,44 @@ public class Utils {
                 setupUI(innerView, a);
             }
         }
+    }
+
+    public static HashMap<String, String> allPhoneNumbersAndName(ContentResolver contentResolver) {
+        HashMap<String, String> phonesMap = new HashMap<String, String>();
+
+        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        while (cursor.moveToNext()) {
+            String contactId = cursor.getString(cursor.getColumnIndex(
+                    ContactsContract.Contacts._ID));
+            String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+            if (Integer.parseInt(hasPhone) == 1) {
+                int nameFieldColumnIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
+                String contact = cursor.getString(nameFieldColumnIndex);
+
+                // You know it has a number so now query it like this
+                Cursor phones = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
+                while (phones.moveToNext()) {
+                    String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                    // Filter out all the "-"'s and "*"'s from the phone number
+                    phoneNumber = phoneNumber.replaceAll("\\+972", "05").replaceAll(" ", "").replaceAll("-", "").replaceAll("\\*", "").replaceAll("[)(]]", "");
+
+                    phonesMap.put(phoneNumber, contact);
+                }
+                phones.close();
+            }
+        }
+        cursor.close();
+
+        return phonesMap;
+    }
+
+    public static List<String> phoneList(HashMap<String, String> hashlist) {
+        List<String> phoneList = new ArrayList<String>();
+        for (String s : hashlist.keySet()) {
+            phoneList.add(s);
+        }
+        return phoneList;
     }
 }
