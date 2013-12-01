@@ -12,11 +12,15 @@ import java.util.List;
  */
 public class DatabaseFunctions {
 
+    private static DatabaseHandler mDatabaseHandler = null;
+
     private static DatabaseHandler getDatabase(Context context) {
         // Store user details in SQLite Database
-        final DatabaseHandler db = new DatabaseHandler(context);
+        if(mDatabaseHandler == null) {
+            mDatabaseHandler = new DatabaseHandler(context);
+        }
 
-        return db;
+        return mDatabaseHandler;
     }
 
     /**
@@ -25,7 +29,7 @@ public class DatabaseFunctions {
      */
     public static void storeContacts(Context context, List<User> users) {
         for (User user : users) {
-            Utils.LOGD("storeContacts: storing  in database " + user.getName());
+            Utils.LOGD("storeContacts: storing  in database " + user);
             storeUserDetails(context, user, DatabaseHandler.TABLE_CONTACTS);
         }
     }
@@ -59,9 +63,9 @@ public class DatabaseFunctions {
             return;
         }
 
-        Utils.LOGD("storeUserDetails : adding   " + user.getName() + " to table: " + tableName);
+        Utils.LOGD("storeUserDetails : adding  user=" + user + " to table: " + tableName);
         DatabaseHandler db = getDatabase(context);
-        db.addUser(tableName, user.getUid(), user.getPhone_number(), user.getRid(), user.getCreated_at(), user.getEmail(), user.getName(), user.getPicture_url());
+        db.addUser(tableName, user);
     }
 
     /**
@@ -98,7 +102,6 @@ public class DatabaseFunctions {
      * @param context application context
      * @param user    the user to be searched in contacts table
      * @return true iff user is stored in the contacts table
-     */
     private static boolean contactIsStored(Context context, User user) {
         List<User> users = loadContacts(context);
         for (User u : users) {
@@ -106,5 +109,14 @@ public class DatabaseFunctions {
                 return true;
         }
         return false;
+    }*/
+
+    /**
+     * @param context application context
+     * @param user    the user to be searched in contacts table
+     * @return true iff user is stored in the contacts table
+     */
+    private static boolean contactIsStored(Context context, User user) {
+        return getDatabase(context).contactExists(user);
     }
 }

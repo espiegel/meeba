@@ -85,17 +85,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in  Login database
      */
-    public void addUser(String tableName, int uid, String phone, String rid, String created_at, String email, String name, String picture_url) {
-        Utils.LOGD("adding to  " + tableName + " user  with name : " + name);
+    public void addUser(String tableName, User user) {
+        int uid = user.getUid();
+        String phone = user.getPhone_number();
+        String rid = user.getRid();
+        String created_at = user.getCreated_at();
+        String email = user.getEmail();
+        String name = user.getName();
+        String picture_url = user.getPicture_url();
+
+        Utils.LOGD("adding to  " + tableName + " user =" + user);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_UID, uid); // uid
-        values.put(KEY_PHONE, phone); // phone
-        values.put(KEY_RID, rid); // rid
-        values.put(KEY_CREATED_AT, created_at); // Created At
-        values.put(KEY_EMAIL, email); // Email
-        values.put(KEY_NAME, name); // uid
-        values.put(KEY_PICTURE_URL, picture_url); // uid
+        values.put(KEY_UID, uid);
+        values.put(KEY_PHONE, phone);
+        values.put(KEY_RID, rid);
+        values.put(KEY_CREATED_AT, created_at);
+        values.put(KEY_EMAIL, email);
+        values.put(KEY_NAME, name);
+        values.put(KEY_PICTURE_URL, picture_url);
 
         // Inserting Row
         db.insert(tableName, null, values);
@@ -162,6 +170,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
                         contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
 
+                Utils.LOGD("Got contact from database, user = "+contact);
                 contacts.add(contact);
             }
             cursor.moveToNext();
@@ -209,6 +218,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (Exception e) {
 
             Utils.LOGD(tableName + " doesn't exist :(((");
+        } finally {
+            mDatabase.close();
         }
         return tableExists;
     }
@@ -223,7 +234,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (!tableName.equals(TABLE_USER) && !tableName.equals(TABLE_CONTACTS))
             return -1;
 
-        String countQuery = "SELECT  * FROM " + tableName;
+        String countQuery = "SELECT * FROM " + tableName;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int rowCount = cursor.getCount();
@@ -233,5 +244,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // return row count
         Utils.LOGD(tableName + " row count is " + rowCount);
         return rowCount;
+    }
+
+    /**
+     * Returns whether a contact exists
+     * @param user User to check
+     * @return returns True or False
+     */
+    public boolean contactExists(User user) {
+        boolean result;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = { KEY_UID };
+        Cursor cursor = db.query(TABLE_CONTACTS, columns, KEY_UID + " = " + user.getUid(), null, null, null, null);
+        result = (cursor.getCount() > 0);
+
+        cursor.close();
+        db.close();
+
+        return result;
     }
 }

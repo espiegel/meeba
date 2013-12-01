@@ -20,6 +20,8 @@
     <string name="when">When?</string>
     <string name="where">Where?</string>
     <string name="next">Next</string>
+    <string name="refreshing_events">Refreshing Events</string>
+    <string name="please_wait">Please wait !</string>
 
     <color name="green">#33C733</color>
     <color name="red">#C73333</color>

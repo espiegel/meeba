@@ -23,6 +23,7 @@ public class User implements Serializable {
         this.phone_number = phone_number;
         this.rid = rid;
         this.created_at = created_at;
+        this.picture_url = picture_url;
         this.selected = false;
     }
 

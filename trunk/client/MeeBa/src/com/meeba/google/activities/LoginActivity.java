@@ -463,7 +463,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                         GooglePlayServicesUtil.getErrorDialog(resultCode, this,
                                 DIALOG_GET_GOOGLE_PLAY_SERVICES).show();
                   } else {
-                        Log.i("MeeBa", "This device is not supported.");
+                        Utils.LOGD("This device is not supported.");
                         finish();
                   }
                   Utils.LOGD("maxagi :checkPlayServices : false");
