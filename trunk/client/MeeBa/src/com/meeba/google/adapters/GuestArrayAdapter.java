@@ -1,7 +1,6 @@
 package com.meeba.google.adapters;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +16,6 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 
 import java.util.List;
 

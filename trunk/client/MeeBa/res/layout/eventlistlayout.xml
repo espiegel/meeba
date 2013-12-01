@@ -6,7 +6,28 @@
     android:background="@drawable/card_background"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="5dp">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/hostPicture"
+            android:src="@drawable/no_photo"
+            android:layout_marginRight="3dp"
+            android:layout_marginLeft="3dp"/>
+
+        <TextView
+            android:id="@+id/txtHost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textIsSelectable="false" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
