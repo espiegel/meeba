@@ -138,12 +138,13 @@ $app->get('/getEventsByUser/:uid', function($uid) use ($app, $db) {
 });
 
 $app->post('/getUsersByPhones', function() use ($app, $db) {
-	$phones = $_POST['phones'];
-	$phones = json_decode($phones); // decode the json array
-	$app->getLog()->info(print_r($phones,TRUE));
-	$users = $db->getUsersByPhones($phones);
-
-	if(!$users) {
+	if(isset($_POST['phones'])) {
+		$phones = $_POST['phones'];
+		$phones = json_decode($phones); // decode the json array
+		$app->getLog()->info(print_r($phones,TRUE));
+		$users = $db->getUsersByPhones($phones);
+	}
+	if(!isset($_POST['phones']) || !$users) {
 		echo json_encode(array(
 			'success' => 0,
 			'error' => "Failed to get users from phone array",
