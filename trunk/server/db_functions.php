@@ -125,11 +125,12 @@ class DB_Functions {
                 $data = mysql_fetch_array($eventdata);
                 $hostuid = $data['host_uid'];            
                 
-                $hostdata = mysql_fetch_assoc(mysql_query("SELECT name from `users` WHERE uid = $hostuid"));
+                $hostdata = mysql_fetch_assoc(mysql_query("SELECT name, picture_url from `users` WHERE uid = $hostuid"));
 
                 $events[$i]['eid'] = $eid;
                 $events[$i]['host_uid'] = $hostuid;
                 $events[$i]['host_name'] = $hostdata['name'];
+                $events[$i]['host_picture_url'] = $hostdata['picture_url'];
                 $events[$i]['where'] = $data['where'];
                 $events[$i]['when'] = $data['when'];
                 $events[$i]['created_at'] = $data['created_at'];
