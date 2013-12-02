@@ -3,14 +3,18 @@ package com.meeba.google.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -56,6 +60,18 @@ public class WhereWhenActivity extends SherlockActivity {
             }
         });
 
+        editWhere.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE) {
+                    nextButton();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         editWhen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,7 +103,7 @@ public class WhereWhenActivity extends SherlockActivity {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                         editWhen.setText("");
-                        mDate = day + "/" + (month+1) + "/" + year;
+                        mDate = day + "/" + (month + 1) + "/" + year;
                         editWhen.setText(mDate);
                         mTimePicker.show();
                     }

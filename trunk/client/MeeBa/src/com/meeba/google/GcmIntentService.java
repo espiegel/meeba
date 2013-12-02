@@ -24,15 +24,12 @@ import org.json.JSONObject;
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    private NotificationCompat.Builder builder;
 
     private static final String TAG_INVITE = "invite";
-    private static final String TITLE_INVITE = "MeeBa Invitation from ";
+    private static final String TITLE_INVITE = "MeeBa invitation from ";
 
     private static final String TAG_RESPONSE = "inviteResponse";
     private static final String TITLE_RESPONSE = "MeeBa response from ";
-
-
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -62,8 +59,6 @@ public class GcmIntentService extends IntentService {
             } else {
                 if (GoogleCloudMessaging.
                         MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-
-
                     try {
                         Utils.LOGD("extras=" + extras.toString());
                         String tag = extras.getString("tag");
@@ -92,10 +87,10 @@ public class GcmIntentService extends IntentService {
 
                          /* get status */
                             String status = extras.getString("status");
-                            if (status.equals("0")){
-                                status="accept";
-                            }else{
-                                status="decline";
+                            if (status.equals("1")){
+                                status = "accepted";
+                            } else {
+                                status = "declined";
                             }
 
 
@@ -180,7 +175,7 @@ public class GcmIntentService extends IntentService {
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            String msg = user.getName()+" " + status + "your invitation";
+            String msg = "They " + status + " your invitation";
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
