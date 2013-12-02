@@ -12,13 +12,11 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
-import com.meeba.google.database.DatabaseHandler;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 /**
  * Created by Eidan on 11/19/13.
@@ -147,9 +145,10 @@ public class InvitationActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(InvitationActivity.this).build();
                         mImageLoader = ImageLoader.getInstance();
-                        mImageLoader.init(config);
+                        if(!mImageLoader.isInited()) {
+                            mImageLoader.init(Utils.getImageLoaderConfig(InvitationActivity.this));
+                        }
                         mImageLoader.displayImage(host.getPicture_url(), mImageHost);
                     }
                 });

@@ -16,7 +16,6 @@ import com.meeba.google.R;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.List;
 
@@ -91,6 +90,9 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
         if(!TextUtils.isEmpty(picture_url)) {
             // Load image, decode it to Bitmap and return Bitmap to callback
             Utils.LOGD("Changing image of "+holder.text.getText());
+            if(!mImageLoader.isInited()) {
+                mImageLoader.init(Utils.getImageLoaderConfig(context));
+            }
             mImageLoader.displayImage(picture_url, holder.imageView);
         }
 
