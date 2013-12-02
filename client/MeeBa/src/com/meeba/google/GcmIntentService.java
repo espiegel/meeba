@@ -11,8 +11,10 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
+import com.meeba.google.activities.EventPageActivity;
 import com.meeba.google.activities.InvitationActivity;
 import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 
 import org.json.JSONException;
@@ -26,6 +28,11 @@ public class GcmIntentService extends IntentService {
 
     private static final String TAG_INVITE = "invite";
     private static final String TITLE_INVITE = "MeeBa Invitation from ";
+
+    private static final String TAG_RESPONSE = "inviteResponse";
+    private static final String TITLE_RESPONSE = "MeeBa response from ";
+
+
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -52,28 +59,55 @@ public class GcmIntentService extends IntentService {
             if (GoogleCloudMessaging.
                     MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
                 Utils.LOGD("GCM: Error sending a GCM message");
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            } else {
+                if (GoogleCloudMessaging.
+                        MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
 
-                try {
-                    Utils.LOGD("extras="+extras.toString());
-                    String tag = extras.getString("tag");
+                    try {
+                        Utils.LOGD("extras=" + extras.toString());
+                        String tag = extras.getString("tag");
 
-                    if(tag.equals(TAG_INVITE)) {
-                        String jsonEvent = extras.getString("event");
-                        Gson gson = new Gson();
-                        JSONObject json = new JSONObject(jsonEvent);
+                        if (tag.equals(TAG_INVITE)) {
+                            String jsonEvent = extras.getString("event");
+                            Gson gson = new Gson();
+                            JSONObject json = new JSONObject(jsonEvent);
 
-                        Utils.LOGD(json.toString());
-                        Event event = gson.fromJson(json.toString(), Event.class);
-                        sendNotification(tag, event);
-                        Utils.LOGD("GCM: Received a message " + extras.toString());
+                            Utils.LOGD(json.toString());
+                            Event event = gson.fromJson(json.toString(), Event.class);
+                            sendNotification(tag, event);
+                            Utils.LOGD("GCM: Received a message " + extras.toString());
+                        } else if (tag.equals(TAG_RESPONSE)){
+                            /* TODO: Dayana add to recev invite from guest  */
+                        /* get event from extras */
+                            String jsonEvent = extras.getString("event");
+                            Gson gson = new Gson();
+                            JSONObject json = new JSONObject(jsonEvent);
+                            Event event = gson.fromJson(json.toString(), Event.class);
+
+                        /* get user  */
+                            String jsonUser = extras.getString("user");
+                            JSONObject json_user = new JSONObject(jsonUser);
+                            User user = gson.fromJson(json_user.toString(), User.class);
+
+                         /* get status */
+                            String status = extras.getString("status");
+                            if (status.equals("0")){
+                                status="accept";
+                            }else{
+                                status="decline";
+                            }
+
+
+                        /*TODO: change to sent a response notification */
+                            recevNotification(tag, event, user , status);
+                            Utils.LOGD("GCM: Received a message " + extras.toString());
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        return;
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return;
-                }
 
                 /*
                 String when = extras.getString("when");
@@ -83,6 +117,7 @@ public class GcmIntentService extends IntentService {
                 Utils.LOGD("hostName="+hostName);
                 int eid = Integer.valueOf(extras.getString("eid"));*/
 
+                }
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -125,5 +160,43 @@ public class GcmIntentService extends IntentService {
 
             mNotificationManager.notify(NOTIFICATION_ID, notif);
         }
+    }
+
+    private void recevNotification(String tag, Event event, User user, String status){
+        /* TODO: like the above function. use to sent the push to host */
+        /* add here if like this I get EVENT and sent to event page*/
+        if(tag.equals(TAG_RESPONSE)) {
+            mNotificationManager = (NotificationManager)
+                    this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Intent intent = new Intent(this, EventPageActivity.class);
+            Bundle bundle = new Bundle();
+
+            bundle.putSerializable(Utils.BUNDLE_EVENT, event);
+
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            String msg = user.getName()+" " + status + "your invitation";
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setContentTitle(TITLE_RESPONSE+user.getName())
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText(msg))
+                            .setContentText(msg);
+
+            mBuilder.setContentIntent(contentIntent);
+            Notification notif = mBuilder.build();
+
+            notif.flags |= Notification.FLAG_AUTO_CANCEL;
+            notif.defaults |= Notification.DEFAULT_ALL;
+
+            mNotificationManager.notify(NOTIFICATION_ID, notif);
+        }
+
     }
 }
