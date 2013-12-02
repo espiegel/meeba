@@ -32,7 +32,6 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder().cacheInMemory(true).build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).denyCacheImageMultipleSizesInMemory()
                 .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
-                .memoryCacheSize(2 * 1024 * 1024)
                 .defaultDisplayImageOptions(mDisplayImageOptions)
                 .build();
         mImageLoader = ImageLoader.getInstance();

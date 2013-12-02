@@ -34,9 +34,7 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
         this.context = context;
         this.list = list;
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).build();
         mImageLoader = ImageLoader.getInstance();
-        mImageLoader.init(config);
     }
 
     public void onDestroy() {
