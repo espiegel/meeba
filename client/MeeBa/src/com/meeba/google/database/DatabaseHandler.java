@@ -107,7 +107,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // Inserting Row
         db.insert(tableName, null, values);
-        db.close(); // Closing database connection
+        //db.close(); // Closing database connection
     }
 
     /**
@@ -131,7 +131,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             userDetails.put(KEY_PICTURE_URL, cursor.getString(6));
         }
         cursor.close();
-        db.close();
+        //db.close();
 
         for (String s : userDetails.values()) {
             Utils.LOGD("DB: " + s);
@@ -177,7 +177,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return contacts;
     }
@@ -199,7 +199,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (tableExists(TABLE_CONTACTS))
             db.delete(TABLE_CONTACTS, null, null);
 
-        db.close();
+        //db.close();
     }
 
     /**
@@ -219,7 +219,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             Utils.LOGD(tableName + " doesn't exist :(((");
         } finally {
-            mDatabase.close();
+            //mDatabase.close();
         }
         return tableExists;
     }
@@ -238,7 +238,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int rowCount = cursor.getCount();
-        db.close();
+        //db.close();
         cursor.close();
 
         // return row count
@@ -260,7 +260,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         result = (cursor.getCount() > 0);
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return result;
     }
