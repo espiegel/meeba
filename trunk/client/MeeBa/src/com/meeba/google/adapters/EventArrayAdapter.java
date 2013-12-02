@@ -11,10 +11,8 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.objects.Event;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.List;
 
@@ -29,13 +27,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         this.context = context;
         this.list = list;
 
-        DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder().cacheInMemory(true).build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).denyCacheImageMultipleSizesInMemory()
-                .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
-                .defaultDisplayImageOptions(mDisplayImageOptions)
-                .build();
         mImageLoader = ImageLoader.getInstance();
-        mImageLoader.init(config);
     }
 
     static class ViewHolder {
@@ -76,6 +68,9 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         final ImageView hostPicture = holder.hostPicture;
 
         if(event.getHost_picture_url() != null && !TextUtils.isEmpty(event.getHost_picture_url())) {
+            if(!mImageLoader.isInited()) {
+                mImageLoader.init(Utils.getImageLoaderConfig(context));
+            }
             mImageLoader.displayImage(event.getHost_picture_url(), hostPicture);
         }
 

@@ -13,6 +13,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -122,5 +126,15 @@ public class Utils {
             phoneList.add(s);
         }
         return phoneList;
+    }
+
+    public static ImageLoaderConfiguration getImageLoaderConfig(Context context) {
+        DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder().cacheInMemory(true).build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).denyCacheImageMultipleSizesInMemory()
+                .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
+                .defaultDisplayImageOptions(mDisplayImageOptions)
+                .build();
+
+        return config;
     }
 }

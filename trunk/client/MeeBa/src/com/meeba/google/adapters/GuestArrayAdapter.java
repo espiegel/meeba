@@ -12,10 +12,7 @@ import android.widget.TextView;
 import com.meeba.google.R;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.List;
 
@@ -33,13 +30,7 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         this.context = context;
         this.list = list;
 
-        DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder().cacheInMemory(true).build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).denyCacheImageMultipleSizesInMemory()
-                .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
-                .defaultDisplayImageOptions(mDisplayImageOptions)
-                .build();
         mImageLoader = ImageLoader.getInstance();
-        mImageLoader.init(config);
     }
 
     static class ViewHolder {
@@ -79,6 +70,9 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         Utils.LOGD("guest="+guest);
         if(!TextUtils.isEmpty(picture_url)) {
             Utils.LOGD("Changing image of pos="+position+", guest=" + holder.guestlist_name.getText());
+            if(!mImageLoader.isInited()) {
+                mImageLoader.init(Utils.getImageLoaderConfig(context));
+            }
             mImageLoader.displayImage(picture_url, holder.guestPicture);
         }
         return view;

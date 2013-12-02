@@ -17,7 +17,6 @@ import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.List;
 
@@ -80,9 +79,10 @@ public class EventPageActivity extends SherlockActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(EventPageActivity.this).build();
                         mImageLoader = ImageLoader.getInstance();
-                        mImageLoader.init(config);
+                        if(!mImageLoader.isInited()) {
+                            mImageLoader.init(Utils.getImageLoaderConfig(EventPageActivity.this));
+                        }
                         mImageLoader.displayImage(host.getPicture_url(), mImageHost);
                     }
                 });
