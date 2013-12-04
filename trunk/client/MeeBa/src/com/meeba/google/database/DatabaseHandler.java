@@ -33,7 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Login Table & Contacts Table  Columns names
     private static final String KEY_UID = "uid";
     private static final String KEY_EMAIL = "email";
-    private static final String KEY_NAME = "name";
+      private static final String KEY_NAME = "name";
     private static final String KEY_PHONE = "phone_number";
     private static final String KEY_RID = "rid";
     private static final String KEY_CREATED_AT = "created_at";
