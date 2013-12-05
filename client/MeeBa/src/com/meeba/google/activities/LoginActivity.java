@@ -469,6 +469,7 @@ public class LoginActivity extends Activity implements OnClickListener,
 
         Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
         startActivity(i);
+        this.finish();
     }
 
     private void signoutAndDisconnect() {
