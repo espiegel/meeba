@@ -102,12 +102,11 @@ public class UserFunctions {
      * @param uid User if of the user.
      * @return Returns a list of all events or null if the web service failed.
      */
-    public static List<Event> getEventsByUser(int uid) {
+    public static List<Event> getEventsByUser(int uid) throws Exception {
         try {
             List<Event> events = new ArrayList<Event>();
             Gson lGson = new Gson();
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getEventsByUser/" + uid);
-
             if(lJsonObject == null)
                 return null;
 
@@ -124,7 +123,8 @@ public class UserFunctions {
             return events;
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
+           // return null;
         }
     }
 

@@ -39,8 +39,9 @@ public class JSONParser {
         //httpGet.addHeader(ACCEPT_ENCODING, ACCEPT_ENCODING_VALUE);
         httpGet.addHeader(CONNECTION, CONNECTION_VALUE);
         httpGet.addHeader(PROXY_CONNECTION, PROXY_CONNECTION_VALUE);
+        HttpEntity httpEntity=null;
 
-        HttpEntity httpEntity = Utils.getInstance().getHttpClient().execute(httpGet).getEntity();
+        httpEntity = Utils.getInstance().getHttpClient().execute(httpGet).getEntity();
         InputStream lInputStream = httpEntity.getContent();
 
         try {

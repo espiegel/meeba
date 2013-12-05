@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -86,8 +87,10 @@ public class DashboardActivity extends SherlockActivity {
 
     private void asyncRefresh() {
         final Activity dashboard = this;
+
         AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
             ProgressDialog progressDialog;
+            boolean exceptionOccured = false;
 
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
@@ -98,7 +101,12 @@ public class DashboardActivity extends SherlockActivity {
 
             protected List<Event> doInBackground(Void... params) {
                 Utils.LOGD("doInBackground");
-                list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
+
+                try {
+                    list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
+                } catch (Exception e) {
+                    exceptionOccured = true;
+                }
 
                 Utils.LOGD("list =  " + list);
 
@@ -112,6 +120,10 @@ public class DashboardActivity extends SherlockActivity {
             protected void onPostExecute(List<Event> events) {
                 Utils.LOGD("onPostExecute");
                 // update the event list view
+                if (exceptionOccured)
+                    Toast.makeText(DashboardActivity.this, "No Internet Connection\n connect  to internet and refresh ",
+                            Toast.LENGTH_LONG).show();
+
                 mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
                 mEventListView.setAdapter(mEventArrayAdapter);
 
