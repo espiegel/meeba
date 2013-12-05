@@ -3,7 +3,6 @@ package com.meeba.google.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -140,7 +139,7 @@ public class WhereWhenActivity extends SherlockActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.where_when, menu);
+        inflater.inflate(R.menu.wherewhen_activity, menu);
         return true;
     }
 
