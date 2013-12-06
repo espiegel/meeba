@@ -27,7 +27,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Sherlock.Light" >
+        android:theme="@style/Theme.Sherlock.Light"
+        android:name="Acra">
 
         <receiver
             android:name=".GcmBroadcastReceiver"
@@ -47,6 +48,12 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity android:name="org.acra.CrashReportDialog"
+            android:theme="@android:style/Theme.Dialog"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true" />
 
         <activity
 
