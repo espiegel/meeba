@@ -23,6 +23,7 @@
     <string name="refreshing_events">Refreshing Events</string>
     <string name="please_wait">Please wait !</string>
     <string name="invite">Invite</string>
+    <string name="crash_toast_text">An unexpected error has occurred. Please help us fix this by sending us an email with the crash report. Thank you!</string>
 
     <color name="green">#33C733</color>
     <color name="red">#C73333</color>
