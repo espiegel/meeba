@@ -6,6 +6,12 @@
     android:paddingLeft="6dp"
     android:paddingRight="6dp">
 
+    <uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/ptr_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <ListView
         android:id="@+id/listViewDashboard"
         android:layout_width="match_parent"
@@ -13,6 +19,7 @@
         android:listSelector="@drawable/card_background">
     </ListView>
 
+    </uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout>
 
 
 

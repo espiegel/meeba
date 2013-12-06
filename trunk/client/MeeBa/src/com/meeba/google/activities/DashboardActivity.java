@@ -30,6 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 /**
  * Created by Padi on 07/11/13.
  */
@@ -41,12 +46,38 @@ public class DashboardActivity extends SherlockActivity {
     private List<Event> list;
     private EventArrayAdapter mEventArrayAdapter;
     private List<User> ListOfAppContacts;
+    private PullToRefreshLayout mPullToRefreshLayout;
+    private boolean pullTorefresh = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Utils.LOGD("Dashboard activity onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_activity);
+
+        // Now find the PullToRefreshLayout to setup
+        mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
+
+        // Now setup the PullToRefreshLayout
+        ActionBarPullToRefresh.from(this)
+                // Mark All Children as pullable
+                .allChildrenArePullable()
+                        // Set the OnRefreshListener
+                .listener(
+                        new OnRefreshListener() {
+
+
+                            @Override
+                            public void onRefreshStarted(View view) {
+                                pullTorefresh=true;
+                                asyncRefresh();
+
+                            }
+                        }
+                )
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
+
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle("Events");
@@ -95,9 +126,12 @@ public class DashboardActivity extends SherlockActivity {
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
-                progressDialog = ProgressDialog
-                        .show(DashboardActivity.this, getString(R.string.refreshing_events), getString(R.string.please_wait), true);
+                if (!pullTorefresh) {
+                    progressDialog = ProgressDialog
+                            .show(DashboardActivity.this, getString(R.string.refreshing_events), getString(R.string.please_wait), true);
+                }
             }
+
 
             protected List<Event> doInBackground(Void... params) {
                 Utils.LOGD("doInBackground");
@@ -128,9 +162,11 @@ public class DashboardActivity extends SherlockActivity {
                 mEventListView.setAdapter(mEventArrayAdapter);
 
                 try {
-                    progressDialog.dismiss();
+                        progressDialog.dismiss();
                 } catch (Exception e) {/* nothing */ }
 
+                mPullToRefreshLayout.setRefreshComplete();  // Notify PullToRefreshLayout that  refresh has finished
+                pullTorefresh=false; //initialize pullTorefresh
             }
         };
         task.execute();
