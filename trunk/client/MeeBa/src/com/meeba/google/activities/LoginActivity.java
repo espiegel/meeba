@@ -244,6 +244,7 @@ public class LoginActivity extends Activity implements OnClickListener,
     private void askUserPhoneNumber() {
         Utils.LOGD("maxagi: in askUserPhoneNumber");
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setInverseBackgroundForced(true);
         alert.setTitle("Please Enter Your Phone Number");
 
         // Set an EditText view to get user input
