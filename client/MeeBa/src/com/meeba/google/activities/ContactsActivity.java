@@ -57,7 +57,7 @@ public class ContactsActivity extends SherlockActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 User selectedUser = (User) adapterView.getAdapter().getItem(i);
-                selectedUser.setSelected(true);
+                selectedUser.setSelected(! selectedUser.isSelected()); // invert the selection state
             }
         });
 
