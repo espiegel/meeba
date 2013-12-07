@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -50,6 +52,15 @@ public class ContactsActivity extends SherlockActivity {
         mWhere = bundle.getString("where");
 
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
+
+        mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                User selectedUser = (User) adapterView.getAdapter().getItem(i);
+                selectedUser.setSelected(true);
+            }
+        });
+
         asyncRefresh();
     }
 
@@ -116,6 +127,7 @@ public class ContactsActivity extends SherlockActivity {
         onBackPressed();
         return true;
     }
+
 
     private void invitePressed() {
         mListUid = new ArrayList<String>();
