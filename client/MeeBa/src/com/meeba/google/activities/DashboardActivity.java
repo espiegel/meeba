@@ -32,7 +32,6 @@ import java.util.Map;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
@@ -57,7 +56,6 @@ public class DashboardActivity extends SherlockActivity {
 
         // Now find the PullToRefreshLayout to setup
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
-
         // Now setup the PullToRefreshLayout
         ActionBarPullToRefresh.from(this)
                 // Mark All Children as pullable
@@ -65,19 +63,15 @@ public class DashboardActivity extends SherlockActivity {
                         // Set the OnRefreshListener
                 .listener(
                         new OnRefreshListener() {
-
-
                             @Override
                             public void onRefreshStarted(View view) {
                                 pullTorefresh=true;
                                 asyncRefresh();
-
                             }
                         }
                 )
                         // Finally commit the setup to our PullToRefreshLayout
                 .setup(mPullToRefreshLayout);
-
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle("Events");
@@ -112,6 +106,7 @@ public class DashboardActivity extends SherlockActivity {
             });
             asyncRefresh();
             asyncUpdateContacts();
+
         }
     }
 
@@ -158,11 +153,19 @@ public class DashboardActivity extends SherlockActivity {
                     Toast.makeText(DashboardActivity.this, "No Internet Connection\n connect  to internet and refresh ",
                             Toast.LENGTH_LONG).show();
 
+                /*
+                // add a dummy event  with eid=-1 when the list is empty ,to allow pull to refresh on an "empty" table
+                //the EventArrayAdapter makes events with eid=-1 invisible
+             if(events.size()==0) {
+                   Event dummyEvent = new Event( -1,-1,"dummyEvent","dummyEvent","dummyEvent"  );
+                    events.add(0,dummyEvent);
+             }
+            */
                 mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
                 mEventListView.setAdapter(mEventArrayAdapter);
 
                 try {
-                        progressDialog.dismiss();
+                    progressDialog.dismiss();
                 } catch (Exception e) {/* nothing */ }
 
                 mPullToRefreshLayout.setRefreshComplete();  // Notify PullToRefreshLayout that  refresh has finished
