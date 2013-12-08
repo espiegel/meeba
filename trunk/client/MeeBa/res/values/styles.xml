@@ -23,7 +23,7 @@
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
 
-    <style name="MeebaStyle.MeebaDialog">
+    <style name="MeebaStyle.MeebaDialog" parent="@android:Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowBackground">@null</item>
         <item name="android:windowIsFloating">true</item>

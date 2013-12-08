@@ -71,7 +71,8 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             if(!mImageLoader.isInited()) {
                 mImageLoader.init(Utils.getImageLoaderConfig(context));
             }
-            mImageLoader.displayImage(event.getHost_picture_url(), hostPicture);
+            String url = event.getHost_picture_url();
+            mImageLoader.displayImage(url.replace("?sz=50", "?sz=64"), hostPicture);
         }
 
         /*

@@ -17,8 +17,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/hostPicture"
             android:src="@drawable/no_photo"
-            android:layout_marginRight="3dp"
-            android:layout_marginLeft="3dp"/>
+            android:layout_marginRight="6dp"
+            android:layout_marginLeft="3dp"
+            android:layout_gravity="center_vertical" />
 
         <TextView
             android:id="@+id/txtHost"
@@ -26,7 +27,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:textIsSelectable="false" />
+            android:textIsSelectable="false"
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
     <LinearLayout
@@ -41,8 +43,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/imageView"
             android:src="@drawable/when"
-            android:layout_marginRight="3dp"
-            android:layout_marginLeft="3dp"/>
+            android:layout_marginRight="6dp"
+            android:layout_marginLeft="3dp"
+            android:layout_gravity="center_vertical" />
 
         <TextView
             android:id="@+id/eventwhen"
@@ -50,7 +53,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:textIsSelectable="false" />
+            android:textIsSelectable="false"
+            android:layout_gravity="center_vertical" />
         </LinearLayout>
 
     <LinearLayout
@@ -64,8 +68,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/imageView"
             android:src="@drawable/where"
-            android:layout_marginRight="3dp"
-            android:layout_marginLeft="3dp"/>
+            android:layout_marginRight="6dp"
+            android:layout_marginLeft="3dp"
+            android:layout_gravity="center_vertical" />
 
         <TextView
             android:id="@+id/eventwhere"
@@ -73,7 +78,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:textIsSelectable="false" />
+            android:textIsSelectable="false"
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
 
