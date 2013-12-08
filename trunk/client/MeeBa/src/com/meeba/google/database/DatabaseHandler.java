@@ -33,7 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Login Table & Contacts Table  Columns names
     private static final String KEY_UID = "uid";
     private static final String KEY_EMAIL = "email";
-      private static final String KEY_NAME = "name";
+    private static final String KEY_NAME = "name";
     private static final String KEY_PHONE = "phone_number";
     private static final String KEY_RID = "rid";
     private static final String KEY_CREATED_AT = "created_at";
@@ -61,8 +61,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         //create the Contacts  table :
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
-                + KEY_UID + " INTEGER PRIMARY KEY,"  // 0
-                + KEY_EMAIL + " TEXT UNIQUE,"        // 1
+                + KEY_UID + " INTEGER,"              // 0
+                + KEY_EMAIL + " TEXT,"               // 1
                 + KEY_NAME + " TEXT,"                // 2
                 + KEY_PHONE + " TEXT,"               // 3
                 + KEY_RID + " TEXT,"                 // 4
@@ -183,6 +183,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
+     * Get a contact from the database that has the same uid as the user argument
+     * @param uid uid of user to get
+     * @return Returns the user or null if not found
+     */
+    public User getContact(int uid) {
+        HashMap<String, String> contactDetails = new HashMap<String, String>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        User contact = null;
+
+        Cursor cursor = db.query(TABLE_CONTACTS, new String[] { KEY_UID, KEY_EMAIL, KEY_NAME, KEY_PHONE, KEY_RID, KEY_CREATED_AT, KEY_PICTURE_URL },
+                KEY_UID + " = ?", new String[] { String.valueOf(uid) }, null, null, null);
+        // Move to first row
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0) {
+            contactDetails.put(KEY_UID, cursor.getString(0));
+            contactDetails.put(KEY_EMAIL, cursor.getString(1));
+            contactDetails.put(KEY_NAME, cursor.getString(2));
+            contactDetails.put(KEY_PHONE, cursor.getString(3));
+            contactDetails.put(KEY_RID, cursor.getString(4));
+            contactDetails.put(KEY_CREATED_AT, cursor.getString(5));
+            contactDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+
+            contact = new User(Integer.valueOf(contactDetails.get(KEY_UID)), contactDetails.get(KEY_EMAIL),
+                    contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
+                    contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
+
+        }
+
+        cursor.close();
+        //db.close();
+
+        return contact;
+    }
+
+    /**
      * Re crate database
      * Delete all tables and create them again
      */
@@ -255,13 +291,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         boolean result;
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String[] columns = { KEY_UID };
-        Cursor cursor = db.query(TABLE_CONTACTS, columns, KEY_UID + " = " + user.getUid(), null, null, null, null);
-        result = (cursor.getCount() > 0);
+        if(user.getUid() != Utils.DUMMY_USER) {
+            String[] columns = { KEY_UID };
+            Cursor cursor = db.query(TABLE_CONTACTS, columns, KEY_UID + " = " + user.getUid(), null, null, null, null);
+            result = (cursor.getCount() > 0);
+            cursor.close();
+            //db.close();
 
-        cursor.close();
-        //db.close();
+            return result;
+        } else {
+            String[] columns = { KEY_UID };
+            Cursor cursor = db.query(TABLE_CONTACTS, columns, KEY_NAME + " = ? AND " + KEY_PHONE + " = ?", new String[] { user.getName(), user.getPhone_number() }, null, null, null);
+            result = (cursor.getCount() > 0);
+            cursor.close();
+            //db.close();
 
-        return result;
+            return result;
+        }
+    }
+
+    /**
+     * Deletes a user from the contact table. If it is a real meeba user then delete by uid, otherwise
+     * we delete by phone number
+     * @param user user to be deleted
+     * @return returns true on success and false on failure
+     */
+    public boolean removeContact(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int result;
+        if(user.getUid() != Utils.DUMMY_USER) {
+            result = db.delete(TABLE_CONTACTS, KEY_UID + " = ?", new String[] { String.valueOf(user.getUid()) });
+        } else {
+            result = db.delete(TABLE_CONTACTS, KEY_PHONE + " = ?", new String[] {user.getPhone_number() });
+        }
+
+        return result > 0;
+    }
+
+    /**
+     * Updates an existing contact. Can't update a contact that doesn't have meeba
+     * @param user User to update. Searches by uid, updates all other values
+     * @return Returns true on success and false on failure
+     */
+    public boolean updateContact(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int result;
+        if(user.getUid() != Utils.DUMMY_USER) {
+            ContentValues args = new ContentValues();
+            args.put(KEY_NAME, user.getName());
+            args.put(KEY_EMAIL, user.getEmail());
+            args.put(KEY_PICTURE_URL, user.getPicture_url());
+            args.put(KEY_PHONE, user.getPhone_number());
+            args.put(KEY_RID, user.getRid());
+
+            result = db.update(TABLE_CONTACTS, args, KEY_UID + " = ?", new String[] { String.valueOf(user.getUid()) });
+
+            return result > 0;
+        }
+        return false;
     }
 }

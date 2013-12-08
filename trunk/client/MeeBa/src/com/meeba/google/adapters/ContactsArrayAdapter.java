@@ -81,14 +81,16 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
             ((ViewHolder) view.getTag()).checkbox.setTag(list.get(position));
         }
         final ViewHolder holder = (ViewHolder) view.getTag();
+
+        User user = list.get(position);
         // For now just show the name
-        String name = list.get(position).getName();
-        boolean check = list.get(position).isSelected();
-        String picture_url = list.get(position).getPicture_url();
+        String name = user.getName();
+        boolean check = user.isSelected();
+        String picture_url = user.getPicture_url();
 
         holder.text.setText(name);
         holder.checkbox.setChecked(check);
-        Utils.LOGD("getView: position="+position+", name="+name+", check="+check+", picture_url="+picture_url);
+        Utils.LOGD("getView: position="+position+", user="+user);
 
 
         if(!TextUtils.isEmpty(picture_url)) {
@@ -98,6 +100,8 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
                 mImageLoader.init(Utils.getImageLoaderConfig(context));
             }
             mImageLoader.displayImage(picture_url, holder.imageView);
+        } else {
+            holder.imageView.setImageResource(R.drawable.no_photo);
         }
 
         return view;

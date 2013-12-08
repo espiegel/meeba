@@ -15,24 +15,29 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Utils {
 
     public static final String BUNDLE_EVENT = "event";
     public static final boolean DEBUG = true;
     public static final String BASE_URL = "http://54.214.243.219/meeba/";
+    public static final int DUMMY_USER = -1;
 
     private static Utils mInstance = null;
     private CookieStore mCookie = null;
     private Object mLock = new Object();
+
+    private static ImageLoader mImageLoader = ImageLoader.getInstance();
 
     public static Utils getInstance() {
         if (mInstance == null) {
@@ -89,8 +94,8 @@ public class Utils {
         }
     }
 
-    public static HashMap<String, String> allPhoneNumbersAndName(ContentResolver contentResolver) {
-        HashMap<String, String> phonesMap = new HashMap<String, String>();
+    public static Map<String, String> allPhoneNumbersAndName(ContentResolver contentResolver) {
+        Map<String, String> phonesMap = new TreeMap<String, String>();
 
         Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         while (cursor.moveToNext()) {
@@ -120,7 +125,7 @@ public class Utils {
         return phonesMap;
     }
 
-    public static List<String> phoneList(HashMap<String, String> hashlist) {
+    public static List<String> phoneList(Map<String, String> hashlist) {
         List<String> phoneList = new ArrayList<String>();
         for (String s : hashlist.keySet()) {
             phoneList.add(s);
@@ -136,5 +141,13 @@ public class Utils {
                 .build();
 
         return config;
+    }
+
+    public static ImageLoader getImageLoader(Context context) {
+        if(!mImageLoader.isInited()) {
+            mImageLoader.init(Utils.getImageLoaderConfig(context));
+        }
+
+        return mImageLoader;
     }
 }

@@ -52,6 +52,8 @@ public class DatabaseFunctions {
      * @param tableName table's  name
      */
     public static void storeUserDetails(Context context, User user, String tableName) {
+        DatabaseHandler db = getDatabase(context);
+
         // Store only if there isn't a user stored already
         if (tableName.equals(DatabaseHandler.TABLE_USER) && userIsStored(context)) {
             Utils.LOGD(user.getName() + "storeUserDetails:   already stored in  " + tableName);
@@ -60,11 +62,22 @@ public class DatabaseFunctions {
 
         if (tableName.equals(DatabaseHandler.TABLE_CONTACTS) && contactIsStored(context, user)) {
             Utils.LOGD(user.getName() + "storeUserDetails :  already stored in  " + tableName);
+
+            // This is a real meeba user
+            if(user.getUid() != Utils.DUMMY_USER) {
+                // Lets get the user thats in the database
+                User databaseUser = db.getContact(user.getUid());
+
+                // If a change was found then update
+                if(!user.equals(databaseUser)) {
+                    Utils.LOGD("Updating user="+user);
+                    db.updateContact(user);
+                }
+            }
             return;
         }
 
         Utils.LOGD("storeUserDetails : adding  user=" + user + " to table: " + tableName);
-        DatabaseHandler db = getDatabase(context);
         db.addUser(tableName, user);
     }
 
