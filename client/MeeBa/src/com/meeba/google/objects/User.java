@@ -125,4 +125,32 @@ public class User implements Serializable {
                 ", picture_url='" + picture_url + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (uid != user.uid) return false;
+        if (!email.equals(user.email)) return false;
+        if (!name.equals(user.name)) return false;
+        if (!phone_number.equals(user.phone_number)) return false;
+        if (!picture_url.equals(user.picture_url)) return false;
+        if (!rid.equals(user.rid)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uid;
+        result = 31 * result + email.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + phone_number.hashCode();
+        result = 31 * result + rid.hashCode();
+        result = 31 * result + picture_url.hashCode();
+        return result;
+    }
 }

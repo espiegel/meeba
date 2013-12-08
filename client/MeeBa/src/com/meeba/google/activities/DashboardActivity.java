@@ -26,9 +26,10 @@ import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
@@ -187,12 +188,40 @@ public class DashboardActivity extends SherlockActivity {
 
             protected Void doInBackground(Void... params) {
                 Utils.LOGD("asyncUpdateContacts  doInBackground");
-                HashMap<String, String> phoneMap = Utils.allPhoneNumbersAndName(getContentResolver());
+                Map<String, String> phoneMap = Utils.allPhoneNumbersAndName(getContentResolver());
                 for (Map.Entry<String, String> entry : phoneMap.entrySet()) {
                     Utils.LOGD(entry.getKey() + ", " + entry.getValue());
                 }
 
-                ListOfAppContacts = UserFunctions.getUsersByPhones(Utils.phoneList(phoneMap));
+                List<String> phoneList = Utils.phoneList(phoneMap);
+                ListOfAppContacts = UserFunctions.getUsersByPhones(phoneList);
+
+                List<String> meebaUsersPhones = new ArrayList<String>();
+                for(User user : ListOfAppContacts) {
+                    meebaUsersPhones.add(user.getPhone_number());
+                }
+
+                // Create an 'ordered' map so that we can sort contacts alphabetically
+                TreeMap<String, String> contactMap = new TreeMap<String, String>(new Comparator<String>() {
+                    @Override
+                    public int compare(String s, String s2) {
+                        return s.toLowerCase().compareTo(s2.toLowerCase());
+                    }
+                });
+
+                // Now swap around the key and the value so that the contacts will go in the tree map ordered by name
+                for(Map.Entry<String, String> entry : phoneMap.entrySet()) {
+                    contactMap.put(entry.getValue(), entry.getKey());
+                }
+
+                // Now add users that don't have meeba to the list
+                for(Map.Entry<String, String> entry : contactMap.entrySet()) {
+                    if(!meebaUsersPhones.contains(entry.getValue())) {
+                        User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
+                        ListOfAppContacts.add(user);
+                    }
+                }
+
                 if(ListOfAppContacts != null) {
                     DatabaseFunctions.storeContacts(getApplicationContext(), ListOfAppContacts);
                 }

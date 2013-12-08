@@ -1,12 +1,18 @@
 package com.meeba.google.activities;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -22,6 +28,8 @@ import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -61,6 +69,34 @@ public class ContactsActivity extends SherlockActivity {
             }
         });
 
+        mUserListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                User user = (User)adapterView.getItemAtPosition(position);
+
+                final Dialog dialog = new Dialog(ContactsActivity.this, R.style.MeebaStyle_MeebaDialog);
+                dialog.setContentView(R.layout.dialog_contact_details);
+                ImageView contactPicture = (ImageView) dialog.findViewById(R.id.contactPicture);
+                TextView contactName = (TextView) dialog.findViewById(R.id.contactName);
+                TextView contactPhone = (TextView) dialog.findViewById(R.id.contactPhone);
+                Button button = (Button) dialog.findViewById(R.id.button);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+
+                if(!TextUtils.isEmpty(user.getPicture_url())) {
+                    Utils.getImageLoader(ContactsActivity.this).displayImage(user.getPicture_url(), contactPicture);
+                }
+                contactName.setText(user.getName());
+                contactPhone.setText(user.getPhone_number());
+
+                dialog.show();
+                return false;
+            }
+        });
         asyncRefresh();
     }
 
@@ -76,7 +112,32 @@ public class ContactsActivity extends SherlockActivity {
             }
 
             protected List<User> doInBackground(Void... params) {
-                return DatabaseFunctions.loadContacts(getApplicationContext());
+                List<User> userList = DatabaseFunctions.loadContacts(getApplicationContext());
+                List<User> sortedUserList = new ArrayList<User>();
+
+                // Sort the user list by alphabetical order
+                Collections.sort(userList, new Comparator<User>() {
+                    @Override
+                    public int compare(User user, User user2) {
+                        return user.getName().toLowerCase().compareTo(user2.getName().toLowerCase());
+                    }
+                });
+
+                // First add meeba users
+                for(User user : userList) {
+                    if(user.getUid() != Utils.DUMMY_USER) {
+                        sortedUserList.add(user);
+                    }
+                }
+
+                // Then add the rest of the contact list
+                for(User user : userList) {
+                    if(user.getUid() == Utils.DUMMY_USER)
+                    sortedUserList.add(user);
+                }
+
+                return sortedUserList;
+
             }
 
             protected void onPostExecute(List<User> list) {
@@ -134,15 +195,59 @@ public class ContactsActivity extends SherlockActivity {
 
         mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
 
+        // Lets get all dummy users (ones without meeba)
+        List<User> dummies = new ArrayList<User>();
+
         for (User user : mContactsAdapter.getList()) {
             Utils.LOGD("user= " + user.toString());
             if (user.isSelected()) {
-                mListUid.add(String.valueOf(user.getUid()));
+                if(user.getUid() != Utils.DUMMY_USER) {
+                    mListUid.add(String.valueOf(user.getUid()));
+                } else {
+                    dummies.add(user);
+                }
+            }
+        }
+
+
+        // Open a dialog asking the user whether he wants to send an sms
+        if(!dummies.isEmpty()) {
+            String separator = "; ";
+
+            // Silly Samsung...
+            if(android.os.Build.MANUFACTURER.equalsIgnoreCase("Samsung")){
+                separator = ", ";
+            }
+
+            String address = "";
+            for(User dummy : dummies) {
+                if(TextUtils.isEmpty(address)) {
+                    address = address.concat(dummy.getPhone_number());
+                } else {
+                    address = address.concat(separator+dummy.getPhone_number());
+                }
+            }
+
+            try {
+                Utils.LOGD("address="+address);
+                Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                sendIntent.putExtra("address", address);
+                sendIntent.putExtra("sms_body", "Hey, you're invited to "+mWhere+" at "+mWhen+"! Generated by MeeBa for Android: https://code.google.com/p/meeba/");
+                sendIntent.setType("vnd.android-dir/mms-sms");
+                startActivity(sendIntent);
+
+            } catch (Exception e) {
+                Toast.makeText(ContactsActivity.this,
+                        "SMS sending failed, oops!",
+                        Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
         }
 
         if (mListUid.isEmpty()) {
-            Utils.showToast(ContactsActivity.this, "You must select users to invite");
+            if(dummies.isEmpty()) {
+                Utils.showToast(ContactsActivity.this, "You must select users to invite");
+            }
             return;
         }
 
