@@ -1,6 +1,5 @@
 package com.meeba.google.activities;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -8,20 +7,18 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.ContactsArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.dialogs.ContactDetailsDialog;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
@@ -36,7 +33,7 @@ import java.util.List;
 /**
  * Created by or malka on 11/11/13.
  */
-public class ContactsActivity extends SherlockActivity {
+public class ContactsActivity extends SherlockFragmentActivity {
     private ListView mUserListView;
     private ContactsArrayAdapter mContactsAdapter;
     private String mWhen;
@@ -74,26 +71,8 @@ public class ContactsActivity extends SherlockActivity {
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
                 User user = (User)adapterView.getItemAtPosition(position);
 
-                final Dialog dialog = new Dialog(ContactsActivity.this, R.style.MeebaStyle_MeebaDialog);
-                dialog.setContentView(R.layout.dialog_contact_details);
-                ImageView contactPicture = (ImageView) dialog.findViewById(R.id.contactPicture);
-                TextView contactName = (TextView) dialog.findViewById(R.id.contactName);
-                TextView contactPhone = (TextView) dialog.findViewById(R.id.contactPhone);
-                Button button = (Button) dialog.findViewById(R.id.button);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
-
-                if(!TextUtils.isEmpty(user.getPicture_url())) {
-                    Utils.getImageLoader(ContactsActivity.this).displayImage(user.getPicture_url(), contactPicture);
-                }
-                contactName.setText(user.getName());
-                contactPhone.setText(user.getPhone_number());
-
-                dialog.show();
+                ContactDetailsDialog dialog = new ContactDetailsDialog(user);
+                dialog.show(getSupportFragmentManager(), ContactDetailsDialog.TAG);
                 return false;
             }
         });

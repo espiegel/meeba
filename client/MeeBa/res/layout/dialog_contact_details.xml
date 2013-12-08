@@ -7,61 +7,59 @@
     android:padding="15dp"
     android:background="@drawable/dialog_background">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp"
-        android:layout_gravity="center">
-
-        <ImageView
-            android:id="@+id/contactPicture"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/no_photo"/>
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:layout_gravity="center">
 
-        <TextView
-            android:id="@+id/contactName"
+            <ImageView
+                android:id="@+id/contactPicture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/large_no_photo"
+                android:layout_gravity="center" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="10dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/contactName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unknown_person"
+                    style="@style/MeebaStyle"
+                    android:textSize="14sp"
+                    android:textIsSelectable="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp" />
+
+
+                <TextView
+                    android:id="@+id/contactPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unknown_person"
+                    android:layout_gravity="center_horizontal"
+                    style="@style/MeebaStyle"
+                    android:textSize="14sp"
+                    android:textIsSelectable="true"
+                    android:layout_margin="10dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/unknown_person"
-            android:layout_marginLeft="10dp"
-            android:layout_gravity="center_vertical"
+            android:text="@string/ok"
+            android:id="@+id/button"
+            android:layout_gravity="center"
             style="@style/MeebaStyle"
-            android:textIsSelectable="true" />
+            android:minWidth="100dp" />
+
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp"
-        android:layout_gravity="center">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/phone_number"
-            android:layout_gravity="center_vertical"
-            style="@style/MeebaStyle"/>
-
-        <TextView
-            android:id="@+id/contactPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/unknown_person"
-            android:layout_marginLeft="10dp"
-            android:layout_gravity="center_vertical"
-            style="@style/MeebaStyle"
-            android:textIsSelectable="true" />
-    </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ok"
-        android:id="@+id/button"
-        android:layout_gravity="center"
-        style="@style/MeebaStyle"
-        android:minWidth="100dp" />
-</LinearLayout>
