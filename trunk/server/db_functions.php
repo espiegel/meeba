@@ -104,12 +104,26 @@ class DB_Functions {
     }
 
     /**
-    * Get events of user by uid
+    * Get events of user by uid and by status
     */
-	public function getEventsByUser($uid) {
-        $result = mysql_query("SELECT i.eid, e.created_at FROM `invites` i, `events` e WHERE guest_uid = $uid and i.eid=e.eid UNION ".
+    public function getEventsByUser($uid,$status = NULL) {
+        // If no status is passed
+        if($status == NULL) {
+            $result = mysql_query("SELECT i.eid, e.created_at FROM `invites` i, `events` e WHERE guest_uid = $uid and i.eid=e.eid UNION ".
                               "SELECT eid,created_at FROM `events` WHERE host_uid = $uid ORDER BY created_at DESC") or die(mysql_error());
-
+        }
+        // If status was passed
+         else {
+            if($status == 0 || $status == -1) {
+                $result = mysql_query("SELECT i.eid FROM `invites` i WHERE guest_uid = $uid AND invite_status = $status") or die(mysql_error());
+            } else if($status != 1) {
+                return false;
+            } else {
+                $result = mysql_query("SELECT i.eid, e.created_at FROM `invites` i, `events` e WHERE guest_uid = $uid AND ".
+                    "invite_status = $status and i.eid=e.eid UNION ".
+                    "SELECT eid,created_at FROM `events` WHERE host_uid = $uid ORDER BY created_at DESC") or die(mysql_error());
+            }
+        }
         $events = array();
         $no_of_rows = mysql_num_rows($result);
         if ($no_of_rows > 0) {
@@ -123,9 +137,15 @@ class DB_Functions {
                 }           
                 
                 $data = mysql_fetch_array($eventdata);
-                $hostuid = $data['host_uid'];            
-                
-                $hostdata = mysql_fetch_assoc(mysql_query("SELECT name, picture_url from `users` WHERE uid = $hostuid"));
+                $hostuid = $data['host_uid'];                            
+
+                // Check whether such an event exists otherwise continue
+                $hostdata_query = mysql_query("SELECT name, picture_url from `users` WHERE uid = $hostuid");
+                if($hostdata_query == false) {
+                    $i++;
+                    continue;
+                }
+                $hostdata = mysql_fetch_assoc($hostdata_query);
 
                 $events[$i]['eid'] = $eid;
                 $events[$i]['host_uid'] = $hostuid;
@@ -135,7 +155,7 @@ class DB_Functions {
                 $events[$i]['when'] = $data['when'];
                 $events[$i]['created_at'] = $data['created_at'];
 
-                $i = $i + 1;
+                $i++;
             }
 
             return $events;
