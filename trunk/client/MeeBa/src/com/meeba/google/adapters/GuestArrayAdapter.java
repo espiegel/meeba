@@ -1,18 +1,22 @@
 package com.meeba.google.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.meeba.google.R;
+import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.meeba.google.util.UserFunctions;
 
 import java.util.List;
 
@@ -29,15 +33,17 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         super(context, R.layout.guestlistlayout, list);
         this.context = context;
         this.list = list;
-
         mImageLoader = ImageLoader.getInstance();
     }
 
+
+
+
     static class ViewHolder {
+
         protected TextView guestlist_name;
         protected ImageView invite_status;
         protected ImageView guestPicture;
-
         protected int position;
     }
 
@@ -45,9 +51,11 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         if (convertView == null) {
-            LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.guestlistlayout, null);
+
             final ViewHolder viewHolder = new ViewHolder();
+            LayoutInflater inflator = context.getLayoutInflater();
+
+            view = inflator.inflate(R.layout.guestlistlayout, null);
             viewHolder.guestlist_name = (TextView) view.findViewById(R.id.guestlist_name);
             viewHolder.invite_status = (ImageView) view.findViewById(R.id.img_invite_status);
             viewHolder.guestPicture = (ImageView) view.findViewById(R.id.guestPicture);
@@ -61,6 +69,8 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         final ViewHolder holder = (ViewHolder) view.getTag();
 
         User guest = list.get(position);
+
+
         String name = guest.getName();
         holder.guestlist_name.setText(name);
         holder.invite_status.setImageResource(getDrawable(guest.getInvite_status()));
