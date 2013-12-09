@@ -90,10 +90,23 @@ public class EventPageActivity extends SherlockActivity {
         //add
         myCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
         my_name.setText(myCurrentUser.getName());
+        Utils.LOGD("MYNAME" + myCurrentUser.getName());
+        Utils.LOGD("HOSTNAME" + mEvent.getHost_name());
+        eid = mEvent.getEid();
 
+
+        if(myCurrentUser.getName().equals(mEvent.getHost_name())){
+            my_status.setVisibility(View.GONE);
+            my_name.setVisibility(View.GONE);
+            my_picture.setVisibility(View.GONE);
+            refreshHostPicture();
+            refreshMyPicture();
+           // refreshMyOwnPicture();
+            refreshGuests();
+        }
+else{
         initSwitch();
 
-        eid = mEvent.getEid();
 
         my_status.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -145,7 +158,7 @@ public class EventPageActivity extends SherlockActivity {
         refreshMyOwnPicture();
         refreshGuests();
     }
-
+    }
     private void refreshMyPicture() {
         refreshMyPicture = new AsyncTask<Void, Void, Void>() {
             @Override
