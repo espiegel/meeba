@@ -137,6 +137,26 @@ $app->get('/getEventsByUser/:uid', function($uid) use ($app, $db) {
 		));
 });
 
+$app->get('/getEventsByUser/:uid/:status', function($uid,$status) use ($app, $db) {
+	$events = $db->getEventsByUser($uid,$status);
+
+	if(!$events) {
+		echo json_encode(array(
+			'success' => 0,
+			'error' => "Failed to get events of user $uid with status $status",
+			'events' => null,
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'error' => null,
+			'events' => $events,
+		));
+});
+
 $app->post('/getUsersByPhones', function() use ($app, $db) {
 	if(isset($_POST['phones'])) {
 		$phones = $_POST['phones'];
