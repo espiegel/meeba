@@ -90,12 +90,11 @@ public class EventPageActivity extends SherlockActivity {
         //add
         myCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
         my_name.setText(myCurrentUser.getName());
-        Utils.LOGD("MYNAME" + myCurrentUser.getName());
-        Utils.LOGD("HOSTNAME" + mEvent.getHost_name());
+
         eid = mEvent.getEid();
 
 
-        if(myCurrentUser.getName().equals(mEvent.getHost_name())){
+        if(myCurrentUser.getUid()==mEvent.getHost_uid()){
             my_status.setVisibility(View.GONE);
             my_name.setVisibility(View.GONE);
             my_picture.setVisibility(View.GONE);
@@ -250,7 +249,7 @@ else{
                 }
                 for(User u:guestList) {
 
-                    if(u.getName().equals( myCurrentUser.getName())){
+                    if(u.getUid()== myCurrentUser.getUid()){
 
                     }
                     else{
