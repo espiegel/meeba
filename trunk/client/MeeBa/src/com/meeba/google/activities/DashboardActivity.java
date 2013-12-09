@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -116,11 +117,14 @@ public class DashboardActivity extends SherlockActivity {
         final Activity dashboard = this;
 
         AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
+            ImageView noEvent;
             ProgressDialog progressDialog;
             boolean exceptionOccured = false;
 
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
+                noEvent = (ImageView) findViewById(R.id.noEvent);
+                noEvent.setVisibility(View.GONE);
                 super.onPreExecute();
                 if (!pullTorefresh) {
                     progressDialog = ProgressDialog
@@ -162,9 +166,18 @@ public class DashboardActivity extends SherlockActivity {
                     events.add(0,dummyEvent);
              }
             */
+
+             //if you have no events this will show the logo and text "you have no events"
+             if (events.isEmpty()){
+                    noEvent.setVisibility(View.VISIBLE);
+
+            }else{
+                try {noEvent.setVisibility(View.GONE);
+                } catch (Exception e) {/* nothing */ }
+                //update the event list view
                 mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
                 mEventListView.setAdapter(mEventArrayAdapter);
-
+            }
                 try {
                     progressDialog.dismiss();
                 } catch (Exception e) {/* nothing */ }
