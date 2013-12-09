@@ -209,6 +209,10 @@ public class DashboardActivity extends SherlockActivity {
                 List<String> phoneList = Utils.phoneList(phoneMap);
                 ListOfAppContacts = UserFunctions.getUsersByPhones(phoneList);
 
+                if(ListOfAppContacts == null) {
+                    return null;
+                }
+
                 List<String> meebaUsersPhones = new ArrayList<String>();
                 for(User user : ListOfAppContacts) {
                     meebaUsersPhones.add(user.getPhone_number());

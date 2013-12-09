@@ -74,7 +74,6 @@ public class Utils {
     }
 
     public static void setupUI(View view, final Activity a) {
-
         //Set up touch listener for non-text box views to hide keyboard.
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {

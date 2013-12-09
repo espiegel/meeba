@@ -129,6 +129,42 @@ public class UserFunctions {
     }
 
     /**
+     * Get the events that user is participating in and has a certain invite status in. (Event hosts count as status 1)
+     * @param uid User if of the user.
+     * @param status Invited status of the user. Must be one of {-1,0,1}
+     * @return Returns a list of all events or null if the web service failed.
+     */
+    public static List<Event> getEventsByUser(int uid, int status) throws Exception {
+        if(status != 0 && status != -1 && status != 1) {
+            return null;
+        }
+
+        try {
+            List<Event> events = new ArrayList<Event>();
+            Gson lGson = new Gson();
+            JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getEventsByUser/" + uid + "/" + status);
+            if(lJsonObject == null)
+                return null;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+
+            for(int i=0;i<lJsonObject.getJSONArray("events").length();i++) {
+                events.add(lGson.fromJson(lJsonObject.getJSONArray("events").get(i).toString(), Event.class));
+            }
+
+            for(Event e : events) {
+                Utils.LOGD("event = "+e.toString());
+            }
+
+            return events;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw ex;
+            // return null;
+        }
+    }
+
+    /**
      * Gets a list of all users from a list of phone numbers
      * @param phones A list of all phone numbers. Every phone number must be a string of digits only.
      * @return Returns a list of users with the given phone numbers.
