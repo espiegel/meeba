@@ -58,14 +58,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
-        mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                User selectedUser = (User) adapterView.getAdapter().getItem(i);
-                selectedUser.setSelected(! selectedUser.isSelected()); // invert the selection state
-            }
-        });
-
         mUserListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {

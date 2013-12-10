@@ -57,12 +57,6 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             viewHolder.imageView = (ImageView) view.findViewById(R.id.personPicture);
             viewHolder.checkbox = (CheckBox) view.findViewById(R.id.check);
-
-            //make those views not focusable so  OnItemClick  can  be fired on  listView ROW click
-            viewHolder.checkbox.setFocusable(false);
-            viewHolder.imageView.setFocusable(false);
-            viewHolder.text.setFocusable(false);
-
             viewHolder.checkbox
                     .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         public void onCheckedChanged(CompoundButton buttonView,

@@ -27,6 +27,23 @@
     <string name="phone_number">Phone Number:</string>
     <string name="ok">Ok</string>
 
+    <string-array
+        name="drawer_event_filters">
+        <item>"All Events"</item>
+        <item>"My Events"</item>
+        <item>"Going"</item>
+        <item>"Not Going "</item>
+    </string-array>
+
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/calendar_small</item>
+        <item>@drawable/calendar_me</item>
+        <item>@drawable/calendar_v</item>
+        <item>@drawable/calendar_x</item>
+    </array>
+
+
     <color name="green">#33C733</color>
     <color name="red">#C73333</color>
     <color name="white">#DADADA</color>
