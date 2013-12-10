@@ -111,17 +111,13 @@
             android:textSize="20sp"
             android:layout_centerVertical="true" />
 
-        <Switch
+        <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/switch1"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/myname"
-            android:layout_marginLeft="66dp"
+            android:id="@+id/checkInviteBox"
             android:checked="false"
-            android:textOff="no"
-            android:textOn="yes"
-            tools:ignore="NewApi" />
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/myPicture" />
     </RelativeLayout>
 
     <ListView
