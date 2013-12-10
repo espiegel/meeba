@@ -2,7 +2,6 @@ package com.meeba.google.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -86,7 +85,7 @@ public class DashboardActivity extends SherlockActivity {
         String[] navMenuTitles = getResources().getStringArray(R.array.drawer_event_filters);
         TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.right_drawer);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // adding nav drawer items to array
         // All Events
@@ -107,9 +106,15 @@ public class DashboardActivity extends SherlockActivity {
         //make the first row selected as default
         mDrawerList.setItemChecked(0, true);
 
+        // Adding nav drawer icon
+        ActionBar ab = getSupportActionBar();
+        ab.setTitle("Events");
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(true);
+
          mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 //TODO show drawer icon in top right side of action bar
-                R.drawable.red_cross, //nav menu toggle icon - wont be showed, requires API level >10
+                R.drawable.ic_navigation_drawer, //nav menu toggle icon - wont be showed, requires API level >10
                 R.string.app_name, // nav drawer open - description for accessibility
                 R.string.app_name // nav drawer close - description for accessibility
         ) {
@@ -123,7 +128,6 @@ public class DashboardActivity extends SherlockActivity {
                 invalidateOptionsMenu();
             }
         };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         /**setup a ClickListener on  an Event Drawer Row**/
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -162,8 +166,6 @@ public class DashboardActivity extends SherlockActivity {
                 .setup(mPullToRefreshLayout);
 
         /** rest of onCreate :*/
-        ActionBar ab = getSupportActionBar();
-        ab.setTitle("Events");
 
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
         if (mCurrentUser == null) {
@@ -432,6 +434,12 @@ public class DashboardActivity extends SherlockActivity {
                 createEvent();
                 break;
 
+            case android.R.id.home:
+                if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                } else {
+                    mDrawerLayout.openDrawer(mDrawerList);
+                }
             default:
                 break;
         }
