@@ -75,10 +75,10 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             mImageLoader.displayImage(url.replace("?sz=50", "?sz=64"), hostPicture);
         }
 
-        /*
+
         if (event.getEid() == -1)
             view.setVisibility(View.GONE);
-        */
+
         return view;
     }
 

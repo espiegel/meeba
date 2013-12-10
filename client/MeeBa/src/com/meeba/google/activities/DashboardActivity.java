@@ -5,13 +5,16 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -20,8 +23,10 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.EventArrayAdapter;
+import com.meeba.google.adapters.NavDrawerListAdapter;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
+import com.meeba.google.objects.NavDrawerItem;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
@@ -40,15 +45,29 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * Created by Padi on 07/11/13.
  */
 
-
 public class DashboardActivity extends SherlockActivity {
     private ListView mEventListView;
     private User mCurrentUser;
-    private List<Event> list;
+    private List<Event> mAllEventsList;
+    private List<Event> mRejectedEventsList;
+    private List<Event> mAcceptedEventsList;
+    private List<Event> mUnknownEventsList;
     private EventArrayAdapter mEventArrayAdapter;
     private List<User> ListOfAppContacts;
     private PullToRefreshLayout mPullToRefreshLayout;
-    private boolean pullTorefresh = false;
+
+    private NavDrawerListAdapter adapter;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private final Activity dashboard = this;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private final int FILTER_ALL_EVENTS = 0;
+    private final int FILTER_CREATED_BY_ME = 1;
+    private final int FILTER_GOING = 2;
+    private final int FILTER_NOT_GOING = 3;
+    private int appliedFilter = FILTER_ALL_EVENTS;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,7 +75,75 @@ public class DashboardActivity extends SherlockActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_activity);
 
-        // Now find the PullToRefreshLayout to setup
+        /**initialize  event lists**/
+        mRejectedEventsList = new ArrayList<Event>();
+        mAcceptedEventsList = new ArrayList<Event>();
+        mUnknownEventsList = new ArrayList<Event>();
+        mAllEventsList = new ArrayList<Event>();
+
+        /** Navigation drawer setup:*/
+        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
+        String[] navMenuTitles = getResources().getStringArray(R.array.drawer_event_filters);
+        TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.right_drawer);
+
+        // adding nav drawer items to array
+        // All Events
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[FILTER_ALL_EVENTS], navMenuIcons.getResourceId(FILTER_ALL_EVENTS, -1), false, "0"));
+        //  I created
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[FILTER_CREATED_BY_ME], navMenuIcons.getResourceId(FILTER_CREATED_BY_ME, -1), false, "0"));
+        // Going
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[FILTER_GOING], navMenuIcons.getResourceId(FILTER_GOING, -1), false, "0"));
+        //Not  Going
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[FILTER_NOT_GOING], navMenuIcons.getResourceId(FILTER_NOT_GOING, -1), false, "0"));
+
+        // Recycle the typed array
+        navMenuIcons.recycle();
+
+        // setting the nav drawer list adapter
+        adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
+        mDrawerList.setAdapter(adapter);
+        //make the first row selected as default
+        mDrawerList.setItemChecked(0, true);
+
+         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                //TODO show drawer icon in top right side of action bar
+                R.drawable.red_cross, //nav menu toggle icon - wont be showed, requires API level >10
+                R.string.app_name, // nav drawer open - description for accessibility
+                R.string.app_name // nav drawer close - description for accessibility
+        ) {
+            public void onDrawerClosed(View view) {
+                // calling onPrepareOptionsMenu()
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                // calling onPrepareOptionsMenu()
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        /**setup a ClickListener on  an Event Drawer Row**/
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                NavDrawerItem selectedRow = (NavDrawerItem) adapter.getItem(position);
+                selectedRow.getTitle();
+
+                //create and show the filtered list,  and close the drawer
+                appliedFilter = position; //filter type is the selected row's number
+                List<Event> filteredList = filterEventList(mAllEventsList);
+                EventArrayAdapter filteredAdapter = new EventArrayAdapter(dashboard, filteredList);
+                mEventListView.setAdapter(filteredAdapter);
+                mDrawerLayout.closeDrawer(mDrawerList);
+            }
+        });
+
+        /** Pull to refresh setup:*/
+        // find the PullToRefreshLayout to setup
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
         // Now setup the PullToRefreshLayout
         ActionBarPullToRefresh.from(this)
@@ -67,7 +154,6 @@ public class DashboardActivity extends SherlockActivity {
                         new OnRefreshListener() {
                             @Override
                             public void onRefreshStarted(View view) {
-                                pullTorefresh=true;
                                 asyncRefresh();
                             }
                         }
@@ -75,6 +161,7 @@ public class DashboardActivity extends SherlockActivity {
                         // Finally commit the setup to our PullToRefreshLayout
                 .setup(mPullToRefreshLayout);
 
+        /** rest of onCreate :*/
         ActionBar ab = getSupportActionBar();
         ab.setTitle("Events");
 
@@ -108,86 +195,164 @@ public class DashboardActivity extends SherlockActivity {
             });
             asyncRefresh();
             asyncUpdateContacts();
-
         }
     }
 
+    /**
+     * Called when invalidateOptionsMenu() is triggered
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //maybe ill use this in future , don't delete
+        // if nav drawer is opened, hide the action items
+        //boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        //menu.findItem(R.id.action_create_event).setVisible(!drawerOpen);
+        //ActionBar ab = getSupportActionBar();
+        // ab.setTitle("Events");
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * filters the events list by the specified filter type
+     */
+    private List<Event> filterEventList(List<Event> eventsTofilter) {
+        List<Event> filtered = new ArrayList<Event>();
+        ActionBar ab = getSupportActionBar();
+
+        switch (appliedFilter) {
+            case FILTER_ALL_EVENTS:
+                filtered = eventsTofilter;
+                ab.setTitle("All Events");
+                break;
+
+            case FILTER_CREATED_BY_ME: {
+                for (Event e : eventsTofilter)
+                    if (e.getHost_uid() == mCurrentUser.getUid())
+                        filtered.add(e);
+            }
+            ab.setTitle("My Events");
+            break;
+            case FILTER_GOING:
+                //mAcceptedEventsList is updated on asyncSortEvents
+                filtered = mAcceptedEventsList;
+                ab.setTitle("Accepted Events");
+                break;
+
+            case FILTER_NOT_GOING:
+                //mRejectedEventsList is updated on asyncSortEvents
+                filtered = mRejectedEventsList;
+                ab.setTitle("Rejected  Events");
+                break;
+
+            default:
+                Utils.LOGD(" not a valid filter :" + appliedFilter);
+        }
+        return filtered;
+    }
 
     private void asyncRefresh() {
-        final Activity dashboard = this;
-
         AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
             ImageView noEvent;
-            ProgressDialog progressDialog;
+           // ProgressDialog progressDialog; using action bar animation instead
             boolean exceptionOccured = false;
 
             protected void onPreExecute() {
-                Utils.LOGD("onPreExecute");
+                Utils.LOGD("asyncRefresh onPreExecute");
                 noEvent = (ImageView) findViewById(R.id.noEvent);
                 noEvent.setVisibility(View.GONE);
                 super.onPreExecute();
-                if (!pullTorefresh) {
-                    progressDialog = ProgressDialog
-                            .show(DashboardActivity.this, getString(R.string.refreshing_events), getString(R.string.please_wait), true);
-                }
+
+                //animate action bar :
+                mPullToRefreshLayout.setRefreshing(true);
             }
 
-
             protected List<Event> doInBackground(Void... params) {
-                Utils.LOGD("doInBackground");
+                Utils.LOGD("asyncRefresh doInBackground");
 
                 try {
-                    list = UserFunctions.getEventsByUser(mCurrentUser.getUid());
+                    mAllEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid());
                 } catch (Exception e) {
                     exceptionOccured = true;
                 }
 
-                Utils.LOGD("list =  " + list);
-
-                if (list == null) {
-                    return new ArrayList<Event>();
-                } else {
-                    return list;
+                if (mAllEventsList == null) {
+                    mAllEventsList = new ArrayList<Event>();
                 }
+                return mAllEventsList;
             }
 
-            protected void onPostExecute(List<Event> events) {
-                Utils.LOGD("onPostExecute");
-                // update the event list view
+            protected void onPostExecute(List<Event> allEvents)
+          {
+              Utils.LOGD("asyncRefresh onPostExecute");
+
+              /** sort Events by status */
+                asyncSortEvents();
+
+                List<Event> filterdEvents;
+
                 if (exceptionOccured)
-                    Toast.makeText(DashboardActivity.this, "No Internet Connection\n connect  to internet and refresh ",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(DashboardActivity.this,
+                            "An Error occured when trying to update events ", Toast.LENGTH_LONG).show();
 
-                /*
-                // add a dummy event  with eid=-1 when the list is empty ,to allow pull to refresh on an "empty" table
-                //the EventArrayAdapter makes events with eid=-1 invisible
-             if(events.size()==0) {
-                   Event dummyEvent = new Event( -1,-1,"dummyEvent","dummyEvent","dummyEvent"  );
-                    events.add(0,dummyEvent);
-             }
-            */
-
-             //if you have no events this will show the logo and text "you have no events"
-             if (events.isEmpty()){
+                if (mAllEventsList.isEmpty()) {//show the NO EVENT pic
                     noEvent.setVisibility(View.VISIBLE);
-
-            }else{
-                try {noEvent.setVisibility(View.GONE);
-                } catch (Exception e) {/* nothing */ }
-                //update the event list view
-                mEventArrayAdapter = new EventArrayAdapter(dashboard, events);
+                    //TODO I will  deal with this later (max)
+                    //create a Dummy invisible event to allow pull to refresh on an "empty"  list too
+                    //  Event dummyEvent = new Event(-1, -1, "dummyEvent", "dummyEvent", "dummyEvent");
+                    // mAllEventsList.add(0, dummyEvent);
+                } else {
+                    noEvent.setVisibility(View.GONE);
+                }
+                //apply the chosen filter to the updated event list
+                filterdEvents = filterEventList(mAllEventsList);
+                mEventArrayAdapter = new EventArrayAdapter(dashboard, filterdEvents);
                 mEventListView.setAdapter(mEventArrayAdapter);
-            }
-                try {
-                    progressDialog.dismiss();
-                } catch (Exception e) {/* nothing */ }
-
-                mPullToRefreshLayout.setRefreshComplete();  // Notify PullToRefreshLayout that  refresh has finished
-                pullTorefresh=false; //initialize pullTorefresh
+                Utils.LOGD("list count =  " + mEventArrayAdapter.getCount());
             }
         };
         task.execute();
     }
+
+    /**
+     * this method fills the lists :  mAcceptedEventsList ,mRejectedEventsList ,mUnknownEventsList
+     */
+    private void asyncSortEvents() {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            boolean exceptionOccured = false;
+
+            @Override
+            protected void onPreExecute() {
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    mAcceptedEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 1);
+                    mRejectedEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid(), -1);
+                    mUnknownEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 0);
+                } catch (Exception e) {
+                   /* Stack Trace is already printed in  UserFunctions*/
+                    exceptionOccured = true;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void voids) {
+                if (exceptionOccured)
+                    Toast.makeText(DashboardActivity.this,
+                            "An Error occured when trying to update events ", Toast.LENGTH_LONG).show();
+
+                    mPullToRefreshLayout.setRefreshing(false);
+                    mPullToRefreshLayout.setRefreshComplete();
+
+                Utils.LOGD("list =  " + mAllEventsList + "\ngoing= " + mAcceptedEventsList +
+                        "\nnotGoing= " + mRejectedEventsList + "\nunknown=" + mUnknownEventsList);
+            }
+        };
+        task.execute();
+    }
+
 
     /**
      * get user contacts who have meeba and store the on phone DB
@@ -209,12 +374,12 @@ public class DashboardActivity extends SherlockActivity {
                 List<String> phoneList = Utils.phoneList(phoneMap);
                 ListOfAppContacts = UserFunctions.getUsersByPhones(phoneList);
 
-                if(ListOfAppContacts == null) {
+                if (ListOfAppContacts == null) {
                     return null;
                 }
 
                 List<String> meebaUsersPhones = new ArrayList<String>();
-                for(User user : ListOfAppContacts) {
+                for (User user : ListOfAppContacts) {
                     meebaUsersPhones.add(user.getPhone_number());
                 }
 
@@ -227,19 +392,19 @@ public class DashboardActivity extends SherlockActivity {
                 });
 
                 // Now swap around the key and the value so that the contacts will go in the tree map ordered by name
-                for(Map.Entry<String, String> entry : phoneMap.entrySet()) {
+                for (Map.Entry<String, String> entry : phoneMap.entrySet()) {
                     contactMap.put(entry.getValue(), entry.getKey());
                 }
 
                 // Now add users that don't have meeba to the list
-                for(Map.Entry<String, String> entry : contactMap.entrySet()) {
-                    if(!meebaUsersPhones.contains(entry.getValue())) {
+                for (Map.Entry<String, String> entry : contactMap.entrySet()) {
+                    if (!meebaUsersPhones.contains(entry.getValue())) {
                         User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
                         ListOfAppContacts.add(user);
                     }
                 }
 
-                if(ListOfAppContacts != null) {
+                if (ListOfAppContacts != null) {
                     DatabaseFunctions.storeContacts(getApplicationContext(), ListOfAppContacts);
                 }
 
@@ -270,7 +435,6 @@ public class DashboardActivity extends SherlockActivity {
             default:
                 break;
         }
-
         return true;
     }
 
