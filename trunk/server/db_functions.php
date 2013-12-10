@@ -142,7 +142,6 @@ class DB_Functions {
                 // Check whether such an event exists otherwise continue
                 $hostdata_query = mysql_query("SELECT name, picture_url from `users` WHERE uid = $hostuid");
                 if($hostdata_query == false) {
-                    $i++;
                     continue;
                 }
                 $hostdata = mysql_fetch_assoc($hostdata_query);
