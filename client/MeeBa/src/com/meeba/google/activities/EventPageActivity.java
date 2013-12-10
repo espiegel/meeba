@@ -290,11 +290,11 @@ else{
               refreshGuests.execute();
     }
 
-  //  @Override
- //   public boolean onOptionsItemSelected(MenuItem menuItem) {
-  //      onBackPressed();
-  //      return true;
-  //  }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+       onBackPressed();
+        return true;
+    }
 
     @Override
     protected void onDestroy() {
