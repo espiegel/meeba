@@ -1,23 +1,17 @@
 package com.meeba.google.activities;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
@@ -41,32 +35,26 @@ public class EventPageActivity extends SherlockActivity {
     private ListView mListView;
     private Event mEvent;
     private GuestArrayAdapter mGuestArrayAdapter = null;
-  //  private ImageView mAcceptButton;
+    // private ImageView mAcceptButton;
 
     //add
     private ImageView mMy_picture;
     private TextView mMy_name;
- //   private Switch my_status;
+    // private Switch my_status;
     private CheckBox mMy_status;
 
     private int eid;
     private ImageView mImageHost;
-    private AsyncTask<Void, Void, Void> refreshHostPicture = null;
-    private AsyncTask<Void, Void, Void> refreshMyPicture = null;
-    private AsyncTask<Void, Void, Void> refreshMyOwnPicture = null;
     private AsyncTask<Void, Void, Void> refreshGuests = null;
-   // private AsyncTask<Void, Void, Void> refreshSwitch = null;
+    // private AsyncTask<Void, Void, Void> refreshSwitch = null;
     private AsyncTask<Void, Void, Void> refreshCheckBox = null;
-  //  private AsyncTask<Void, Void, User> initSwitch = null;
+    // private AsyncTask<Void, Void, User> initSwitch = null;
     private AsyncTask<Void, Void, User> initCheckBox = null;
 
     private ImageLoader mImageLoader;
-    private User mCurrentUser;
     private User mMyCurrentUser;
     private User mMe;
-   // final Activity eventPage = this;
 
-    @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.eventpage_activity);
@@ -75,8 +63,6 @@ public class EventPageActivity extends SherlockActivity {
         ab.setTitle("Event Page");
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-
-
 
         mTxtHost = (TextView) findViewById(R.id.txtHost);
         mTxtWhere = (TextView) findViewById(R.id.txtWhere);
@@ -87,14 +73,13 @@ public class EventPageActivity extends SherlockActivity {
         //add
         mMy_name = (TextView) findViewById(R.id.myname);
         mMy_picture = (ImageView) findViewById(R.id.myPicture);
-  //      my_status = (Switch) findViewById(R.id.switch1);
-   //     mAcceptButton = (ImageView) findViewById(R.id.action_accept_invite_status);
+        // my_status = (Switch) findViewById(R.id.switch1);
+        // mAcceptButton = (ImageView) findViewById(R.id.action_accept_invite_status);
 
         mMy_status = (CheckBox) findViewById(R.id.checkInviteBox);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-
 
         mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
         Utils.LOGD("bundle event=" + mEvent);
@@ -108,156 +93,68 @@ public class EventPageActivity extends SherlockActivity {
 
         eid = mEvent.getEid();
 
+        mImageLoader = Utils.getImageLoader(this);
+        mImageLoader.displayImage(mEvent.getHost_picture_url(), mImageHost);
+        mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
 
         if(mMyCurrentUser.getUid()==mEvent.getHost_uid()){
             mMy_status.setVisibility(View.GONE);
             mMy_name.setVisibility(View.GONE);
             mMy_picture.setVisibility(View.GONE);
-            refreshHostPicture();
-           // refreshMyPicture();
-            refreshMyOwnPicture();
-            refreshGuests();
-        }
-else{
+        } else {
             initCheckBox();
+             // initSwitch();
+             // initImage();
+            mMy_status.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-            //    initSwitch();
-   //     initImage();
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                    refreshCheckBox =  new AsyncTask<Void, Void, Void>() {
 
-        mMy_status.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        protected Void doInBackground(Void... voids) {
 
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-                refreshCheckBox =  new AsyncTask<Void, Void, Void>() {
+                            List<User> guestList = UserFunctions.getUsersByEvent(eid);
+                            if (guestList == null) {
+                                return null;
+                            }
+                            for(User u:guestList) {
+                                if(u.getUid()==mMyCurrentUser.getUid()){
+                                    mMe = u;
+                                }
+                            }
+                            if(isChecked){
+                                if(mMe.getInvite_status()==1){
 
-                    @Override
-                    protected Void doInBackground(Void... voids) {
+                                }
+                                else{
+                                mMe.setInvite_status(1);
+                                UserFunctions.acceptInvite(mMe.getUid(), eid);
+                                }
+                            }
+                            else{
+                                if(mMe.getInvite_status()==-1){
 
-                        List<User> guestList = UserFunctions.getUsersByEvent(eid);
-                        if (guestList == null) {
+                                }
+                                else{
+                                mMe.setInvite_status(-1);
+                                UserFunctions.declineInvite(mMe.getUid(), eid);
+                            }
+                            }
                             return null;
                         }
-                        for(User u:guestList) {
-                            if(u.getUid()==mMyCurrentUser.getUid()){
-                                mMe = u;
-                            }
-                        }
-                        if(isChecked){
-                            if(mMe.getInvite_status()==1){
+                    };
+                    refreshCheckBox.execute();
 
-                            }
-                            else{
-                            mMe.setInvite_status(1);
-                            UserFunctions.acceptInvite(mMe.getUid(), eid);
-                            }
-                        }
-                        else{
-                            if(mMe.getInvite_status()==-1){
-
-                            }
-                            else{
-                            mMe.setInvite_status(-1);
-                            UserFunctions.declineInvite(mMe.getUid(), eid);
-                        }
-                        }
-                        return null;
                     }
-                };
-                refreshCheckBox.execute();
+            });
+        }
 
-            }
-        });
-
-
-
-        refreshHostPicture();
-     //   refreshMyPicture();
-        refreshMyOwnPicture();
         refreshGuests();
-    }
-    }
-    /*
-    private void refreshMyPicture() {
-        refreshMyPicture = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-
-                if (mCurrentUser == null) {
-                    return null;
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mImageLoader = ImageLoader.getInstance();
-                        if(!mImageLoader.isInited()) {
-                            mImageLoader.init(Utils.getImageLoaderConfig(EventPageActivity.this));
-                        }
-                        mImageLoader.displayImage(mCurrentUser.getPicture_url(), mImageHost);
-                    }
-                });
-                return null;
-            }
-        };
-        refreshMyPicture.execute();
-    }
-    */
-    private void refreshMyOwnPicture() {
-        refreshMyOwnPicture = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-
-
-
-                if (mMyCurrentUser == null) {
-                    return null;
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mImageLoader = ImageLoader.getInstance();
-                        if(!mImageLoader.isInited()) {
-                            mImageLoader.init(Utils.getImageLoaderConfig(EventPageActivity.this));
-                        }
-                        mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
-                    }
-                });
-                return null;
-            }
-        };
-        refreshMyOwnPicture.execute();
-    }
-
-    private void refreshHostPicture() {
-        refreshHostPicture = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-
-                final User host = UserFunctions.getUserByUid(mEvent.getHost_uid());
-
-                if (host == null) {
-                    return null;
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mImageLoader = ImageLoader.getInstance();
-                        if(!mImageLoader.isInited()) {
-                            mImageLoader.init(Utils.getImageLoaderConfig(EventPageActivity.this));
-                        }
-                        mImageLoader.displayImage(host.getPicture_url(), mImageHost);
-                    }
-                });
-                return null;
-            }
-        };
-        refreshHostPicture.execute();
     }
 
     private void refreshGuests() {
-      refreshGuests =  new AsyncTask<Void, Void, Void>() {
+        refreshGuests = new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -267,14 +164,13 @@ else{
                 if (guestList == null) {
                     return null;
                 }
-                for(User u:guestList) {
+                for (User u : guestList) {
 
-                    if(u.getUid()== mMyCurrentUser.getUid()){
+                    if (u.getUid() == mMyCurrentUser.getUid()) {
 
-                    }
-                    else{
+                    } else {
                         guestListWithoutMe.add(u);
-                }
+                    }
                 }
                 mGuestArrayAdapter = new GuestArrayAdapter(EventPageActivity.this, guestListWithoutMe);
                 runOnUiThread(new Runnable() {
@@ -287,7 +183,7 @@ else{
                 return null;
             }
         };
-              refreshGuests.execute();
+        refreshGuests.execute();
     }
 
     @Override
@@ -298,32 +194,21 @@ else{
 
     @Override
     protected void onDestroy() {
-        if (refreshHostPicture != null) {
-            refreshHostPicture.cancel(true);
+        if (refreshGuests != null) {
+            refreshGuests.cancel(true);
         }
-
-        /*if(mImageLoader != null) {
-            mImageLoader.stop();
-            mImageLoader.destroy();
-        }*/
 
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }
-
-
-
-
-
 
 /*
     public void initSwitch (){
@@ -448,6 +333,4 @@ public void changeInviteStatus(){
         };
         initCheckBox.execute();
     }
-
-
 }
