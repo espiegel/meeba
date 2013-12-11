@@ -4,18 +4,21 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
+import com.meeba.google.dialogs.ContactDetailsDialog;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
@@ -28,7 +31,7 @@ import java.util.List;
 /**
  * Created by Eidan on 11/19/13.
  */
-public class EventPageActivity extends SherlockActivity {
+public class EventPageActivity extends SherlockFragmentActivity {
     private TextView mTxtHost;
     private TextView mTxtWhere;
     private TextView mTxtWhen;
@@ -97,6 +100,23 @@ public class EventPageActivity extends SherlockActivity {
         mImageLoader.displayImage(mEvent.getHost_picture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
 
+        RelativeLayout guestLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                User user = (User)adapterView.getItemAtPosition(position);
+                showContactDialog(user);
+                return false;
+            }
+        });
+        guestLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                showContactDialog(mMyCurrentUser);
+                return false;
+            }
+        });
+
         if(mMyCurrentUser.getUid()==mEvent.getHost_uid()){
             mMy_status.setVisibility(View.GONE);
             mMy_name.setVisibility(View.GONE);
@@ -151,6 +171,11 @@ public class EventPageActivity extends SherlockActivity {
         }
 
         refreshGuests();
+    }
+
+    private void showContactDialog(User user) {
+        ContactDetailsDialog dialog = new ContactDetailsDialog(user);
+        dialog.show(getSupportFragmentManager(), ContactDetailsDialog.TAG);
     }
 
     private void refreshGuests() {
