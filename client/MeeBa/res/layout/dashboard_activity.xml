@@ -42,7 +42,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:choiceMode="singleChoice"
-        android:dividerHeight="1dp"
+        android:dividerHeight="3dp"
         android:divider="@color/list_divider"
         android:listSelector="@drawable/list_selector"
         android:background="@color/list_background"/>
