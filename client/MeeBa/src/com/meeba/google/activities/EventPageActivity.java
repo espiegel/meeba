@@ -1,6 +1,10 @@
 package com.meeba.google.activities;
 
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -170,6 +175,40 @@ public class EventPageActivity extends SherlockFragmentActivity {
             });
         }
 
+        LinearLayout layoutWhere = (LinearLayout) findViewById(R.id.layoutWhere);
+        layoutWhere.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                    String query = mTxtWhere.getText().toString();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(EventPageActivity.this);
+                    builder.setMessage("Do you want to search for "+query+" using Waze?")
+                    .setIcon(R.drawable.waze_icon)
+                    .setTitle("Waze Navigation")
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            try {
+                                String url = "waze://?q=" + mTxtWhere.getText();
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                startActivity(intent);
+                            } catch (ActivityNotFoundException ex) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.waze"));
+                                startActivity(intent);
+                            } finally {
+                                dialogInterface.dismiss();
+                            }
+                        }
+                    });
+                builder.create().show();
+            }
+        });
         refreshGuests();
     }
 
