@@ -182,7 +182,6 @@ public class LoginActivity extends Activity implements OnClickListener,
                     //store user in phone DB
                     DatabaseFunctions.upgradeDatabase(context);
                     DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
-                    DatabaseFunctions.storeUserDetails(context, user, DatabaseHandler.TABLE_USER);
 
                     Utils.LOGD("maxagi:storring in phone DB user = " + user);
                     User debug = DatabaseFunctions.getUserDetails(getApplicationContext());
