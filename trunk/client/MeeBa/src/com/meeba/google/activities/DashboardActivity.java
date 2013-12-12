@@ -29,6 +29,8 @@ import com.meeba.google.objects.NavDrawerItem;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+import com.twotoasters.jazzylistview.JazzyHelper;
+import com.twotoasters.jazzylistview.JazzyListView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -45,7 +47,7 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  */
 
 public class DashboardActivity extends SherlockActivity {
-    private ListView mEventListView;
+    private JazzyListView mEventListView;
     private User mCurrentUser;
     private List<Event> mAllEventsList;
     private List<Event> mRejectedEventsList;
@@ -175,7 +177,8 @@ public class DashboardActivity extends SherlockActivity {
             startActivity(intent);
             finish();
         } else {
-            mEventListView = (ListView) findViewById(R.id.listViewDashboard);
+            mEventListView = (JazzyListView) findViewById(R.id.listViewDashboard);
+            mEventListView.setTransitionEffect(JazzyHelper.HELIX);
             mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {

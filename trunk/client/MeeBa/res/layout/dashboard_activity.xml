@@ -24,12 +24,12 @@
                 android:id="@+id/noEvent"
                 android:src="@drawable/no_events" />
 
-            <ListView
+            <com.twotoasters.jazzylistview.JazzyListView
                 android:id="@+id/listViewDashboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:listSelector="@drawable/card_background">
-            </ListView>
+            </com.twotoasters.jazzylistview.JazzyListView>
 
         </uk.co.senab.actionbarpulltorefresh.extras.actionbarsherlock.PullToRefreshLayout>
 
