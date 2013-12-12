@@ -29,7 +29,7 @@ public class GcmIntentService extends IntentService {
     private static final String TITLE_INVITE = "MeeBa invitation from ";
 
     private static final String TAG_RESPONSE = "inviteResponse";
-    private static final String TITLE_RESPONSE = "MeeBa response from ";
+    //private static final String TITLE_RESPONSE = "MeeBa response from ";
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -179,7 +179,7 @@ public class GcmIntentService extends IntentService {
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(TITLE_RESPONSE+user.getName())
+                            .setContentTitle(user.getName())
                             .setStyle(new NotificationCompat.BigTextStyle()
                                     .bigText(msg))
                             .setContentText(msg);
