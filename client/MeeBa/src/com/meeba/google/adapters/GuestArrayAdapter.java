@@ -95,7 +95,7 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         if(invite_status == 1)
             return R.drawable.green_check;
 
-        return R.drawable.question_mark;
+        return R.drawable.ic_action_help;
     }
 
     public List<User> getList() {
