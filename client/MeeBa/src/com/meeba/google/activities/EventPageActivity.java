@@ -91,7 +91,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
 
         mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
         Utils.LOGD("bundle event=" + mEvent);
-        mTxtHost.setText(mEvent.getHost_name());
+        mTxtHost.setText(mEvent.getHost().getName());
         mTxtWhere.setText(mEvent.getWhere());
         mTxtWhen.setText(mEvent.getWhen());
 
@@ -102,7 +102,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
         eid = mEvent.getEid();
 
         mImageLoader = Utils.getImageLoader(this);
-        mImageLoader.displayImage(mEvent.getHost_picture_url(), mImageHost);
+        mImageLoader.displayImage(mEvent.getHost().getPicture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
 
         RelativeLayout guestLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
@@ -122,7 +122,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
             }
         });
 
-        if(mMyCurrentUser.getUid()==mEvent.getHost_uid()){
+        if(mMyCurrentUser.getUid()==mEvent.getHost().getUid()){
             mMy_status.setVisibility(View.GONE);
             mMy_name.setVisibility(View.GONE);
             mMy_picture.setVisibility(View.GONE);

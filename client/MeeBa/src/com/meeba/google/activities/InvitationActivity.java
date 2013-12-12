@@ -56,7 +56,7 @@ public class InvitationActivity extends Activity {
 
         mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
         Utils.LOGD("mEvent=" + mEvent);
-        mHostName = mEvent.getHost_name();
+        mHostName = mEvent.getHost().getName();
         mWhere = mEvent.getWhere();
         mWhen = mEvent.getWhen();
 
@@ -136,7 +136,7 @@ public class InvitationActivity extends Activity {
         refreshHostPicture = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                final User host = UserFunctions.getUserByUid(mEvent.getHost_uid());
+                final User host = UserFunctions.getUserByUid(mEvent.getHost().getUid());
 
                 if (host == null) {
                     return null;

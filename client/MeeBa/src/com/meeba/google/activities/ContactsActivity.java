@@ -242,6 +242,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             protected void onPostExecute(Event event) {
                 progressDialog.dismiss();
 
+                Utils.LOGD("newly created event ="+event);
                 if (event == null) {
                     Utils.showToast(ContactsActivity.this, "Failed to create event");
                 } else {
