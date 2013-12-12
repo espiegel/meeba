@@ -93,9 +93,9 @@ class DB_Functions {
 
             $host_uid = $response['host_uid'];
 
-            $host_name = mysql_fetch_assoc(mysql_query("SELECT name from `users` where uid = $host_uid"));
+            $host = mysql_fetch_assoc(mysql_query("SELECT * from `users` where uid = $host_uid"));
 
-            $response['host_name'] = $host_name['name'];
+            $response['host'] = $host;
             return $response;
         } else {
             // user not found
@@ -136,23 +136,22 @@ class DB_Functions {
                     continue;
                 }           
                 
-                $data = mysql_fetch_array($eventdata);
+                $data = mysql_fetch_assoc($eventdata);
                 $hostuid = $data['host_uid'];                            
 
                 // Check whether such an event exists otherwise continue
-                $hostdata_query = mysql_query("SELECT name, picture_url from `users` WHERE uid = $hostuid");
+                $hostdata_query = mysql_query("SELECT * from `users` WHERE uid = $hostuid");
                 if($hostdata_query == false) {
                     continue;
                 }
                 $hostdata = mysql_fetch_assoc($hostdata_query);
 
-                $events[$i]['eid'] = $eid;
-                $events[$i]['host_uid'] = $hostuid;
-                $events[$i]['host_name'] = $hostdata['name'];
-                $events[$i]['host_picture_url'] = $hostdata['picture_url'];
-                $events[$i]['where'] = $data['where'];
-                $events[$i]['when'] = $data['when'];
-                $events[$i]['created_at'] = $data['created_at'];
+                $events[$i] = $data;
+                //$events[$i]['eid'] = $eid;
+                $events[$i]['host'] = $hostdata;
+                //$events[$i]['where'] = $data['where'];
+                //$events[$i]['when'] = $data['when'];
+                //$events[$i]['created_at'] = $data['created_at'];
 
                 $i++;
             }
@@ -225,7 +224,8 @@ class DB_Functions {
     public function createEvent($host_uid, $where, $when, $uid) {
         $app = \Slim\Slim::getInstance();
         $app->getLog()->info("inside create_event");
-        $result = mysql_query("INSERT INTO events(host_uid, `where`, `when`, `created_at`) VALUES('$host_uid', '$where', '$when', NOW())")
+        $app->getLog()->info("INSERT INTO events(`host_uid`, `where`, `when`, `created_at`) VALUES('$host_uid', '$where', '$when', NOW())");
+        $result = mysql_query("INSERT INTO events(`host_uid`, `where`, `when`, `created_at`) VALUES('$host_uid', '$where', '$when', NOW())")
             or die(mysql_error());
 
         if(!$result) {
@@ -233,11 +233,14 @@ class DB_Functions {
         }
 
         $eid = mysql_insert_id();
+        $app->getLog()->info("SELECT * FROM `events` WHERE eid = $eid");
         $event = mysql_query("SELECT * FROM `events` WHERE eid = $eid");
         $event = mysql_fetch_assoc($event);
 
-        $host_name = mysql_fetch_assoc(mysql_query("SELECT name from `users` WHERE uid = $host_uid"));
-        $event['host_name'] = $host_name['name'];
+        $app->getLog()->info("SELECT * from `users` WHERE uid = $host_uid");
+        $host = mysql_fetch_assoc(mysql_query("SELECT * from `users` WHERE uid = $host_uid"));
+        $event['host'] = $host;
+        $app->getLog()->info("event = " . print_r($event, TRUE));
 
         // Lets get an array of rids
         $guests = array();
@@ -248,7 +251,7 @@ class DB_Functions {
             array_push($guests, $user);
             array_push($rids, $user['rid']);
         }
-
+        $app->getLog()->info("guests = ".print_r($guests, true)." , rids= ".print_r($rids, true));
         // Get the host of the event
         $host = $this->getUserByUid($host_uid);
 
