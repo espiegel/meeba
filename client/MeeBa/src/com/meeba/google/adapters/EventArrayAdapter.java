@@ -15,6 +15,7 @@ import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventArrayAdapter extends ArrayAdapter<Event> {
@@ -26,6 +27,10 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         super(context, R.layout.eventlistlayout, list);
         this.mContext = context;
         this.mList = list;
+
+        if(mList == null) {
+            mList = new ArrayList<Event>();
+        }
 
     }
 
@@ -82,5 +87,10 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
     public List<Event> getList() {
         return mList;
+    }
+
+    @Override
+    public int getCount() {
+        return mList.size();
     }
 }
