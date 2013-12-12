@@ -20,6 +20,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.gson.Gson;
 import com.meeba.google.R;
 import com.meeba.google.adapters.EventArrayAdapter;
 import com.meeba.google.adapters.NavDrawerListAdapter;
@@ -232,7 +233,7 @@ public class DashboardActivity extends SherlockActivity {
 
             case FILTER_CREATED_BY_ME: {
                 for (Event e : eventsTofilter)
-                    if (e.getHost_uid() == mCurrentUser.getUid())
+                    if (e.getHost().getUid() == mCurrentUser.getUid())
                         filtered.add(e);
             }
             ab.setTitle("My Events");
@@ -302,6 +303,7 @@ public class DashboardActivity extends SherlockActivity {
                 if (mAllEventsList.isEmpty()) {//show the NO EVENT pic
                     noEvent.setVisibility(View.VISIBLE);
                     //TODO I will  deal with this later (max)
+                    //TODO Eidan: Note that the event constructor changed!
                     //create a Dummy invisible event to allow pull to refresh on an "empty"  list too
                     //  Event dummyEvent = new Event(-1, -1, "dummyEvent", "dummyEvent", "dummyEvent");
                     // mAllEventsList.add(0, dummyEvent);

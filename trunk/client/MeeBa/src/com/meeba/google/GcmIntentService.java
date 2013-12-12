@@ -142,7 +142,7 @@ public class GcmIntentService extends IntentService {
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(TITLE_INVITE+event.getHost_name())
+                            .setContentTitle(TITLE_INVITE+event.getHost().getName())
                             .setStyle(new NotificationCompat.BigTextStyle()
                                     .bigText(msg))
                             .setContentText(msg);

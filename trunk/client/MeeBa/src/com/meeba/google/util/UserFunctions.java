@@ -113,6 +113,7 @@ public class UserFunctions {
             Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
 
             for(int i=0;i<lJsonObject.getJSONArray("events").length();i++) {
+                Utils.LOGD("events = "+lJsonObject.getJSONArray("events").get(i).toString());
                 events.add(lGson.fromJson(lJsonObject.getJSONArray("events").get(i).toString(), Event.class));
             }
 

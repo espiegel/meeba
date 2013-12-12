@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -18,16 +19,14 @@ import java.util.List;
 
 public class EventArrayAdapter extends ArrayAdapter<Event> {
 
-    private final ImageLoader mImageLoader;
-    private List<Event> list;
-    private final Activity context;
+    private List<Event> mList;
+    private final Activity mContext;
 
     public EventArrayAdapter(Activity context, List<Event> list) {
         super(context, R.layout.eventlistlayout, list);
-        this.context = context;
-        this.list = list;
+        this.mContext = context;
+        this.mList = list;
 
-        mImageLoader = ImageLoader.getInstance();
     }
 
     static class ViewHolder {
@@ -38,14 +37,14 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
     }
 
     public void setList(List<Event> list) {
-        this.list = list;
+        this.mList = list;
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = null;
         if (convertView == null) {
-            LayoutInflater inflator = context.getLayoutInflater();
+            LayoutInflater inflator = mContext.getLayoutInflater();
             view = inflator.inflate(R.layout.eventlistlayout, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.eventwhere = (TextView) view.findViewById(R.id.eventwhere);
@@ -59,20 +58,19 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         }
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        Event event = list.get(position);
+        Event event = mList.get(position);
         holder.eventwhere.setText(event.getWhere());
         holder.eventwhen.setText(event.getWhen());
 
-        holder.eventHostName.setText(event.getHost_name());
+        User host = event.getHost();
+        holder.eventHostName.setText(host.getName());
 
         final ImageView hostPicture = holder.hostPicture;
 
-        if(event.getHost_picture_url() != null && !TextUtils.isEmpty(event.getHost_picture_url())) {
-            if(!mImageLoader.isInited()) {
-                mImageLoader.init(Utils.getImageLoaderConfig(context));
-            }
-            String url = event.getHost_picture_url();
-            mImageLoader.displayImage(url.replace("?sz=50", "?sz=64"), hostPicture);
+        String url = host.getPicture_url();
+        if(url != null && !TextUtils.isEmpty(url)) {
+            ImageLoader imageLoader = Utils.getImageLoader(mContext);
+            imageLoader.displayImage(url.replace("?sz=50", "?sz=64"), hostPicture);
         }
 
 
@@ -83,6 +81,6 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
     }
 
     public List<Event> getList() {
-        return list;
+        return mList;
     }
 }
