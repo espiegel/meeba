@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView3"
-            android:src="@drawable/when" />
+            android:src="@drawable/clock" />
 
         <TextView
             android:layout_width="wrap_content"

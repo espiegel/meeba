@@ -23,7 +23,7 @@
             android:id="@+id/whenTxtUser"
             android:layout_gravity="center_horizontal"
             android:imeOptions="actionNext"
-            android:drawableLeft="@drawable/when"
+            android:drawableLeft="@drawable/clock"
             android:drawablePadding="5dp"/>
 
         <EditText
@@ -38,7 +38,7 @@
             android:id="@+id/whereTxtUser"
             android:layout_gravity="center_horizontal"
             android:imeOptions="actionDone"
-            android:drawableLeft="@drawable/where"
+            android:drawableLeft="@drawable/earth"
             android:drawablePadding="5dp"/>
 
     </LinearLayout>
