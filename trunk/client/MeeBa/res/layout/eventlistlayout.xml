@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView"
-            android:src="@drawable/when"
+            android:src="@drawable/clock"
             android:layout_marginRight="6dp"
             android:layout_marginLeft="3dp"
             android:layout_gravity="center_vertical" />
@@ -67,7 +67,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView"
-            android:src="@drawable/where"
+            android:src="@drawable/earth"
             android:layout_marginRight="6dp"
             android:layout_marginLeft="3dp"
             android:layout_gravity="center_vertical" />
