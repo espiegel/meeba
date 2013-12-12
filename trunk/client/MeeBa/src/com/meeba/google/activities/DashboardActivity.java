@@ -20,7 +20,6 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.gson.Gson;
 import com.meeba.google.R;
 import com.meeba.google.adapters.EventArrayAdapter;
 import com.meeba.google.adapters.NavDrawerListAdapter;
@@ -70,12 +69,16 @@ public class DashboardActivity extends SherlockActivity {
     private final int FILTER_NOT_GOING = 3;
     private int appliedFilter = FILTER_ALL_EVENTS;
 
+    private ImageView mNoEvent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Utils.LOGD("Dashboard activity onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard_activity);
+
+        // No event placeholder
+        mNoEvent = (ImageView) findViewById(R.id.noEvent);
 
         /**initialize  event lists**/
         mRejectedEventsList = new ArrayList<Event>();
@@ -137,6 +140,7 @@ public class DashboardActivity extends SherlockActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
+                mNoEvent.setVisibility(View.GONE);
                 NavDrawerItem selectedRow = (NavDrawerItem) adapter.getItem(position);
                 selectedRow.getTitle();
 
@@ -146,6 +150,9 @@ public class DashboardActivity extends SherlockActivity {
                 EventArrayAdapter filteredAdapter = new EventArrayAdapter(dashboard, filteredList);
                 mEventListView.setAdapter(filteredAdapter);
                 mDrawerLayout.closeDrawer(mDrawerList);
+                if(filteredList == null || filteredList.isEmpty()) {
+                    mNoEvent.setVisibility(View.VISIBLE); // Show this also if the filter is empty
+                }
             }
         });
 
@@ -258,14 +265,12 @@ public class DashboardActivity extends SherlockActivity {
 
     private void asyncRefresh() {
         AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
-            ImageView noEvent;
            // ProgressDialog progressDialog; using action bar animation instead
             boolean exceptionOccured = false;
 
             protected void onPreExecute() {
                 Utils.LOGD("asyncRefresh onPreExecute");
-                noEvent = (ImageView) findViewById(R.id.noEvent);
-                noEvent.setVisibility(View.GONE);
+                mNoEvent.setVisibility(View.GONE);
                 super.onPreExecute();
 
                 //animate action bar :
@@ -287,11 +292,10 @@ public class DashboardActivity extends SherlockActivity {
                 return mAllEventsList;
             }
 
-            protected void onPostExecute(List<Event> allEvents)
-          {
-              Utils.LOGD("asyncRefresh onPostExecute");
+            protected void onPostExecute(List<Event> allEvents) {
+                Utils.LOGD("asyncRefresh onPostExecute");
 
-              /** sort Events by status */
+                /** sort Events by status */
                 asyncSortEvents();
 
                 List<Event> filterdEvents;
@@ -301,14 +305,14 @@ public class DashboardActivity extends SherlockActivity {
                             "An Error occured when trying to update events ", Toast.LENGTH_LONG).show();
 
                 if (mAllEventsList.isEmpty()) {//show the NO EVENT pic
-                    noEvent.setVisibility(View.VISIBLE);
+                    mNoEvent.setVisibility(View.VISIBLE);
                     //TODO I will  deal with this later (max)
                     //TODO Eidan: Note that the event constructor changed!
                     //create a Dummy invisible event to allow pull to refresh on an "empty"  list too
                     //  Event dummyEvent = new Event(-1, -1, "dummyEvent", "dummyEvent", "dummyEvent");
                     // mAllEventsList.add(0, dummyEvent);
                 } else {
-                    noEvent.setVisibility(View.GONE);
+                    mNoEvent.setVisibility(View.GONE);
                 }
                 //apply the chosen filter to the updated event list
                 filterdEvents = filterEventList(mAllEventsList);
