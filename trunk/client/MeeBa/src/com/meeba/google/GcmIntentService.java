@@ -88,9 +88,9 @@ public class GcmIntentService extends IntentService {
                          /* get status */
                             String status = extras.getString("status");
                             if (status.equals("1")){
-                                status = "accepted";
+                                status = "Accepted";
                             } else {
-                                status = "declined";
+                                status = "Declined";
                             }
 
 
@@ -175,7 +175,7 @@ public class GcmIntentService extends IntentService {
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            String msg = "They " + status + " your invitation";
+            String msg = status + " your invitation";
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
