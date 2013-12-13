@@ -113,13 +113,25 @@
             android:textSize="20sp"
             android:layout_centerVertical="true" />
 
-        <CheckBox
+        <!--CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/checkInviteBox"
             android:checked="false"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/myPicture" />
+            android:layout_alignTop="@+id/myPicture" /-->
+
+
+        <ImageButton
+            android:id="@+id/statusImgBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/myPicture"
+            android:background="@null"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true" />
+
+
     </RelativeLayout>
 
     <ListView
