@@ -70,6 +70,7 @@ public class DashboardActivity extends SherlockActivity {
     private int appliedFilter = FILTER_ALL_EVENTS;
 
     private ImageView mNoEvent;
+    private final Event mDummyEvent = new Event(-1, "", "", "", new User(-1, "", "", "", "", "", ""));
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,8 +119,7 @@ public class DashboardActivity extends SherlockActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
-         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                //TODO show drawer icon in top right side of action bar
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_navigation_drawer, //nav menu toggle icon - wont be showed, requires API level >10
                 R.string.app_name, // nav drawer open - description for accessibility
                 R.string.app_name // nav drawer close - description for accessibility
@@ -145,14 +145,22 @@ public class DashboardActivity extends SherlockActivity {
                 selectedRow.getTitle();
 
                 //create and show the filtered list,  and close the drawer
+
                 appliedFilter = position; //filter type is the selected row's number
                 List<Event> filteredList = filterEventList(mAllEventsList);
+
+                if (filteredList.isEmpty()) {
+                    mNoEvent.setVisibility(View.VISIBLE); // Show this also if the filter is empty
+                    filteredList.add(mDummyEvent);
+                }
+
+                if (filteredList.get(0).getEid() == -1) {
+                    mNoEvent.setVisibility(View.VISIBLE);
+                }
+
                 EventArrayAdapter filteredAdapter = new EventArrayAdapter(dashboard, filteredList);
                 mEventListView.setAdapter(filteredAdapter);
                 mDrawerLayout.closeDrawer(mDrawerList);
-                if(filteredList == null || filteredList.isEmpty()) {
-                    mNoEvent.setVisibility(View.VISIBLE); // Show this also if the filter is empty
-                }
             }
         });
 
@@ -216,12 +224,6 @@ public class DashboardActivity extends SherlockActivity {
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        //maybe ill use this in future , don't delete
-        // if nav drawer is opened, hide the action items
-        //boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        //menu.findItem(R.id.action_create_event).setVisible(!drawerOpen);
-        //ActionBar ab = getSupportActionBar();
-        // ab.setTitle("Events");
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -260,12 +262,13 @@ public class DashboardActivity extends SherlockActivity {
             default:
                 Utils.LOGD(" not a valid filter :" + appliedFilter);
         }
+        if (filtered.isEmpty()) filtered.add(mDummyEvent);
         return filtered;
     }
 
     private void asyncRefresh() {
         AsyncTask<Void, Void, List<Event>> task = new AsyncTask<Void, Void, List<Event>>() {
-           // ProgressDialog progressDialog; using action bar animation instead
+            // ProgressDialog progressDialog; using action bar animation instead
             boolean exceptionOccured = false;
 
             protected void onPreExecute() {
@@ -295,27 +298,22 @@ public class DashboardActivity extends SherlockActivity {
             protected void onPostExecute(List<Event> allEvents) {
                 Utils.LOGD("asyncRefresh onPostExecute");
 
-                /** sort Events by status */
-                asyncSortEvents();
-
                 List<Event> filterdEvents;
-
+                asyncSortEvents();  /** sort Events by status */
                 if (exceptionOccured)
                     Toast.makeText(DashboardActivity.this,
                             "An Error occured when trying to update events ", Toast.LENGTH_LONG).show();
 
-                if (mAllEventsList.isEmpty()) {//show the NO EVENT pic
+                //apply the chosen filter to the updated event list
+                filterdEvents = filterEventList(mAllEventsList);
+
+                if (filterdEvents.isEmpty() || filterdEvents.get(0).getEid() == -1) {
+                    Utils.LOGD("maxEebug " + filterdEvents.size() + "first= " + filterdEvents.get(0).getEid());
                     mNoEvent.setVisibility(View.VISIBLE);
-                    //TODO I will  deal with this later (max)
-                    //TODO Eidan: Note that the event constructor changed!
-                    //create a Dummy invisible event to allow pull to refresh on an "empty"  list too
-                    //  Event dummyEvent = new Event(-1, -1, "dummyEvent", "dummyEvent", "dummyEvent");
-                    // mAllEventsList.add(0, dummyEvent);
                 } else {
                     mNoEvent.setVisibility(View.GONE);
                 }
-                //apply the chosen filter to the updated event list
-                filterdEvents = filterEventList(mAllEventsList);
+
                 mEventArrayAdapter = new EventArrayAdapter(dashboard, filterdEvents);
                 mEventListView.setAdapter(mEventArrayAdapter);
                 Utils.LOGD("list count =  " + mEventArrayAdapter.getCount());
@@ -338,9 +336,17 @@ public class DashboardActivity extends SherlockActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    mAcceptedEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 1);
-                    mRejectedEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid(), -1);
-                    mUnknownEventsList = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 0);
+
+                    List<Event> temp;
+                    temp = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 1);
+                    mAcceptedEventsList = temp != null ? temp : new ArrayList<Event>();
+
+                    temp = UserFunctions.getEventsByUser(mCurrentUser.getUid(), -1);
+                    mRejectedEventsList = temp != null ? temp : new ArrayList<Event>();
+
+                    temp = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 0);
+                    mUnknownEventsList = temp != null ? temp : new ArrayList<Event>();
+
                 } catch (Exception e) {
                    /* Stack Trace is already printed in  UserFunctions*/
                     exceptionOccured = true;
@@ -354,8 +360,8 @@ public class DashboardActivity extends SherlockActivity {
                     Toast.makeText(DashboardActivity.this,
                             "An Error occured when trying to update events ", Toast.LENGTH_LONG).show();
 
-                    mPullToRefreshLayout.setRefreshing(false);
-                    mPullToRefreshLayout.setRefreshComplete();
+                mPullToRefreshLayout.setRefreshing(false);
+                mPullToRefreshLayout.setRefreshComplete();
 
                 Utils.LOGD("list =  " + mAllEventsList + "\ngoing= " + mAcceptedEventsList +
                         "\nnotGoing= " + mRejectedEventsList + "\nunknown=" + mUnknownEventsList);
@@ -474,4 +480,12 @@ public class DashboardActivity extends SherlockActivity {
                 .setNegativeButton("No", null)
                 .show();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        asyncRefresh();
+
+    }
+
 }

@@ -294,15 +294,12 @@ public class EventPageActivity extends SherlockFragmentActivity {
         switch (mInviteStatus) {
             case STATUS_ACCEPTED: {
                 alertDialog.setMessage("decline event ?");
-                //  alertDialog.setIcon(R.drawable.red_cross);
-
                 // Setting  "YES" Button
                 alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(EventPageActivity.this, "try reject ", Toast.LENGTH_SHORT).show();
                         newStatus = STATUS_REJECTED;
                         asyncChangeStatus();
-                        //TODO reject
                     }
                 });
 
@@ -316,18 +313,14 @@ public class EventPageActivity extends SherlockFragmentActivity {
             }
             break;
 
-
             case STATUS_REJECTED: {
                 alertDialog.setMessage("accept  event ?");
-                // alertDialog.setIcon(R.drawable.green_check);
-
                 // Setting  "YES" Button
                 alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(EventPageActivity.this, "try accept ", Toast.LENGTH_SHORT).show();
                         newStatus = STATUS_ACCEPTED;
                         asyncChangeStatus();
-                        //TODO accept
                     }
                 });
                 // Setting  "NO" Button
