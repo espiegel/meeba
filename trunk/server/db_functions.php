@@ -24,6 +24,13 @@ class DB_Functions {
      * returns user details
      */
     public function createUser($email, $name, $rid, $phone, $picture_url) {
+        // Escape special characters in the strings
+        $email = mysql_real_escape_string($email);
+        $name = mysql_real_escape_string($name);
+        $phone = mysql_real_escape_string($phone);
+        $picture_url = mysql_real_escape_string($picture_url);
+        $rid = mysql_real_escape_string($rid);
+
     	$result = mysql_query("INSERT INTO users(phone_number, rid, created_at, email, name, picture_url) ".
             "VALUES('$phone', '$rid', NOW(), '$email', '$name', '$picture_url')");
     	if($result) {
@@ -221,11 +228,16 @@ class DB_Functions {
     /**
     * Create an event, create and send out invitations to guests via gcm
     */
-    public function createEvent($host_uid, $where, $when, $uid) {
+    public function createEvent($host_uid, $title, $where, $when, $uid) {
+        // Escape special characters inside the string
+        $title = mysql_real_escape_string($title);
+        $where = mysql_real_escape_string($where);
+        $when = mysql_real_escape_string($when);
+
         $app = \Slim\Slim::getInstance();
         $app->getLog()->info("inside create_event");
-        $app->getLog()->info("INSERT INTO events(`host_uid`, `where`, `when`, `created_at`) VALUES('$host_uid', '$where', '$when', NOW())");
-        $result = mysql_query("INSERT INTO events(`host_uid`, `where`, `when`, `created_at`) VALUES('$host_uid', '$where', '$when', NOW())")
+        $app->getLog()->info("INSERT INTO events(`host_uid`, `title`, `where`, `when`, `created_at`) VALUES('$host_uid', '$title', '$where', '$when', NOW())");
+        $result = mysql_query("INSERT INTO events(`host_uid`, `title`, `where`, `when`, `created_at`) VALUES('$host_uid', '$title', '$where', '$when', NOW())")
             or die(mysql_error());
 
         if(!$result) {
