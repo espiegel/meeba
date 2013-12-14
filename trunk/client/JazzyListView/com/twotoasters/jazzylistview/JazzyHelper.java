@@ -192,6 +192,7 @@ public class JazzyHelper implements AbsListView.OnScrollListener {
     }
 
     private void doJazzinessImpl(View item, int position, int scrollDirection) {
+        try{
         ViewPropertyAnimator animator = com.nineoldandroids.view.ViewPropertyAnimator
                 .animate(item)
                 .setDuration(DURATION)
@@ -201,6 +202,10 @@ public class JazzyHelper implements AbsListView.OnScrollListener {
         mTransitionEffect.initView(item, position, scrollDirection);
         mTransitionEffect.setupAnimation(item, position, scrollDirection, animator);
         animator.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
