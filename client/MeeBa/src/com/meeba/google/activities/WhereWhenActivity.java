@@ -67,7 +67,7 @@ public class WhereWhenActivity extends SherlockActivity {
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                         actionId == EditorInfo.IME_ACTION_DONE) {
-                    editWhere.requestFocus();;
+                    editWhere.requestFocus();
                     return true;
                 }
                 return false;
