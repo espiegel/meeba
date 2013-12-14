@@ -66,6 +66,31 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/imageView1"
+            android:src="@drawable/android_notepad"
+            android:layout_marginRight="6dp"
+            android:layout_marginLeft="3dp"
+            android:layout_gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/eventtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textIsSelectable="false"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_margin="5dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/imageView"
             android:src="@drawable/earth"
             android:layout_marginRight="6dp"

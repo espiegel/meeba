@@ -11,9 +11,9 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.ImageView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -70,7 +70,7 @@ public class DashboardActivity extends SherlockActivity {
     private int appliedFilter = FILTER_ALL_EVENTS;
 
     private ImageView mNoEvent;
-    private final Event mDummyEvent = new Event(-1, "", "", "", new User(-1, "", "", "", "", "", ""));
+    private final Event mDummyEvent = new Event(-1, "","", "", "", new User(-1, "", "", "", "", "", ""));
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

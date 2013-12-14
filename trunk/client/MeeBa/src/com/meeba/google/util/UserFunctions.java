@@ -209,13 +209,14 @@ public class UserFunctions {
      * @param uids A List of Strings containing the uids of all the invited guests.
      * @return Returns the created event on success or null if an error occurred.
      */
-    public static Event createEvent(int host_uid, String where, String when, List<String> uids) {
+    public static Event createEvent(int host_uid,String title, String where, String when, List<String> uids) {
         try {
             Gson lGson = new Gson();
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
 
             params.add(new BasicNameValuePair("host_uid", String.valueOf(host_uid)));
+            params.add(new BasicNameValuePair("title", title));
             params.add(new BasicNameValuePair("where", where));
             params.add(new BasicNameValuePair("when", when));
 

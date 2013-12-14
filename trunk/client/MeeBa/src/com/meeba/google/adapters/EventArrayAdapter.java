@@ -36,6 +36,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
     static class ViewHolder {
         protected TextView eventHostName;
+        protected TextView eventtitle;
         protected TextView eventwhere;
         protected TextView eventwhen;
         protected ImageView hostPicture;
@@ -53,6 +54,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             view = inflator.inflate(R.layout.eventlistlayout, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.eventwhere = (TextView) view.findViewById(R.id.eventwhere);
+            viewHolder.eventtitle = (TextView) view.findViewById(R.id.eventtitle);
             viewHolder.eventwhen = (TextView) view.findViewById(R.id.eventwhen);
             viewHolder.eventHostName = (TextView) view.findViewById(R.id.txtHost);
             viewHolder.hostPicture = (ImageView) view.findViewById(R.id.hostPicture);
@@ -65,6 +67,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
         Event event = mList.get(position);
         holder.eventwhere.setText(event.getWhere());
+        holder.eventtitle.setText(event.getWhere());
         holder.eventwhen.setText(event.getWhen());
 
         User host = event.getHost();

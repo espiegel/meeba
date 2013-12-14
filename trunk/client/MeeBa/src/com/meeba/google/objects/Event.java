@@ -7,13 +7,15 @@ import java.io.Serializable;
  */
 public class Event implements Serializable {
     private int eid;
+    private String title;
     private String where;
     private String when;
     private String created_at;
     private User host;
 
-    public Event(int eid, String where, String when, String created_at, User host) {
+    public Event(int eid,String title, String where, String when, String created_at, User host) {
         this.eid = eid;
+        this.title = title;
         this.where = where;
         this.when = when;
         this.created_at = created_at;
@@ -39,6 +41,8 @@ public class Event implements Serializable {
         this.eid = eid;
     }
 
+    public String getTitle(){return title;}
+
     public String getWhere() {
         return where;
     }
@@ -59,6 +63,7 @@ public class Event implements Serializable {
     public String toString() {
         return "Event{" +
                 "eid=" + eid +
+                ", title='" + title + '\'' +
                 ", where='" + where + '\'' +
                 ", when='" + when + '\'' +
                 ", created_at='" + created_at + '\'' +

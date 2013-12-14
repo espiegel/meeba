@@ -45,6 +45,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
     private final int STATUS_UNKNOWN = 0;
 
     private TextView mTxtHost;
+    private TextView mTxtTitle;
     private TextView mTxtWhere;
     private TextView mTxtWhen;
     private ListView mListView;
@@ -86,6 +87,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
 
         statusImgButton = (ImageButton) findViewById(R.id.statusImgBtn);
         mTxtHost = (TextView) findViewById(R.id.txtHost);
+        mTxtTitle = (TextView) findViewById(R.id.txtTitle);
         mTxtWhere = (TextView) findViewById(R.id.txtWhere);
         mTxtWhen = (TextView) findViewById(R.id.txtWhen);
         mListView = (ListView) findViewById(R.id.listGuests);
@@ -105,6 +107,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
         mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
         Utils.LOGD("bundle event=" + mEvent);
         mTxtHost.setText(mEvent.getHost().getName());
+        mTxtTitle.setText(mEvent.getTitle());
         mTxtWhere.setText(mEvent.getWhere());
         mTxtWhen.setText(mEvent.getWhen());
 
@@ -392,7 +395,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
                 if (newStatus == STATUS_ACCEPTED)
                     statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
                 else
-                    statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
+                    statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross));
 
                 mInviteStatus = newStatus;
             }
