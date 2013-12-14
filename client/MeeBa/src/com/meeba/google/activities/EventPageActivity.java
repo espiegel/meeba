@@ -148,13 +148,6 @@ public class EventPageActivity extends SherlockFragmentActivity {
 
             /** get the current user, and his invite status , and set the status of the image button **/
             new AsyncTask<Void, Void, User>() {
-                private ProgressDialog dialog = new ProgressDialog(EventPageActivity.this);
-
-                @Override
-                protected void onPreExecute() {
-                    this.dialog.setMessage("loading ... ");
-                    this.dialog.show();
-                }
 
                 @Override
                 protected User doInBackground(Void... voids) {
@@ -172,9 +165,6 @@ public class EventPageActivity extends SherlockFragmentActivity {
 
                 @Override
                 protected void onPostExecute(User me) {
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
                     mInviteStatus = me.getInvite_status();
 
                     if (mInviteStatus == STATUS_ACCEPTED) {
@@ -419,14 +409,6 @@ public class EventPageActivity extends SherlockFragmentActivity {
     private void refreshGuests() {
         refreshGuests = new AsyncTask<Void, Void, Void>() {
 
-            private ProgressDialog dialog = new ProgressDialog(EventPageActivity.this);
-
-            @Override
-            protected void onPreExecute() {
-                this.dialog.setMessage("loading ... ");
-                this.dialog.show();
-            }
-
             @Override
             protected Void doInBackground(Void... voids) {
                 List<User> guestListWithoutMe = new ArrayList<User>();
@@ -452,12 +434,6 @@ public class EventPageActivity extends SherlockFragmentActivity {
                 });
 
                 return null;
-            }
-
-            protected void onPostExecute(Void v) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
             }
 
         };
