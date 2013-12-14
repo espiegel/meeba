@@ -37,7 +37,7 @@
             android:id="@+id/titleTxtUser"
             android:layout_gravity="center_horizontal"
             android:imeOptions="actionDone"
-            android:drawableLeft="@drawable/ic_launcher"
+            android:drawableLeft="@drawable/android_notepad"
             android:drawablePadding="5dp"/>
 
 
