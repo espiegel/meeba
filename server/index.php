@@ -187,6 +187,7 @@ $app->post('/createEvent', function() use ($app, $db) {
 	$where = $_POST['where'];
 	$when = $_POST['when'];
 	$uid = $_POST['uid']; // array of guest uids
+	$title = $_POST['title'];
 
 	$uid = json_decode($uid); // decode the json array
 
@@ -201,7 +202,7 @@ $app->post('/createEvent', function() use ($app, $db) {
 	}*/
 
 	// Create the event and send out invites
-	$event = $db->createEvent($host_uid, $where, $when, $uid);
+	$event = $db->createEvent($host_uid, $title, $where, $when, $uid);
 
 	if(!$event) {
 		echo json_encode(array(
