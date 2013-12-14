@@ -73,7 +73,6 @@ public class GcmIntentService extends IntentService {
                             sendNotification(tag, event);
                             Utils.LOGD("GCM: Received a message " + extras.toString());
                         } else if (tag.equals(TAG_RESPONSE)){
-                            /* TODO: Dayana add to recev invite from guest  */
                         /* get event from extras */
                             String jsonEvent = extras.getString("event");
                             Gson gson = new Gson();
@@ -158,8 +157,7 @@ public class GcmIntentService extends IntentService {
     }
 
     private void recevNotification(String tag, Event event, User user, String status){
-        /* TODO: like the above function. use to sent the push to host */
-        /* add here if like this I get EVENT and sent to event page*/
+
         if(tag.equals(TAG_RESPONSE)) {
             mNotificationManager = (NotificationManager)
                     this.getSystemService(Context.NOTIFICATION_SERVICE);

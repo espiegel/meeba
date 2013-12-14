@@ -19,6 +19,7 @@
     <string name="create_new_event">Create New Event</string>
     <string name="when">When?</string>
     <string name="where">Where?</string>
+    <string name="title">Title?</string>
     <string name="next">Next</string>
     <string name="refreshing_events">Refreshing Events</string>
     <string name="please_wait">Please wait !</string>

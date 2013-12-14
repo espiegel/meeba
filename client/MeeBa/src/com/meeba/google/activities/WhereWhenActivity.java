@@ -33,6 +33,7 @@ import java.util.Calendar;
 public class WhereWhenActivity extends SherlockActivity {
 
     EditText editWhere;
+    EditText editTitle;
     EditText editWhen;
 
     private String mDate = "";
@@ -48,7 +49,30 @@ public class WhereWhenActivity extends SherlockActivity {
 
         Utils.setupUI(findViewById(R.id.wherewhenLayout), this);
         editWhen = (EditText) findViewById(R.id.whenTxtUser);
+        editTitle = (EditText) findViewById(R.id.titleTxtUser);
         editWhere = (EditText) findViewById(R.id.whereTxtUser);
+
+
+        editTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+
+        editTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE) {
+                    editWhere.requestFocus();;
+                    return true;
+                }
+                return false;
+            }
+        });
 
         editWhere.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -92,7 +116,7 @@ public class WhereWhenActivity extends SherlockActivity {
                             minutes = String.valueOf(selectedMinute);
                         }
                         editWhen.setText(selectedHour + ":" + minutes + " " + mDate);
-                        editWhere.requestFocus();
+                        editTitle.requestFocus();
                     }
                 }, hour, minute, true);//Yes 24 hour time
                 mTimePicker.setTitle("Select Time");
@@ -114,9 +138,10 @@ public class WhereWhenActivity extends SherlockActivity {
     }
 
     private void nextButton() {
+        String title =  editTitle.getText().toString();
         String where = editWhere.getText().toString();
         String when = editWhen.getText().toString();
-        if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when)) {
+        if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title))  {
             Toast.makeText(getApplicationContext(), "You must input a location and a time", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -131,6 +156,7 @@ public class WhereWhenActivity extends SherlockActivity {
         //build this so i can use user's input in the post activity
         Bundle bundle = new Bundle();
         bundle.putString("when", when);
+        bundle.putString("title", title);
         bundle.putString("where", where);
         i.putExtras(bundle);
         startActivity(i);
