@@ -256,8 +256,36 @@ public class UserFunctions {
         return respondToInvite(uid, eid, -1);
     }
 
+    // Respond to an invite
+    private static boolean respondToInvite(int uid, int eid, int status) {
+        try {
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            params.add(new BasicNameValuePair("uid", String.valueOf(uid)));
+            params.add(new BasicNameValuePair("eid", String.valueOf(eid)));
+            params.add(new BasicNameValuePair("status", String.valueOf(status)));
+
+            JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "respondToInvite", params);
+
+            if(lJsonObject == null)
+                return false;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+
+            if(lJsonObject.getInt("success") == 1) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     /**
-     * TODO
      * @param eid Event id
      * @return Returns a list of all users that are a part of this event
      */
@@ -292,17 +320,14 @@ public class UserFunctions {
         }
     }
 
-    private static boolean respondToInvite(int uid, int eid, int status) {
+    /**
+     * Deletes an event.
+     * @param eid Event id
+     * @return Returns true on success and false on failure.
+     */
+    public static boolean deleteEvent(int eid) {
         try {
-            Gson lGson = new Gson();
-
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-
-            params.add(new BasicNameValuePair("uid", String.valueOf(uid)));
-            params.add(new BasicNameValuePair("eid", String.valueOf(eid)));
-            params.add(new BasicNameValuePair("status", String.valueOf(status)));
-
-            JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "respondToInvite", params);
+            JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "deleteEvent/" + eid);
 
             if(lJsonObject == null)
                 return false;
@@ -315,8 +340,8 @@ public class UserFunctions {
             else {
                 return false;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

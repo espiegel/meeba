@@ -16,14 +16,13 @@
         android:id="@+id/txtInviteYourFriends"
         android:layout_gravity="center_horizontal" />
 
-    <ListView
+    <com.twotoasters.jazzylistview.JazzyListView
         android:id="@+id/appContacts"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:layout_weight="1"
-        android:choiceMode="multipleChoice" >
-    </ListView>
+        android:choiceMode="multipleChoice" />
 
 </LinearLayout>

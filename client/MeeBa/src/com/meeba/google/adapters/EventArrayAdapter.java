@@ -67,7 +67,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
         Event event = mList.get(position);
         holder.eventwhere.setText(event.getWhere());
-        holder.eventtitle.setText(event.getWhere());
+        holder.eventtitle.setText(event.getTitle());
         holder.eventwhen.setText(event.getWhen());
 
         User host = event.getHost();
@@ -80,7 +80,6 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             ImageLoader imageLoader = Utils.getImageLoader(mContext);
             imageLoader.displayImage(url.replace("?sz=50", "?sz=64"), hostPicture);
         }
-
 
         if (event.getEid() == -1)
             view.setVisibility(View.GONE);

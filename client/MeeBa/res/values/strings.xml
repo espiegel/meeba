@@ -6,7 +6,7 @@
     <string name="welcomeString">welcome to MeeBa</string>
     <string name="signed_out_status">click below to sign in with google</string>
     <string name="signed_in_status">You are signed in as %s</string>
-    <string name="unknown_person">Unknown</string>
+    <string name="unknown">Unknown</string>
 
     <!-- Dashboard -->
     <string name="txtWelcome">WELCOME</string>
@@ -19,14 +19,14 @@
     <string name="create_new_event">Create New Event</string>
     <string name="when">When?</string>
     <string name="where">Where?</string>
-    <string name="title">Title?</string>
+    <string name="title">Event Title</string>
     <string name="next">Next</string>
     <string name="refreshing_events">Refreshing Events</string>
     <string name="please_wait">Please wait !</string>
     <string name="invite">Invite</string>
-    <string name="crash_toast_text">An unexpected error has occurred. Please help us fix this by sending us an email with the crash report. Thank you!</string>
     <string name="phone_number">Phone Number:</string>
     <string name="ok">Ok</string>
+    <string name="actionbar_search">Search Contacts</string>
 
     <string-array
         name="drawer_event_filters">
@@ -69,12 +69,12 @@
     <!-- ACRA -->
     <string name="acra">Send an e-mail crash report</string>
     <string name="acra_crash">The app just crashed. Please send us an email containing the crash report!</string>
-    <string name="crash_toast_text">Ooooops ! I crashed, but a report has been sent to my developer to help fix the issue !</string>
+    <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue !</string>
     <string name="crash_dialog_title">MeeBa has crashed</string>
     <string name="crash_dialog_text">An unexpected error occurred forcing the
     application to stop. Please help us fix this by sending us error data,
     all you have to do is click OK.</string>
     <string name="crash_dialog_comment_prompt">Please add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you !</string>
-    <string name="actionbar_search">Search Contacts</string>
+
 </resources>

@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,7 +17,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -51,29 +49,22 @@ public class EventPageActivity extends SherlockFragmentActivity {
     private ListView mListView;
     private Event mEvent;
     private GuestArrayAdapter mGuestArrayAdapter = null;
-    // private ImageView mAcceptButton;
 
     //add
     private ImageButton statusImgButton;
     private ImageView mMy_picture;
     private TextView mMy_name;
-    // private Switch my_status;
-    private CheckBox mMy_status;
 
     private int eid;
     private ImageView mImageHost;
     private AsyncTask<Void, Void, Void> refreshGuests = null;
-    // private AsyncTask<Void, Void, Void> refreshSwitch = null;
-    private AsyncTask<Void, Void, Integer> refreshImgButton = null;
-    // private AsyncTask<Void, Void, User> initSwitch = null;
-    private AsyncTask<Void, Void, User> initCheckBox = null;
-    private AsyncTask<Void, Void, User> initImgButton = null;
 
     private ImageLoader mImageLoader;
-    private User mMyCurrentUser;//user to be retrieved from  retrieved from phone DB
-    private User mMe;                          //user to be retrieved from current Event guests
-    private int mInviteStatus;    // the current users event status  of the current event (if he is invited)
-    private int newStatus = 0;       //the status to change to, when clicking the Image Button
+    private User mMyCurrentUser;  // User to be retrieved from  retrieved from phone DB
+    private User mMe;             // User to be retrieved from current Event guests
+    private User mHost;           // Host of the event
+    private int mInviteStatus;    // The current users event status  of the current event (if he is invited)
+    private int newStatus = 0;    // The status to change to, when clicking the Image Button
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -93,25 +84,20 @@ public class EventPageActivity extends SherlockFragmentActivity {
         mListView = (ListView) findViewById(R.id.listGuests);
         mImageHost = (ImageView) findViewById(R.id.eventpage_host_pic);
 
-        //add
         mMy_name = (TextView) findViewById(R.id.myname);
         mMy_picture = (ImageView) findViewById(R.id.myPicture);
-        // my_status = (Switch) findViewById(R.id.switch1);
-        // mAcceptButton = (ImageView) findViewById(R.id.action_accept_invite_status);
-
-        //mMy_status = (CheckBox) findViewById(R.id.checkInviteBox);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
         mEvent = (Event) bundle.getSerializable(Utils.BUNDLE_EVENT);
         Utils.LOGD("bundle event=" + mEvent);
-        mTxtHost.setText(mEvent.getHost().getName());
+        mHost = mEvent.getHost();
+        mTxtHost.setText(mHost.getName());
         mTxtTitle.setText(mEvent.getTitle());
         mTxtWhere.setText(mEvent.getWhere());
         mTxtWhen.setText(mEvent.getWhen());
 
-        //add
         //get the current user from phone DB:
         mMyCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
         mMy_name.setText(mMyCurrentUser.getName());
@@ -119,10 +105,11 @@ public class EventPageActivity extends SherlockFragmentActivity {
         eid = mEvent.getEid();
 
         mImageLoader = Utils.getImageLoader(this);
-       mImageLoader.displayImage(mEvent.getHost().getPicture_url(), mImageHost);
+        mImageLoader.displayImage(mHost.getPicture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
 
         RelativeLayout guestLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
+        LinearLayout hostLayout = (LinearLayout) findViewById(R.id.hostLayout);
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -138,17 +125,20 @@ public class EventPageActivity extends SherlockFragmentActivity {
                 return false;
             }
         });
-
+        hostLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                showContactDialog(mHost);
+                return false;
+            }
+        });
         //if the host is the current user , he shouldn't be able to change his status
-        if (mMyCurrentUser.getUid() == mEvent.getHost().getUid()) {
+        if (mMyCurrentUser.getUid() == mHost.getUid()) {
             Utils.LOGD(" max debug " + mMy_name + "  " + mMy_picture + " " + "  " + mMyCurrentUser);
             mMy_name.setVisibility(View.GONE);
             mMy_picture.setVisibility(View.GONE);
             statusImgButton.setVisibility(View.GONE);
         } else {
-
-            //   initCheckBox();
-
             /** get the current user, and his invite status , and set the status of the image button **/
             new AsyncTask<Void, Void, User>() {
 
@@ -193,49 +183,6 @@ public class EventPageActivity extends SherlockFragmentActivity {
                     });
                 }
             }.execute();
-
-/*
-            mMy_status.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-                    refreshImgButton = new AsyncTask<Void, Void, Integer>() {
-
-                        @Override
-                        protected Integer doInBackground(Void... voids) {
-
-                            List<User> guestList = UserFunctions.getUsersByEvent(eid);
-                            if (guestList == null) {
-                                return null;
-                            }
-                            for (User u : guestList) {
-                                if (u.getUid() == mMyCurrentUser.getUid()) {
-                                    mMe = u;
-                                }
-                            }
-                            if (isChecked) {
-                                if (mMe.getInvite_status() == 1) {
-
-                                } else {
-                                    mMe.setInvite_status(1);
-                                    UserFunctions.acceptInvite(mMe.getUid(), eid);
-                                }
-                            } else {
-                                if (mMe.getInvite_status() == -1) {
-
-                                } else {
-                                    mMe.setInvite_status(-1);
-                                    UserFunctions.declineInvite(mMe.getUid(), eid);
-                                }
-                            }
-                            return null;
-                        }
-                    };
-                    refreshImgButton.execute();
-
-                }
-            });
-            */
         }
 
         /** rest of onCreate : **/
@@ -286,18 +233,18 @@ public class EventPageActivity extends SherlockFragmentActivity {
 
         switch (mInviteStatus) {
             case STATUS_ACCEPTED: {
-                alertDialog.setMessage("decline event ?");
+                alertDialog.setMessage("Decline the event?");
                 // Setting  "YES" Button
-                alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(EventPageActivity.this, "try reject ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EventPageActivity.this, "Event declined", Toast.LENGTH_SHORT).show();
                         newStatus = STATUS_REJECTED;
                         asyncChangeStatus();
                     }
                 });
 
                 // Setting  "NO" Button
-                alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
@@ -307,17 +254,17 @@ public class EventPageActivity extends SherlockFragmentActivity {
             break;
 
             case STATUS_REJECTED: {
-                alertDialog.setMessage("accept  event ?");
+                alertDialog.setMessage("Attend the event?");
                 // Setting  "YES" Button
-                alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(EventPageActivity.this, "try accept ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EventPageActivity.this, "Event attended", Toast.LENGTH_SHORT).show();
                         newStatus = STATUS_ACCEPTED;
                         asyncChangeStatus();
                     }
                 });
                 // Setting  "NO" Button
-                alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
@@ -328,22 +275,22 @@ public class EventPageActivity extends SherlockFragmentActivity {
             break;
 
             case STATUS_UNKNOWN: {
-                alertDialog.setMessage("change your invite status ");
+                alertDialog.setMessage("Change your invite status:");
                 alertDialog.setIcon(R.drawable.green_check);
 
                 // Setting  "YES" Button
-                alertDialog.setPositiveButton("ACCEPT", new DialogInterface.OnClickListener() {
+                alertDialog.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(EventPageActivity.this, "try accept ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EventPageActivity.this, "Event attended", Toast.LENGTH_SHORT).show();
                         newStatus = STATUS_ACCEPTED;
                         asyncChangeStatus();
                     }
                 });
 
                 // Setting  "NO" Button
-                alertDialog.setNegativeButton("REJECT", new DialogInterface.OnClickListener() {
+                alertDialog.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(EventPageActivity.this, "try reject ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EventPageActivity.this, "Event declined", Toast.LENGTH_SHORT).show();
                         newStatus = STATUS_REJECTED;
                         asyncChangeStatus();
                     }
@@ -421,10 +368,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
                     return null;
                 }
                 for (User u : guestList) {
-
-                    if (u.getUid() == mMyCurrentUser.getUid()) {
-
-                    } else {
+                    if (u.getUid() != mMyCurrentUser.getUid()) {
                         guestListWithoutMe.add(u);
                     }
                 }
@@ -465,127 +409,5 @@ public class EventPageActivity extends SherlockFragmentActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
-    }
-
-/*
-    public void initSwitch (){
-
-        initSwitch =  new AsyncTask<Void, Void, User>() {
-
-            protected User doInBackground(Void... voids) {
-                List<User> guestList = UserFunctions.getUsersByEvent(eid);
-                if (guestList == null) {
-                    return null;
-                }
-                for(User u:guestList) {
-                    if(u.getUid()==myCurrentUser.getUid()){
-                        me = u;
-                    }
-                }
-                return me;
-            }
-
-            protected void onPostExecute(User me){
-                if( me.getInvite_status()==1){
-                    my_status.setChecked(true);
-                }
-
-                else{
-                    my_status.setChecked(false);
-                }
-            }
-        };
-        initSwitch.execute();
-    }
-    */
- /*
-    public void initImage (){
-
-        initImage =  new AsyncTask<Void, Void, User>() {
-
-            protected User doInBackground(Void... voids) {
-                List<User> guestList = UserFunctions.getUsersByEvent(eid);
-                if (guestList == null) {
-                    return null;
-                }
-                for(User u:guestList) {
-                    if(u.getUid()==myCurrentUser.getUid()){
-                        me = u;
-                    }
-                }
-                return me;
-            }
-
-            protected void onPostExecute(User me){
-                if( me.getInvite_status()==1){
-              //      my_status.setChecked(true);
-                    //setImageResource(R.id.action_accept_invite_status);
-                }
-
-                else{
-              //      my_status.setChecked(false);
-                 //   mAcceptButton.setImageResource(R.id.action_decline_invite_status);
-//                mAcceptButton.setBackgroundResource(R.id.action_decline_invite_status);
-                }
-            }
-        };
-        initImage.execute();
-    }
-*/
-    /*
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.eventpage_activity, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_accept_invite_status:
-                changeInviteStatus();
-                return true;
-
-            default:
-                break;
-        }
-        onBackPressed();
-        return true;
-
-    }
-
-public void changeInviteStatus(){
-
-}
-*/
-
-
-    public void initCheckBox() {
-        initCheckBox = new AsyncTask<Void, Void, User>() {
-
-            protected User doInBackground(Void... voids) {
-                List<User> guestList = UserFunctions.getUsersByEvent(eid);
-                if (guestList == null) {
-                    return null;
-                }
-                for (User u : guestList) {
-                    if (u.getUid() == mMyCurrentUser.getUid()) {
-                        mMe = u;
-                    }
-                }
-                return mMe;
-            }
-
-            protected void onPostExecute(User me) {
-                if (me.getInvite_status() == 1) {
-                    mMy_status.setChecked(true);
-                } else {
-                    mMy_status.setChecked(false);
-                }
-            }
-        };
-        initCheckBox.execute();
     }
 }
