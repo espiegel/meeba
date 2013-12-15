@@ -173,10 +173,20 @@ class DB_Functions {
     * Get an array of users from an array of phones
     */
     public function getUsersByPhones($phones) {
+        if($phones == null) {
+            return false;
+        }
+
         $phone_numbers = array();
 
-        
-        $phoneList = implode("," , $phones);
+        foreach($phones as $phone) {
+            $phone = mysql_real_escape_string($phone);
+            array_push($phone_numbers, $phone);
+        }
+
+        $phoneList = implode("," , $phone_numbers);
+        //$app = \Slim\Slim::getInstance();
+        //$app->getLog()->info("phonelist = " . $phoneList);
         $sql = 'SELECT * FROM users WHERE phone_number IN ('. $phoneList .')';
         $result = mysql_query($sql) or die(mysql_error());
         

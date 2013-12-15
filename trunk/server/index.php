@@ -160,11 +160,15 @@ $app->get('/getEventsByUser/:uid/:status', function($uid,$status) use ($app, $db
 $app->post('/getUsersByPhones', function() use ($app, $db) {
 	if(isset($_POST['phones'])) {
 		$phones = $_POST['phones'];
+		$app->getLog()->info("before phones = " . print_r($phones,TRUE));
 		$phones = json_decode($phones); // decode the json array
-		$app->getLog()->info(print_r($phones,TRUE));
-		$users = $db->getUsersByPhones($phones);
+		$app->getLog()->info("after phones = " . print_r($phones,TRUE));
+		if($phones != null) {
+			$users = $db->getUsersByPhones($phones);
+		}
 	}
-	if(!isset($_POST['phones']) || !$users) {
+	if(!isset($_POST['phones']) || !isset($users) || !$users) {
+		$app->getLog()->info("Failed to get users from phone array");
 		echo json_encode(array(
 			'success' => 0,
 			'error' => "Failed to get users from phone array",
@@ -174,6 +178,7 @@ $app->post('/getUsersByPhones', function() use ($app, $db) {
 		return;
 	}
 
+	$app->getLog()->info("Success getting users! users = " . print_r($users, TRUE));
 	echo json_encode(array(
 			'success' => 1,
 			'error' => null,
