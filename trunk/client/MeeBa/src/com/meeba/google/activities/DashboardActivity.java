@@ -194,7 +194,7 @@ public class DashboardActivity extends SherlockActivity {
             finish();
         } else {
             mEventListView = (JazzyListView) findViewById(R.id.listViewDashboard);
-            mEventListView.setTransitionEffect(JazzyHelper. GROW);
+            mEventListView.setTransitionEffect(JazzyHelper.TILT);
             //mEventListView.setShouldOnlyAnimateNewItems(true);
             mEventListView.setShouldOnlyAnimateFling(false);
             mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -219,6 +219,51 @@ public class DashboardActivity extends SherlockActivity {
             asyncRefresh();
             asyncUpdateContacts();
         }
+
+        mEventListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                final Event event = ((EventArrayAdapter)mEventListView.getAdapter()).getItem((int)id);
+                Utils.LOGD("selected event = "+ event);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(DashboardActivity.this);
+                builder.setMessage("Are you sure you want to delete "+event.getTitle()+"?")
+                        .setTitle("Delete Event")
+                        .setIcon(R.drawable.ic_launcher)
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                       .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
+                               new AsyncTask<Void, Void, Void>() {
+
+                                   @Override
+                                   protected void onPreExecute() {
+                                       Utils.showToast(DashboardActivity.this, "Deleting event...");
+                                   }
+
+                                   @Override
+                                   protected Void doInBackground(Void... voids) {
+                                       UserFunctions.deleteEvent(event.getEid());
+                                       runOnUiThread(new Runnable() {
+                                           @Override
+                                           public void run() {
+                                               asyncRefresh();
+                                           }
+                                       });
+                                       return null;
+                                   }
+                               }.execute();
+                           }
+                       });
+                builder.create().show();
+                return false;
+            }
+        });
     }
 
     /**

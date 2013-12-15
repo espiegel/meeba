@@ -1,22 +1,18 @@
 package com.meeba.google.adapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.meeba.google.R;
-import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.meeba.google.util.UserFunctions;
 
 import java.util.List;
 
@@ -64,12 +60,10 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
             view.setTag(viewHolder);
         } else {
             view = convertView;
-            return view;
         }
         final ViewHolder holder = (ViewHolder) view.getTag();
 
         User guest = list.get(position);
-
 
         String name = guest.getName();
         holder.guestlist_name.setText(name);

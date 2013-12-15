@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -23,6 +22,8 @@ import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+import com.twotoasters.jazzylistview.JazzyHelper;
+import com.twotoasters.jazzylistview.JazzyListView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ import java.util.List;
  * Created by or malka on 11/11/13.
  */
 public class ContactsActivity extends SherlockFragmentActivity {
-    private ListView mUserListView;
+    private JazzyListView mUserListView;
     private ContactsArrayAdapter mContactsAdapter;
     private String mWhen;
     private String mTitle;
@@ -52,7 +53,8 @@ public class ContactsActivity extends SherlockFragmentActivity {
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        mUserListView = (ListView) findViewById(R.id.appContacts);
+        mUserListView = (JazzyListView) findViewById(R.id.appContacts);
+        mUserListView.setTransitionEffect(JazzyHelper.SLIDE_IN);
 
         Bundle bundle = getIntent().getExtras();
         mWhen = bundle.getString("when");
@@ -186,7 +188,9 @@ public class ContactsActivity extends SherlockFragmentActivity {
         if (mListUid.isEmpty()) {
             if(mDummies.isEmpty()) {
                 Utils.showToast(ContactsActivity.this, "You must select users to invite");
+                return;
             }
+            sendSms(mDummies);
             return;
         }
 

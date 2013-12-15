@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -13,7 +14,6 @@ import android.widget.TextView;
 import com.meeba.google.R;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
-import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -25,17 +25,18 @@ public class InvitationActivity extends Activity {
     private TextView mTxtHost;
     private TextView mTxtWhere;
     private TextView mTxtWhen;
+    private TextView mTxtTitle;
     private Button mBtnAccept;
     private Button mBtnDecline;
 
-    private int uid;
-    private int eid;
+    private int mUid;
+    private int mEid;
     private String mWhere;
     private String mWhen;
     private String mHostName;
+    private String mTitle;
 
     private Event mEvent;
-    private AsyncTask<Void, Void, Void> refreshHostPicture;
     private ImageLoader mImageLoader;
     private ImageView mImageHost;
 
@@ -46,6 +47,7 @@ public class InvitationActivity extends Activity {
         mTxtHost = (TextView) findViewById(R.id.txtHost);
         mTxtWhere = (TextView) findViewById(R.id.txtWhere);
         mTxtWhen = (TextView) findViewById(R.id.txtWhen);
+        mTxtTitle = (TextView) findViewById(R.id.txtTitle);
         mImageHost = (ImageView) findViewById(R.id.hostPicture);
 
         mBtnAccept = (Button) findViewById(R.id.btnAccept);
@@ -59,13 +61,15 @@ public class InvitationActivity extends Activity {
         mHostName = mEvent.getHost().getName();
         mWhere = mEvent.getWhere();
         mWhen = mEvent.getWhen();
+        mTitle = mEvent.getTitle();
 
         mTxtHost.setText(mHostName);
         mTxtWhere.setText(mWhere);
         mTxtWhen.setText(mWhen);
-        eid = mEvent.getEid();
+        mTxtTitle.setText(mTitle);
+        mEid = mEvent.getEid();
 
-        uid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
+        mUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
         mBtnAccept.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +86,7 @@ public class InvitationActivity extends Activity {
 
                     @Override
                     protected Void doInBackground(Void... voids) {
-                        UserFunctions.acceptInvite(uid, eid);
+                        UserFunctions.acceptInvite(mUid, mEid);
 
                         return null;
                     }
@@ -113,7 +117,7 @@ public class InvitationActivity extends Activity {
 
                     @Override
                     protected Void doInBackground(Void... voids) {
-                        UserFunctions.declineInvite(uid, eid);
+                        UserFunctions.declineInvite(mUid, mEid);
 
                         return null;
                     }
@@ -129,33 +133,10 @@ public class InvitationActivity extends Activity {
             }
         });
 
-        refreshHostPicture();
-    }
-
-    private void refreshHostPicture() {
-        refreshHostPicture = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                final User host = UserFunctions.getUserByUid(mEvent.getHost().getUid());
-
-                if (host == null) {
-                    return null;
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mImageLoader = ImageLoader.getInstance();
-                        if(!mImageLoader.isInited()) {
-                            mImageLoader.init(Utils.getImageLoaderConfig(InvitationActivity.this));
-                        }
-                        mImageLoader.displayImage(host.getPicture_url(), mImageHost);
-                    }
-                });
-                return null;
-            }
-        };
-        refreshHostPicture.execute();
+        mImageLoader = Utils.getImageLoader(this);
+        if(mEvent != null && mEvent.getHost() != null && !TextUtils.isEmpty(mEvent.getHost().getPicture_url())) {
+            mImageLoader.displayImage(mEvent.getHost().getPicture_url(), mImageHost);
+        }
     }
 
     private void startEventPage() {
@@ -167,19 +148,4 @@ public class InvitationActivity extends Activity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
-
-    @Override
-    protected void onDestroy() {
-        if (refreshHostPicture != null) {
-            refreshHostPicture.cancel(true);
-        }
-
-        if (mImageLoader != null) {
-            mImageLoader.stop();
-            mImageLoader.destroy();
-        }
-
-        super.onDestroy();
-    }
-
 }

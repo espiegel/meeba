@@ -19,13 +19,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/hostPicture"
-            android:src="@drawable/person" />
+            android:src="@drawable/no_photo" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
+            android:text="@string/unknown"
             android:id="@+id/txtHost"
             android:layout_marginLeft="10dp" />
     </LinearLayout>
@@ -48,32 +48,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
+            android:text="@string/unknown"
             android:id="@+id/txtTitle"
-            android:layout_marginLeft="10dp" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_dark"
-        android:layout_gravity="center|left"
-        android:padding="10dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
-            android:src="@drawable/earth" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/txtWhere"
             android:layout_marginLeft="10dp" />
     </LinearLayout>
 
@@ -95,8 +71,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
+            android:text="@string/unknown"
             android:id="@+id/txtWhen"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:divider="@android:drawable/divider_horizontal_dark"
+        android:layout_gravity="center|left"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2"
+            android:src="@drawable/earth" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/unknown"
+            android:id="@+id/txtWhere"
             android:layout_marginLeft="10dp" />
     </LinearLayout>
 
@@ -107,7 +106,7 @@
 
     <Button
         android:layout_width="150dp"
-        android:layout_height="120dp"
+        android:layout_height="110dp"
         android:text="@string/invitation_accept"
         android:id="@+id/btnAccept"
         android:layout_gravity="center"
@@ -117,7 +116,7 @@
 
     <Button
         android:layout_width="150dp"
-        android:layout_height="120dp"
+        android:layout_height="110dp"
         android:text="@string/invitation_decline"
         android:id="@+id/btnDecline"
         android:layout_gravity="center"

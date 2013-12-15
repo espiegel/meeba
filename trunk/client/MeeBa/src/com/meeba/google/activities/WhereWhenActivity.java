@@ -98,43 +98,56 @@ public class WhereWhenActivity extends SherlockActivity {
         editWhen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Calendar currentTime = Calendar.getInstance();
-                int year = currentTime.get(Calendar.YEAR);
-                int month = currentTime.get(Calendar.MONTH);
-                int day = currentTime.get(Calendar.DAY_OF_MONTH);
-                int hour = currentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = currentTime.get(Calendar.MINUTE);
-
-                final TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(WhereWhenActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        String minutes;
-                        if (selectedMinute < 10) {
-                            minutes = "0" + selectedMinute;
-                        } else {
-                            minutes = String.valueOf(selectedMinute);
-                        }
-                        editWhen.setText(selectedHour + ":" + minutes + " " + mDate);
-                        editTitle.requestFocus();
-                    }
-                }, hour, minute, true);//Yes 24 hour time
-                mTimePicker.setTitle("Select Time");
-
-                DatePickerDialog mDatePicker;
-                mDatePicker = new DatePickerDialog(WhereWhenActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        editWhen.setText("");
-                        mDate = day + "/" + (month + 1) + "/" + year;
-                        editWhen.setText(mDate);
-                        mTimePicker.show();
-                    }
-                }, year, month, day);
-                mDatePicker.setTitle("Select date");
-                mDatePicker.show();
+                showTimePicker();
             }
         });
+
+        editWhen.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean focus) {
+                if(focus) {
+                    showTimePicker();
+                }
+            }
+        });
+    }
+
+    private void showTimePicker() {
+        Calendar currentTime = Calendar.getInstance();
+        int year = currentTime.get(Calendar.YEAR);
+        int month = currentTime.get(Calendar.MONTH);
+        int day = currentTime.get(Calendar.DAY_OF_MONTH);
+        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = currentTime.get(Calendar.MINUTE);
+
+        final TimePickerDialog mTimePicker;
+        mTimePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                String minutes;
+                if (selectedMinute < 10) {
+                    minutes = "0" + selectedMinute;
+                } else {
+                    minutes = String.valueOf(selectedMinute);
+                }
+                editWhen.setText(selectedHour + ":" + minutes + " " + mDate);
+                editWhere.requestFocus();
+            }
+        }, hour, minute, true);//Yes 24 hour time
+        mTimePicker.setTitle("Select Time");
+
+        DatePickerDialog mDatePicker;
+        mDatePicker = new DatePickerDialog(WhereWhenActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                editWhen.setText("");
+                mDate = day + "/" + (month + 1) + "/" + year;
+                editWhen.setText(mDate);
+                mTimePicker.show();
+            }
+        }, year, month, day);
+        mDatePicker.setTitle("Select date");
+        mDatePicker.show();
     }
 
     private void nextButton() {
@@ -142,7 +155,7 @@ public class WhereWhenActivity extends SherlockActivity {
         String where = editWhere.getText().toString();
         String when = editWhen.getText().toString();
         if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title))  {
-            Toast.makeText(getApplicationContext(), "You must input a location and a time", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "You must input a title, location and a time", Toast.LENGTH_SHORT).show();
             return;
         }
 

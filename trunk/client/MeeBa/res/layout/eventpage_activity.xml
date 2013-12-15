@@ -8,6 +8,7 @@
     android:padding="10dp">
 
     <LinearLayout
+        android:id="@+id/hostLayout"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,7 +57,28 @@
             android:layout_marginLeft="10dp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:divider="@android:drawable/divider_horizontal_dark"
+        android:layout_gravity="center|left"
+        android:padding="10dp">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3"
+            android:src="@drawable/clock" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/txtWhen"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutWhere"
@@ -79,29 +101,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
             android:id="@+id/txtWhere"
-            android:layout_marginLeft="10dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_dark"
-        android:layout_gravity="center|left"
-        android:padding="10dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView3"
-            android:src="@drawable/clock" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/txtWhen"
             android:layout_marginLeft="10dp" />
     </LinearLayout>
 
@@ -136,7 +135,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="50dp"
             android:layout_marginRight="5dp"
-            android:text="@string/unknown_person"
+            android:text="@string/unknown"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:layout_centerVertical="true" />
