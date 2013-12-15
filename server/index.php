@@ -264,4 +264,22 @@ $app->get('/getUsersByEvent/:eid', function($eid) use ($app, $db) {
 		));
 });
 
+$app->get('/deleteEvent/:eid', function($eid) use ($app, $db) {
+	$success = $db->deleteEvent($eid);
+
+	if(!$success) {
+		echo json_encode(array(
+			'success' => 0,
+			'error' => "Failed to delete event with eid=$eid",
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'error' => null,
+		));
+});
+
 $app->run();
