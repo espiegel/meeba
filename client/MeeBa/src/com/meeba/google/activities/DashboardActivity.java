@@ -226,6 +226,11 @@ public class DashboardActivity extends SherlockActivity {
                 final Event event = ((EventArrayAdapter)mEventListView.getAdapter()).getItem((int)id);
                 Utils.LOGD("selected event = "+ event);
 
+                if(mCurrentUser == null || event == null || event.getHost() == null ||
+                   event.getHost().getUid() != mCurrentUser.getUid()) {
+                    return false;
+                }
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(DashboardActivity.this);
                 builder.setMessage("Are you sure you want to delete "+event.getTitle()+"?")
                         .setTitle("Delete Event")
