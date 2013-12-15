@@ -280,6 +280,23 @@ class DB_Functions {
     }
 
     /**
+    * Delete an event by its eid. Also delete all invites associated with it.
+    */
+    public function deleteEvent($eid) {
+        $deleteEventResult = mysql_query("DELETE FROM `events` WHERE eid = $eid");
+        if(!$deleteEventResult) {
+            return false;
+        }
+
+        $deleteInvitesResult = mysql_query("DELETE FROM `invites` where eid = $eid");
+        if(!$deleteInvitesResult) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
     * Create an invite for an array of guests
     */
     private function createInvite($eid, $guests) {
