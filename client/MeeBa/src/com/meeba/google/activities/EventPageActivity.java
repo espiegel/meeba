@@ -91,7 +91,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
         mTxtWhere = (TextView) findViewById(R.id.txtWhere);
         mTxtWhen = (TextView) findViewById(R.id.txtWhen);
         mListView = (ListView) findViewById(R.id.listGuests);
-        mImageHost = (ImageView) findViewById(R.id.hostPicture);
+        mImageHost = (ImageView) findViewById(R.id.eventpage_host_pic);
 
         //add
         mMy_name = (TextView) findViewById(R.id.myname);
@@ -119,7 +119,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
         eid = mEvent.getEid();
 
         mImageLoader = Utils.getImageLoader(this);
-        mImageLoader.displayImage(mEvent.getHost().getPicture_url(), mImageHost);
+       mImageLoader.displayImage(mEvent.getHost().getPicture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
 
         RelativeLayout guestLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
