@@ -88,9 +88,15 @@ public class LoginActivity extends Activity implements OnClickListener,
         mSignInButton.setOnClickListener(this);
         mSignInStatus = (TextView) findViewById(R.id.tvSignInStatus);
         View mSignOutButton = findViewById(R.id.sign_out_button);
+
         mSignOutButton.setOnClickListener(this);
+        mSignOutButton.setVisibility(View.INVISIBLE);
+
         View mRevokeAccessButton = findViewById(R.id.revoke_access_button);
+
         mRevokeAccessButton.setOnClickListener(this);
+        mRevokeAccessButton.setVisibility(View.INVISIBLE);
+
         context = getApplicationContext();
 
         /*check if google play services are available*/

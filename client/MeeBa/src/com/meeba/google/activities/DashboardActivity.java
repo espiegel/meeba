@@ -93,6 +93,7 @@ public class DashboardActivity extends SherlockActivity {
         TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mEventListView = (JazzyListView) findViewById(R.id.listViewDashboard);
 
         // adding nav drawer items to array
         // All Events

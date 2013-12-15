@@ -106,21 +106,21 @@
 
     <Button
         android:layout_width="150dp"
-        android:layout_height="110dp"
+        android:layout_height="60dp"
         android:text="@string/invitation_accept"
         android:id="@+id/btnAccept"
         android:layout_gravity="center"
-        android:layout_margin="12dp"
+        android:layout_margin="20dp"
         android:background="@drawable/green_btn"
         style="@style/ButtonText"/>
 
     <Button
         android:layout_width="150dp"
-        android:layout_height="110dp"
+        android:layout_height="60dp"
         android:text="@string/invitation_decline"
         android:id="@+id/btnDecline"
         android:layout_gravity="center"
-        android:layout_margin="12dp"
+        android:layout_margin="10dp"
         android:background="@drawable/red_btn"
         style="@style/ButtonText"/>
 
