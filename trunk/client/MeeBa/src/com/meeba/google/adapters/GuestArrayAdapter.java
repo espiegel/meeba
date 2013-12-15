@@ -22,18 +22,14 @@ import java.util.List;
 public class GuestArrayAdapter extends ArrayAdapter<User> {
 
     private final List<User> list;
-    private final Activity context;
+    private final Activity mContext;
     private ImageLoader mImageLoader;
 
     public GuestArrayAdapter(Activity context, List<User> list) {
         super(context, R.layout.guestlistlayout, list);
-        this.context = context;
+        this.mContext = context;
         this.list = list;
-        mImageLoader = ImageLoader.getInstance();
     }
-
-
-
 
     static class ViewHolder {
 
@@ -49,7 +45,7 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         if (convertView == null) {
 
             final ViewHolder viewHolder = new ViewHolder();
-            LayoutInflater inflator = context.getLayoutInflater();
+            LayoutInflater inflator = mContext.getLayoutInflater();
 
             view = inflator.inflate(R.layout.guestlistlayout, null);
             viewHolder.guestlist_name = (TextView) view.findViewById(R.id.guestlist_name);
@@ -74,9 +70,7 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
         Utils.LOGD("guest="+guest);
         if(!TextUtils.isEmpty(picture_url)) {
             Utils.LOGD("Changing image of pos="+position+", guest=" + holder.guestlist_name.getText());
-            if(!mImageLoader.isInited()) {
-                mImageLoader.init(Utils.getImageLoaderConfig(context));
-            }
+            mImageLoader = Utils.getImageLoader(mContext);
             mImageLoader.displayImage(picture_url, holder.guestPicture);
         }
         return view;

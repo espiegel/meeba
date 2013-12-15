@@ -25,20 +25,13 @@ import java.util.List;
 public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterable {
 
     private List<User> list;
-    private Activity context;
+    private Activity mContext;
     private ImageLoader mImageLoader;
 
     public ContactsArrayAdapter(Activity context, List<User> list) {
         super(context, R.layout.contactlistlayout, list);
-        this.context = context;
+        this.mContext = context;
         this.list = list;
-
-        mImageLoader = ImageLoader.getInstance();
-    }
-
-    public void onDestroy() {
-        mImageLoader.stop();
-        mImageLoader.destroy();
     }
 
     static class ViewHolder {
@@ -51,7 +44,7 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         if (convertView == null) {
-            LayoutInflater inflator = context.getLayoutInflater();
+            LayoutInflater inflator = mContext.getLayoutInflater();
             view = inflator.inflate(R.layout.contactlistlayout, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
@@ -90,9 +83,7 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
         if(!TextUtils.isEmpty(picture_url)) {
             // Load image, decode it to Bitmap and return Bitmap to callback
             Utils.LOGD("Changing image of "+holder.text.getText());
-            if(!mImageLoader.isInited()) {
-                mImageLoader.init(Utils.getImageLoaderConfig(context));
-            }
+            mImageLoader = Utils.getImageLoader(mContext);
             mImageLoader.displayImage(picture_url, holder.imageView);
         } else {
             holder.imageView.setImageResource(R.drawable.no_photo);
