@@ -111,11 +111,11 @@ public class Utils {
                 while (phones.moveToNext()) {
                     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                    // Filter out all the "-"'s and "*"'s from the phone number
-                    phoneNumber = phoneNumber.replaceAll("[^0-9]","");
-                    //phoneNumber = phoneNumber.replaceAll("\\+972", "0").replaceAll(" ", "").replaceAll("-", "").replaceAll("\\*", "").replaceAll("[)(]]", "");
-
-                    phonesMap.put(phoneNumber, contact);
+                    // Filter out all non-numeric characters
+                    if(phoneNumber != null) {
+                        phoneNumber = phoneNumber.replaceAll("[^0-9]","");
+                        phonesMap.put(phoneNumber, contact);
+                    }
                 }
                 phones.close();
             }
