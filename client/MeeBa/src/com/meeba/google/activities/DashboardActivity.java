@@ -309,7 +309,7 @@ public class DashboardActivity extends SherlockActivity {
             case FILTER_NOT_GOING:
                 //mRejectedEventsList is updated on asyncSortEvents
                 filtered = mRejectedEventsList;
-                ab.setTitle("Rejected  Events");
+                ab.setTitle("Rejected Events");
                 break;
 
             default:
