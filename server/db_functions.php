@@ -181,7 +181,12 @@ class DB_Functions {
 
         foreach($phones as $phone) {
             $phone = mysql_real_escape_string($phone);
-            array_push($phone_numbers, $phone);
+            if(!empty($phone)) {
+                if($this->startsWith($phone,"972")) {
+                    $phone = substr_replace($phone, "0", 0, 3);
+                }
+                array_push($phone_numbers, $phone);
+            }
         }
 
         $phoneList = implode("," , $phone_numbers);
@@ -410,6 +415,13 @@ class DB_Functions {
         curl_close($ch);
      
         return $response;
+    }
+
+    private function startsWith($haystack, $needle) {
+        return $needle === "" || strpos($haystack, $needle) === 0;
+    }
+    private function endsWith($haystack, $needle) {
+        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
     }
 
 }
