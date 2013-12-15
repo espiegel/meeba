@@ -491,7 +491,7 @@ public class DashboardActivity extends SherlockActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.dashboard, menu);
+        inflater.inflate(R.menu.actionbar_dashboard, menu);
         return true;
     }
 
@@ -508,6 +508,15 @@ public class DashboardActivity extends SherlockActivity {
                 } else {
                     mDrawerLayout.openDrawer(mDrawerList);
                 }
+                break;
+            case R.id.action_settings:
+                Intent email = new Intent(Intent.ACTION_SEND);
+                email.setType("text/email");
+                email.putExtra(Intent.EXTRA_EMAIL, new String[]{"meeba-dev@googlegroups.com"});
+                email.putExtra(Intent.EXTRA_SUBJECT, "MeeBa Feedback");
+                email.putExtra(Intent.EXTRA_TEXT, "Dear developers. This is my feedback: ");
+                startActivity(Intent.createChooser(email, "Send Feedback:"));
+                break;
             default:
                 break;
         }

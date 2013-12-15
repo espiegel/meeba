@@ -76,5 +76,8 @@
     all you have to do is click OK.</string>
     <string name="crash_dialog_comment_prompt">Please add your comments about the problem below:</string>
     <string name="crash_dialog_ok_toast">Thank you !</string>
+    <string name="create_event">Create Event</string>
+    <string name="settings">Settings</string>
+    <string name="send_feedback">Send Feedback</string>
 
 </resources>
