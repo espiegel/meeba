@@ -137,14 +137,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        if (mContactsAdapter != null) {
-            mContactsAdapter.onDestroy();
-        }
-        super.onDestroy();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.contacts_activity, menu);
