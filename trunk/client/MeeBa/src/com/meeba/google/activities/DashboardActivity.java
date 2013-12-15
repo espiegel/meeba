@@ -194,7 +194,7 @@ public class DashboardActivity extends SherlockActivity {
             finish();
         } else {
             mEventListView = (JazzyListView) findViewById(R.id.listViewDashboard);
-            mEventListView.setTransitionEffect(JazzyHelper.FLIP);
+            mEventListView.setTransitionEffect(JazzyHelper. GROW);
             //mEventListView.setShouldOnlyAnimateNewItems(true);
             mEventListView.setShouldOnlyAnimateFling(false);
             mEventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
