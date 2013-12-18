@@ -13,10 +13,10 @@
         android:background="@drawable/card_background"
         android:padding="10dp">
 
-        <EditText
+        <com.meeba.google.view.ClearableEditText
             android:hint="@string/title"
             android:textColorHint="#888"
-            android:layout_margin="20dp"
+            android:layout_margin="10dp"
             android:inputType="textCapSentences"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -26,12 +26,12 @@
             android:drawableLeft="@drawable/android_notepad"
             android:drawablePadding="5dp"/>
 
-        <EditText
+        <com.meeba.google.view.ClearableEditText
             android:hint="@string/when"
             android:textColorHint="#888"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:inputType="datetime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -41,20 +41,21 @@
             android:drawableLeft="@drawable/clock"
             android:drawablePadding="5dp"/>
 
-        <EditText
+        <com.meeba.google.view.AutoCompleteClearableEditText
+            style="@style/MeebaStyle"
             android:hint="@string/where"
             android:textColorHint="#888"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="20dp"
-            android:inputType="textCapSentences"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:inputType="textCapSentences|textNoSuggestions"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/whereTxtUser"
             android:layout_gravity="center_horizontal"
             android:imeOptions="actionDone"
             android:drawableLeft="@drawable/earth"
+            android:dropDownVerticalOffset="5dp"
             android:drawablePadding="5dp"/>
-
     </LinearLayout>
 </LinearLayout>
