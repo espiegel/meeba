@@ -1,11 +1,7 @@
 <?php
 /**
- * File to handle all API requests
+ * Controller of all API requests
  * Accepts GET and POST
- *
- * Each request will be identified by TAG
- * Response will be JSON data
- * check for POST request
 */
 require 'vendor/autoload.php';
 require 'DateTimeFileWriter.php';
@@ -283,6 +279,26 @@ $app->get('/deleteEvent/:eid', function($eid) use ($app, $db) {
 
 	echo json_encode(array(
 			'success' => 1,
+			'error' => null,
+		));
+});
+
+$app->get('/placeAutocomplete/:input', function($input) use ($app, $db) {
+	$places = $db->placeAutocomplete($input);
+
+	if($places == null) {	
+		echo json_encode(array(
+			'success' => 0,
+			'places' => null,
+			'error' => "Failed to get autocomplete",
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'places' => $places,
 			'error' => null,
 		));
 });

@@ -424,6 +424,35 @@ class DB_Functions {
         return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
     }
 
+    /**
+    * Autocompletes an input string and gives out an array of autocomplete options
+    */
+    public function placeAutocomplete($input) {
+        // Need to replace all spaces with %20
+
+        $array = array(
+            'sensor' => 'false',
+            'key' => API_KEY,
+            'input' => $input
+            );
+        $param = http_build_query($array);
+        $url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?" . $param;
+
+        $json = file_get_contents($url);
+
+        $data = json_decode($json,TRUE);
+
+        if(array_key_exists('predictions', $data)) {
+            $predictions = $data['predictions'];
+            $placeList = array();
+            foreach($predictions as $place) {
+                if(array_key_exists('description', $place)) {
+                    array_push($placeList, $place['description']);
+                }
+            }
+            return $placeList;
+        }
+        return false;
+    }
 }
- 
 ?>
