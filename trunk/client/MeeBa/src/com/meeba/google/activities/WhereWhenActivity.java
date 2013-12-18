@@ -12,7 +12,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -23,7 +22,10 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
+import com.meeba.google.adapters.WhereAutoCompleteAdapter;
 import com.meeba.google.util.Utils;
+import com.meeba.google.view.AutoCompleteClearableEditText;
+import com.meeba.google.view.ClearableEditText;
 
 import java.util.Calendar;
 
@@ -32,9 +34,9 @@ import java.util.Calendar;
  */
 public class WhereWhenActivity extends SherlockActivity {
 
-    EditText editWhere;
-    EditText editTitle;
-    EditText editWhen;
+    AutoCompleteClearableEditText editWhere;
+    ClearableEditText editTitle;
+    ClearableEditText editWhen;
 
     private String mDate = "";
 
@@ -48,10 +50,19 @@ public class WhereWhenActivity extends SherlockActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         Utils.setupUI(findViewById(R.id.wherewhenLayout), this);
-        editWhen = (EditText) findViewById(R.id.whenTxtUser);
-        editTitle = (EditText) findViewById(R.id.titleTxtUser);
-        editWhere = (EditText) findViewById(R.id.whereTxtUser);
+        editWhen = (ClearableEditText) findViewById(R.id.whenTxtUser);
+        editTitle = (ClearableEditText) findViewById(R.id.titleTxtUser);
+        editWhere = (AutoCompleteClearableEditText) findViewById(R.id.whereTxtUser);
 
+        WhereAutoCompleteAdapter autoCompleteAdapter = new WhereAutoCompleteAdapter(WhereWhenActivity.this, R.layout.dropdown_autocomplete,
+                R.id.txtViewSearch, new WhereAutoCompleteAdapter.SearchAutoComplete() {
+            @Override
+            public void autoCompleteItemClicked(String query) {
+                editWhere.setText(query);
+            }
+        });
+        editWhere.setThreshold(2);
+        editWhere.setAdapter(autoCompleteAdapter);
 
         editTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

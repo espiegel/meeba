@@ -345,4 +345,39 @@ public class UserFunctions {
             return false;
         }
     }
+
+    /**
+     * Gives a list of place suggestions given a query input. Uses Google Places API.
+     * @param input The input string to perform autocompletion on
+     * @return Returns a list of autocompletion suggestions or null on failure.
+     */
+    public static List<String> placeAutocomplete(String input) {
+        List<String> suggestions = new ArrayList<String>();
+
+        try {
+            Utils.LOGD(Utils.BASE_URL + "placeAutocomplete/" + input);
+            JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "placeAutocomplete/" + input);
+
+            if(lJsonObject == null)
+                return null;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+
+            if(lJsonObject.getInt("success") == 1) {
+                JSONArray places = lJsonObject.getJSONArray("places");
+                for(int i=0;i<places.length();i++) {
+                    suggestions.add((String)places.get(i));
+                }
+
+                Utils.LOGD("suggestions = "+suggestions);
+                return suggestions;
+            }
+            else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
