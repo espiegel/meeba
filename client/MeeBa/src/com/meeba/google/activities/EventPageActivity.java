@@ -342,7 +342,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
                 if (newStatus == STATUS_ACCEPTED)
                     statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
                 else
-                    statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross));
+                    statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
 
                 mInviteStatus = newStatus;
             }
