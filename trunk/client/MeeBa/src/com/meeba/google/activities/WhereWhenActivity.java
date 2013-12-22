@@ -166,7 +166,7 @@ public class WhereWhenActivity extends SherlockActivity {
         String where = editWhere.getText().toString();
         String when = editWhen.getText().toString();
         if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title))  {
-            Toast.makeText(getApplicationContext(), "You must input a title, location and a time", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.bad_event_details_input), Toast.LENGTH_SHORT).show();
             return;
         }
 

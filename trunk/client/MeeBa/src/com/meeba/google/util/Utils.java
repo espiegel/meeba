@@ -150,4 +150,18 @@ public class Utils {
 
         return mImageLoader;
     }
+
+    public static void showKeyboard(Context context, View view) {
+        try {
+            InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            keyboard.showSoftInput(view, 0);
+        } catch(Exception e) {}
+    }
+
+    public static void hideKeyboard(Context context, View view) {
+        try {
+            InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        } catch(Exception e) {}
+    }
 }

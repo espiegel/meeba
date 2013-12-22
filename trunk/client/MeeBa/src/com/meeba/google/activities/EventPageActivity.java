@@ -20,11 +20,14 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.dialogs.ContactDetailsDialog;
+import com.meeba.google.dialogs.EditEventDialog;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
@@ -37,7 +40,7 @@ import java.util.List;
 /**
  * Created by Eidan on 11/19/13.
  */
-public class EventPageActivity extends SherlockFragmentActivity {
+public class EventPageActivity extends SherlockFragmentActivity implements EditEventDialog.EventUpdateCallback{
     private final int STATUS_ACCEPTED = 1;
     private final int STATUS_REJECTED = -1;
     private final int STATUS_UNKNOWN = 0;
@@ -50,7 +53,6 @@ public class EventPageActivity extends SherlockFragmentActivity {
     private Event mEvent;
     private GuestArrayAdapter mGuestArrayAdapter = null;
 
-    //add
     private ImageButton statusImgButton;
     private ImageView mMy_picture;
     private TextView mMy_name;
@@ -60,7 +62,7 @@ public class EventPageActivity extends SherlockFragmentActivity {
     private AsyncTask<Void, Void, Void> refreshGuests = null;
 
     private ImageLoader mImageLoader;
-    private User mMyCurrentUser;  // User to be retrieved from  retrieved from phone DB
+    private User mMyCurrentUser;  // User to be retrieved from phone DB
     private User mMe;             // User to be retrieved from current Event guests
     private User mHost;           // Host of the event
     private int mInviteStatus;    // The current users event status  of the current event (if he is invited)
@@ -70,6 +72,8 @@ public class EventPageActivity extends SherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.eventpage_activity);
+
+        Utils.setupUI(findViewById(R.id.eventpage_activity_layout), this);
 
         ActionBar ab = getSupportActionBar();
         ab.setTitle("Event Page");
@@ -388,7 +392,27 @@ public class EventPageActivity extends SherlockFragmentActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(mMyCurrentUser.getUid() == mEvent.getHost().getUid()) {
+            MenuInflater inflater = getSupportMenuInflater();
+            inflater.inflate(R.menu.actionbar_eventpage, menu);
+            return true;
+        } else {
+            return super.onCreateOptionsMenu(menu);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.action_edit:
+                EditEventDialog dialog = new EditEventDialog(mEvent, this);
+                dialog.show(getSupportFragmentManager(), EditEventDialog.TAG);
+                return true;
+
+            default:
+                break;
+        }
         onBackPressed();
         return true;
     }
@@ -409,5 +433,12 @@ public class EventPageActivity extends SherlockFragmentActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onEventDetailsUpdate(Event newEvent) {
+        mTxtTitle.setText(newEvent.getTitle());
+        mTxtWhen.setText(newEvent.getWhen());
+        mTxtWhere.setText(newEvent.getWhere());
     }
 }
