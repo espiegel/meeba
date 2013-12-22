@@ -26,10 +26,9 @@ public class GcmIntentService extends IntentService {
     private NotificationManager mNotificationManager;
 
     private static final String TAG_INVITE = "invite";
-    private static final String TITLE_INVITE = " - ";
-
     private static final String TAG_RESPONSE = "inviteResponse";
-    //private static final String TITLE_RESPONSE = "MeeBa response from ";
+    private static final String TAG_EVENT_DETAILS_UPDATE = "eventDetailsUpdate";
+    private static final String TITLE_INVITE = " - ";
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -44,7 +43,7 @@ public class GcmIntentService extends IntentService {
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
+        if(!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
              * Filter messages based on message type. Since it is likely that GCM
              * will be extended in the future with new message types, just ignore
@@ -53,38 +52,37 @@ public class GcmIntentService extends IntentService {
              *
              */
 
-            if (GoogleCloudMessaging.
+            if(GoogleCloudMessaging.
                     MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
                 Utils.LOGD("GCM: Error sending a GCM message");
             } else {
-                if (GoogleCloudMessaging.
+                if(GoogleCloudMessaging.
                         MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+                    Gson gson = new Gson();
                     try {
                         Utils.LOGD("extras=" + extras.toString());
                         String tag = extras.getString("tag");
 
-                        if (tag.equals(TAG_INVITE)) {
+                        if(tag.equals(TAG_INVITE)) {
                             String jsonEvent = extras.getString("event");
-                            Gson gson = new Gson();
                             JSONObject json = new JSONObject(jsonEvent);
 
                             Utils.LOGD(json.toString());
                             Event event = gson.fromJson(json.toString(), Event.class);
-                            sendNotification(tag, event);
+                            newEventNotification(tag, event);
                             Utils.LOGD("GCM: Received a message " + extras.toString());
-                        } else if (tag.equals(TAG_RESPONSE)){
-                        /* get event from extras */
+                        } else if(tag.equals(TAG_RESPONSE)){
+                            /* get event from extras */
                             String jsonEvent = extras.getString("event");
-                            Gson gson = new Gson();
                             JSONObject json = new JSONObject(jsonEvent);
                             Event event = gson.fromJson(json.toString(), Event.class);
 
-                        /* get user  */
+                            /* get user  */
                             String jsonUser = extras.getString("user");
                             JSONObject json_user = new JSONObject(jsonUser);
                             User user = gson.fromJson(json_user.toString(), User.class);
 
-                         /* get status */
+                             /* get status */
                             String status = extras.getString("status");
                             if (status.equals("1")){
                                 status = "Accepted";
@@ -92,24 +90,19 @@ public class GcmIntentService extends IntentService {
                                 status = "Declined";
                             }
 
-
-                        /*TODO: change to sent a response notification */
-                            recevNotification(tag, event, user , status);
+                            guestResponseNotification(tag, event, user, status);
                             Utils.LOGD("GCM: Received a message " + extras.toString());
+                        } else if(tag.equals(TAG_EVENT_DETAILS_UPDATE)) {
+                            String jsonEvent = extras.getString("event");
+                            Event event = gson.fromJson(jsonEvent, Event.class);
+
+                            eventDetailsUpdatedNotification(tag, event);
                         }
 
                     } catch (JSONException e) {
                         e.printStackTrace();
                         return;
                     }
-
-                /*
-                String when = extras.getString("when");
-                String where = extras.getString("where");
-                String hostName = extras.getString("hostName");
-
-                Utils.LOGD("hostName="+hostName);
-                int eid = Integer.valueOf(extras.getString("eid"));*/
 
                 }
             }
@@ -121,7 +114,7 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String tag, Event event) {
+    private void newEventNotification(String tag, Event event) {
         if(tag.equals(TAG_INVITE)) {
             mNotificationManager = (NotificationManager)
                     this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -156,8 +149,7 @@ public class GcmIntentService extends IntentService {
         }
     }
 
-    private void recevNotification(String tag, Event event, User user, String status){
-
+    private void guestResponseNotification(String tag, Event event, User user, String status) {
         if(tag.equals(TAG_RESPONSE)) {
             mNotificationManager = (NotificationManager)
                     this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -190,6 +182,42 @@ public class GcmIntentService extends IntentService {
 
             mNotificationManager.notify(NOTIFICATION_ID, notif);
         }
+    }
 
+    private void eventDetailsUpdatedNotification(String tag, Event event) {
+        if(!tag.equals(TAG_EVENT_DETAILS_UPDATE)) {
+            return;
+        }
+
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent intent = new Intent(this, EventPageActivity.class);
+        Bundle bundle = new Bundle();
+
+        bundle.putSerializable(Utils.BUNDLE_EVENT, event);
+
+        intent.putExtras(bundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String msg = event.getTitle() + " has been updated.";
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(event.getHost().getName())
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(msg))
+                        .setContentText(msg);
+
+        mBuilder.setContentIntent(contentIntent);
+        Notification notif = mBuilder.build();
+
+        notif.flags |= Notification.FLAG_AUTO_CANCEL;
+        notif.defaults |= Notification.DEFAULT_ALL;
+
+        mNotificationManager.notify(NOTIFICATION_ID, notif);
     }
 }
