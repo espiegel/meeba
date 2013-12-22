@@ -311,6 +311,24 @@ class DB_Functions {
         return true;
     }
 
+    public function updateEvent($eid, $title, $when, $where) {
+        // Escape special characters inside the string
+        $title = mysql_real_escape_string($title);
+        $where = mysql_real_escape_string($where);
+        $when = mysql_real_escape_string($when);
+
+        $query = mysql_query("UPDATE `events` SET `title` = '$title', `where` = '$where', `when` = '$when' WHERE eid = $eid");
+
+        // Update failure
+        if(!$query) {
+            return false;
+        }
+
+        $event = $this->getEventByEid($eid);
+
+        return $event;
+    }
+
     /**
     * Create an invite for an array of guests
     */

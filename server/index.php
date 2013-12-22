@@ -303,4 +303,29 @@ $app->get('/placeAutocomplete/:input', function($input) use ($app, $db) {
 		));
 });
 
+$app->post('/updateEvent', function() use ($app, $db) {
+	$eid = $_POST['eid'];
+	$title = $_POST['title'];
+	$when = $_POST['when'];
+	$where = $_POST['where'];
+
+	$event = $db->updateEvent($eid, $title, $when, $where);
+
+	if(!$event) {
+		echo json_encode(array(
+			'success' => 0,
+			'error' => "Failed to update the event",
+			'event' => null,
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'error' => null,
+			'event' => $event,
+		));	
+});
+
 $app->run();
