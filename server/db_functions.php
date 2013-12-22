@@ -311,6 +311,9 @@ class DB_Functions {
         return true;
     }
 
+    /**
+    * Updates an event and sends the guests notifcations about the update
+    */
     public function updateEvent($eid, $title, $when, $where) {
         // Escape special characters inside the string
         $title = mysql_real_escape_string($title);
@@ -326,6 +329,22 @@ class DB_Functions {
 
         $event = $this->getEventByEid($eid);
 
+        // Get all the guests of this event
+        $guests = $this->getUsersByEvent($eid);
+
+        // Get the guests' rid array
+        $rid_array = array();
+        foreach($guests['guests'] as $guest) {
+            array_push($rid_array, $guest['rid']);
+        }
+
+        // Data to send
+        $message_data = array(
+            'tag' => 'eventDetailsUpdate',
+            'event' => $event
+            );
+
+        $this->sendNotification(API_KEY, $rid_array, $message_data);
         return $event;
     }
 
