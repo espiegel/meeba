@@ -237,6 +237,37 @@ public class UserFunctions {
     }
 
     /**
+     * Updates an event with new values: title, where, when.
+     * @param eid eid of event to update
+     * @param title new title
+     * @param where new where
+     * @param when new when
+     * @return Returns new event on success and null on failure
+     */
+    public static Event updateEvent(int eid, String title, String when, String where) {
+        try {
+            Gson lGson = new Gson();
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            params.add(new BasicNameValuePair("eid", String.valueOf(eid)));
+            params.add(new BasicNameValuePair("title", title));
+            params.add(new BasicNameValuePair("when", when));
+            params.add(new BasicNameValuePair("where", where));
+
+            JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "updateEvent", params);
+
+            if(lJsonObject == null)
+                return null;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            return lGson.fromJson(lJsonObject.getString("event"), Event.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    /**
      * Accept an invitation
      * @param uid The user id of the current user that is accepting this invitation
      * @param eid The event id that this user is accepting

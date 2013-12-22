@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/card_background"
+    android:id="@+id/eventpage_activity_layout"
     android:padding="10dp">
 
     <LinearLayout
