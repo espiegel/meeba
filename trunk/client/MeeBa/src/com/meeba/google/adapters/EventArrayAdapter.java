@@ -40,6 +40,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         protected TextView eventwhere;
         protected TextView eventwhen;
         protected ImageView hostPicture;
+        protected ImageView eventPicture;
     }
 
     public void setList(List<Event> list) {
@@ -58,6 +59,7 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             viewHolder.eventwhen = (TextView) view.findViewById(R.id.eventwhen);
             viewHolder.eventHostName = (TextView) view.findViewById(R.id.txtHost);
             viewHolder.hostPicture = (ImageView) view.findViewById(R.id.hostPicture);
+            viewHolder.eventPicture = (ImageView) view.findViewById(R.id.eventPicture);
 
             view.setTag(viewHolder);
         } else {
@@ -74,11 +76,18 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
         holder.eventHostName.setText(host.getName());
 
         final ImageView hostPicture = holder.hostPicture;
+        final ImageView eventPicture = holder.eventPicture;
 
         String url = host.getPicture_url();
+        String eventPictureUrl = event.getEvent_picture();
+        ImageLoader imageLoader = Utils.getImageLoader(mContext);
         if(url != null && !TextUtils.isEmpty(url)) {
-            ImageLoader imageLoader = Utils.getImageLoader(mContext);
-            imageLoader.displayImage(url.replace("?sz=50", "?sz=64"), hostPicture);
+            imageLoader.displayImage(url.replace("?sz=50", ""), hostPicture);
+        }
+        if(eventPictureUrl != null && !TextUtils.isEmpty(eventPictureUrl)) {
+            imageLoader.displayImage(eventPictureUrl, eventPicture);
+        } else {
+            eventPicture.setImageResource(R.drawable.pub);
         }
 
         if (event.getEid() == -1)

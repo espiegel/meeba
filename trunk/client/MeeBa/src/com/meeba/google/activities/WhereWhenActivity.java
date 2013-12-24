@@ -4,7 +4,12 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,6 +17,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -27,6 +33,7 @@ import com.meeba.google.util.Utils;
 import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.meeba.google.view.ClearableEditText;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 
 /**
@@ -34,11 +41,24 @@ import java.util.Calendar;
  */
 public class WhereWhenActivity extends SherlockActivity {
 
-    AutoCompleteClearableEditText editWhere;
-    ClearableEditText editTitle;
-    ClearableEditText editWhen;
+    private static final int RESULT_LOAD_IMAGE = 1;
+    private static final int REQUEST_CROP_ICON = 2;
+
+    AutoCompleteClearableEditText mEditWhere;
+    ClearableEditText mEditTitle;
+    ClearableEditText mEditWhen;
 
     private String mDate = "";
+    private ImageView mEditPicture;
+    private ImageView mPicturePlusButton;
+
+    private View.OnClickListener mOnPictureClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(i, RESULT_LOAD_IMAGE);
+        }
+    };
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,21 +70,26 @@ public class WhereWhenActivity extends SherlockActivity {
         ab.setDisplayHomeAsUpEnabled(true);
 
         Utils.setupUI(findViewById(R.id.wherewhenLayout), this);
-        editWhen = (ClearableEditText) findViewById(R.id.whenTxtUser);
-        editTitle = (ClearableEditText) findViewById(R.id.titleTxtUser);
-        editWhere = (AutoCompleteClearableEditText) findViewById(R.id.whereTxtUser);
+        mEditWhen = (ClearableEditText) findViewById(R.id.whenTxtUser);
+        mEditTitle = (ClearableEditText) findViewById(R.id.titleTxtUser);
+        mEditWhere = (AutoCompleteClearableEditText) findViewById(R.id.whereTxtUser);
+        mEditPicture = (ImageView) findViewById(R.id.eventPicture);
+        mPicturePlusButton = (ImageView) findViewById(R.id.plusButton);
+
+        mEditPicture.setOnClickListener(mOnPictureClick);
+        mPicturePlusButton.setOnClickListener(mOnPictureClick);
 
         WhereAutoCompleteAdapter autoCompleteAdapter = new WhereAutoCompleteAdapter(WhereWhenActivity.this, R.layout.dropdown_autocomplete,
                 R.id.txtViewSearch, new WhereAutoCompleteAdapter.SearchAutoComplete() {
             @Override
             public void autoCompleteItemClicked(String query) {
-                editWhere.setText(query);
+                mEditWhere.setText(query);
             }
         });
-        editWhere.setThreshold(2);
-        editWhere.setAdapter(autoCompleteAdapter);
+        mEditWhere.setThreshold(2);
+        mEditWhere.setAdapter(autoCompleteAdapter);
 
-        editTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mEditTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -73,19 +98,19 @@ public class WhereWhenActivity extends SherlockActivity {
             }
         });
 
-        editTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mEditTitle.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                         actionId == EditorInfo.IME_ACTION_DONE) {
-                    editWhere.requestFocus();
+                    mEditWhere.requestFocus();
                     return true;
                 }
                 return false;
             }
         });
 
-        editWhere.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mEditWhere.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -94,7 +119,7 @@ public class WhereWhenActivity extends SherlockActivity {
             }
         });
 
-        editWhere.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mEditWhere.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH ||
@@ -106,21 +131,61 @@ public class WhereWhenActivity extends SherlockActivity {
             }
         });
 
-        editWhen.setOnClickListener(new View.OnClickListener() {
+        mEditWhen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showTimePicker();
             }
         });
 
-        editWhen.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mEditWhen.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focus) {
-                if(focus) {
+                if (focus) {
                     showTimePicker();
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && null != data) {
+            if(requestCode == RESULT_LOAD_IMAGE) {
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
+
+                // Crop the photo
+                Intent intent = new Intent("com.android.camera.action.CROP");
+                Uri uri = selectedImage;
+                intent.setData(uri);
+                intent.putExtra("crop", "true");
+                intent.putExtra("aspectX", 0);
+                intent.putExtra("aspectY", 0);
+                intent.putExtra("outputX", 525);
+                intent.putExtra("outputY", 170);
+                intent.putExtra("noFaceDetection", true);
+                intent.putExtra("return-data", true);
+                startActivityForResult(intent, REQUEST_CROP_ICON);
+            } else if(requestCode == REQUEST_CROP_ICON) {
+                // Get the cropped photo
+                Bundle extras = data.getExtras();
+                if(extras != null ) {
+                    Bitmap photo = extras.getParcelable("data");
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    photo.compress(Bitmap.CompressFormat.PNG, 75, stream);
+
+                    // Display the photo
+                    mEditPicture.setImageBitmap(photo);
+                }
+            }
+        }
     }
 
     private void showTimePicker() {
@@ -141,8 +206,8 @@ public class WhereWhenActivity extends SherlockActivity {
                 } else {
                     minutes = String.valueOf(selectedMinute);
                 }
-                editWhen.setText(selectedHour + ":" + minutes + " " + mDate);
-                editWhere.requestFocus();
+                mEditWhen.setText(selectedHour + ":" + minutes + " " + mDate);
+                mEditWhere.requestFocus();
             }
         }, hour, minute, true);//Yes 24 hour time
         mTimePicker.setTitle("Select Time");
@@ -151,9 +216,9 @@ public class WhereWhenActivity extends SherlockActivity {
         mDatePicker = new DatePickerDialog(WhereWhenActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                editWhen.setText("");
+                mEditWhen.setText("");
                 mDate = day + "/" + (month + 1) + "/" + year;
-                editWhen.setText(mDate);
+                mEditWhen.setText(mDate);
                 mTimePicker.show();
             }
         }, year, month, day);
@@ -162,9 +227,9 @@ public class WhereWhenActivity extends SherlockActivity {
     }
 
     private void nextButton() {
-        String title =  editTitle.getText().toString();
-        String where = editWhere.getText().toString();
-        String when = editWhen.getText().toString();
+        String title =  mEditTitle.getText().toString();
+        String where = mEditWhere.getText().toString();
+        String when = mEditWhen.getText().toString();
         if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title))  {
             Toast.makeText(getApplicationContext(), getString(R.string.bad_event_details_input), Toast.LENGTH_SHORT).show();
             return;
@@ -172,7 +237,7 @@ public class WhereWhenActivity extends SherlockActivity {
 
         InputMethodManager imm = (InputMethodManager)getSystemService(
                 Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editWhere.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(mEditWhere.getWindowToken(), 0);
 
         //when we click on the button it will bring us to the contacts activity
         Intent i = new Intent(getApplicationContext(),
@@ -182,6 +247,7 @@ public class WhereWhenActivity extends SherlockActivity {
         bundle.putString("when", when);
         bundle.putString("title", title);
         bundle.putString("where", where);
+        bundle.putParcelable("event_picture", ((BitmapDrawable)mEditPicture.getDrawable()).getBitmap());
         i.putExtras(bundle);
         startActivity(i);
     }

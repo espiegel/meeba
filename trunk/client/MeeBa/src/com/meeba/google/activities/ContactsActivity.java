@@ -2,6 +2,7 @@ package com.meeba.google.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -43,6 +44,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
     private int mHostUid;
     private List<String> mListUid;
     private List<User> mDummies;
+    private Bitmap mPicture;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +62,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
         mWhen = bundle.getString("when");
         mTitle = bundle.getString("title");
         mWhere = bundle.getString("where");
+        mPicture = bundle.getParcelable("event_picture");
 
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
@@ -199,7 +202,11 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
             @Override
             protected Event doInBackground(Void... voids) {
-                return UserFunctions.createEvent(mHostUid,mTitle, mWhere, mWhen, mListUid);
+                Event event = UserFunctions.createEvent(mHostUid,mTitle, mWhere, mWhen, mListUid);
+                if(mPicture != null) {
+                    UserFunctions.uploadImage(event.getEid(), mPicture);
+                }
+                return event;
             }
 
             @Override

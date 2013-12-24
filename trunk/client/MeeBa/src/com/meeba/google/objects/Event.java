@@ -12,6 +12,7 @@ public class Event implements Serializable {
     private String when;
     private String created_at;
     private User host;
+    private String event_picture;
 
     public Event(int eid,String title, String where, String when, String created_at, User host) {
         this.eid = eid;
@@ -61,6 +62,14 @@ public class Event implements Serializable {
         this.when = when;
     }
 
+    public String getEvent_picture() {
+        return event_picture;
+    }
+
+    public void setEvent_picture(String event_picture) {
+        this.event_picture = event_picture;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
@@ -70,6 +79,7 @@ public class Event implements Serializable {
                 ", when='" + when + '\'' +
                 ", created_at='" + created_at + '\'' +
                 ", host=" + host +
+                ", event_picture='" + event_picture + '\'' +
                 '}';
     }
 }
