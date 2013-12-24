@@ -294,6 +294,35 @@ class DB_Functions {
         return $event;
     }
 
+    public function uploadEventPicture($eid, $pictureData) {
+        $pictureData = base64_decode($pictureData);
+
+        $filename = "/var/www/meeba/event_pictures/$eid" . ".png";
+        $url = "http://54.214.243.219/meeba/event_pictures/$eid" . ".png";
+
+        $success = false;
+        $file = fopen($filename, 'wb');
+        if($file) {
+            $success = fwrite($file, $pictureData);
+            fclose($file);
+        }
+
+        // We failed writing the image
+        if(!$success) {
+            return false;
+        }
+
+        // We succeeded, now store this url in the database
+        $query = mysql_query("UPDATE `events` SET `event_picture` = '$url' WHERE eid = $eid");
+        
+        // Update failure
+        if(!$query) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
     * Delete an event by its eid. Also delete all invites associated with it.
     */
@@ -364,7 +393,6 @@ class DB_Functions {
 
     /**
     * Send an invitation (notification) to an array of "rid"s
-    *
     */
     public function sendInvite($host, $rids, $event) {
         $app = \Slim\Slim::getInstance();
@@ -465,8 +493,7 @@ class DB_Functions {
     * Autocompletes an input string and gives out an array of autocomplete options
     */
     public function placeAutocomplete($input) {
-        // Need to replace all spaces with %20
-
+        // Use http_build_query to get rid of unwanted characters
         $array = array(
             'sensor' => 'false',
             'key' => API_KEY,

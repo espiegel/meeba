@@ -328,4 +328,25 @@ $app->post('/updateEvent', function() use ($app, $db) {
 		));	
 });
 
+$app->post('/uploadEventPicture', function() use ($app, $db) {
+	$eid = $_POST['eid'];
+	$pictureData = $_POST['pictureData'];
+
+	$success = $db->uploadEventPicture($eid, $pictureData);
+
+	if(!$success) {
+		echo json_encode(array(
+			'success' => 0,
+			'error' => "Failed to upload the picture",
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'error' => null,
+		));
+});
+
 $app->run();
