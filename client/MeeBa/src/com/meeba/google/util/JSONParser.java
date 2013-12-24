@@ -7,7 +7,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -39,7 +38,7 @@ public class JSONParser {
         //httpGet.addHeader(ACCEPT_ENCODING, ACCEPT_ENCODING_VALUE);
         httpGet.addHeader(CONNECTION, CONNECTION_VALUE);
         httpGet.addHeader(PROXY_CONNECTION, PROXY_CONNECTION_VALUE);
-        HttpEntity httpEntity=null;
+        HttpEntity httpEntity = null;
 
         httpEntity = Utils.getInstance().getHttpClient().execute(httpGet).getEntity();
         InputStream lInputStream = httpEntity.getContent();
@@ -62,47 +61,9 @@ public class JSONParser {
             return null;
         } catch (Exception e) {
             Utils.LOGD(e.getMessage());
-            //System.err.println(toString() + " - ErrorMessage: " + e.getMessage());
         }
         return null;
     }
-
-    /*public static Object doPOSTRequest(String url, List<NameValuePair> params) throws ClientProtocolException, IOException {
-        HttpPost httpPost = new HttpPost(url);
-
-        httpPost.addHeader(HOST, HOST_VALUE);
-        //httpPost.addHeader(ACCEPT_ENCODING, ACCEPT_ENCODING_VALUE);
-        httpPost.addHeader(CONNECTION, CONNECTION_VALUE);
-        httpPost.addHeader(PROXY_CONNECTION, PROXY_CONNECTION_VALUE);
-
-        httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-
-        HttpEntity httpEntity = Utils.getInstance().getHttpClient().execute(httpPost).getEntity();
-        InputStream lInputStream = httpEntity.getContent();
-
-        try {
-            BufferedReader lBufferedReader = new BufferedReader(new InputStreamReader(lInputStream, STREAM_ENCODING), 8);
-            StringBuilder lStringBuilder = new StringBuilder();
-            String line = null;
-            while ((line = lBufferedReader.readLine()) != null) {
-                lStringBuilder.append(line + "\n");
-            }
-            lInputStream.close();
-
-            Utils.LOGD("JSON STRING = "+lStringBuilder.toString());
-            JSONObject lJSONObject = new JSONObject(lStringBuilder.toString());
-
-            if (lJSONObject.getInt("success") == 1) {
-                return lJSONObject;
-            }
-            return null;
-        } catch (Exception e) {
-            Utils.LOGD(e.getMessage());
-            //System.err.println(toString() + " - ErrorMessage: " + e.getMessage());
-        }
-
-        return null;
-    }*/
 
     public static Object doPOSTRequest(String url, List<NameValuePair> params) {
         try {
@@ -151,10 +112,8 @@ public class JSONParser {
             return null;
         } catch (Exception e) {
             Utils.LOGD(e.getMessage());
-            //System.err.println(toString() + " - ErrorMessage: " + e.getMessage());
         }
 
         return null;
     }
-
 }

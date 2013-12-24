@@ -1,5 +1,8 @@
 package com.meeba.google.util;
 
+import android.graphics.Bitmap;
+import android.util.Base64;
+
 import com.google.gson.Gson;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
@@ -9,6 +12,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -290,7 +294,6 @@ public class UserFunctions {
     // Respond to an invite
     private static boolean respondToInvite(int uid, int eid, int status) {
         try {
-
             List<NameValuePair> params = new ArrayList<NameValuePair>();
 
             params.add(new BasicNameValuePair("uid", String.valueOf(uid)));
@@ -409,6 +412,42 @@ public class UserFunctions {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private static String bitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String strBitMap = Base64.encodeToString(b, Base64.DEFAULT);
+        return strBitMap;
+    }
+
+    public static boolean uploadImage(int eid, Bitmap bitmap) {
+        String pictureData = bitMapToString(bitmap);
+
+        try {
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            params.add(new BasicNameValuePair("eid", String.valueOf(eid)));
+            params.add(new BasicNameValuePair("pictureData", pictureData));
+
+            JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "uploadEventPicture", params);
+
+            if(lJsonObject == null)
+                return false;
+
+            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+
+            if(lJsonObject.getInt("success") == 1) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
     }
 }
