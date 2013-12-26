@@ -23,7 +23,7 @@ class DB_Functions {
      * Storing new user
      * returns user details
      */
-    public function createUser($email, $name, $rid, $phone, $picture_url) {
+    public function createUser($email, $name, $rid, $phone, $picture_url, $dummy) {
         // Escape special characters in the strings
         $email = mysql_real_escape_string($email);
         $name = mysql_real_escape_string($name);
@@ -31,8 +31,8 @@ class DB_Functions {
         $picture_url = mysql_real_escape_string($picture_url);
         $rid = mysql_real_escape_string($rid);
 
-    	$result = mysql_query("INSERT INTO users(phone_number, rid, created_at, email, name, picture_url) ".
-            "VALUES('$phone', '$rid', NOW(), '$email', '$name', '$picture_url')");
+    	$result = mysql_query("INSERT INTO users(phone_number, rid, created_at, email, name, picture_url, is_dummy) ".
+            "VALUES('$phone', '$rid', NOW(), '$email', '$name', '$picture_url', $dummy)");
     	if($result) {
     		$uid = mysql_insert_id();
     		$result = mysql_query("SELECT * FROM users WHERE uid = $uid");
@@ -216,14 +216,15 @@ class DB_Functions {
     */
     public function getUsersByEvent($eid) {
         // First get the host
-        $host = mysql_fetch_assoc(mysql_query("SELECT * FROM `users` u,`events` e WHERE e.eid = $eid AND e.host_uid = u.uid"));
+        $host = mysql_fetch_assoc(mysql_query("SELECT uid, email, name, phone_number, rid, u.created_at, picture_url, is_dummy ".
+            "FROM `users` u,`events` e WHERE e.eid = $eid AND e.host_uid = u.uid"));
 
         $result = array();
 
         $result['host'] = $host;
 
         // Now lets get all the guests
-        $guest_result = mysql_query("SELECT DISTINCT uid, email, name, phone_number, rid, created_at, invite_status, picture_url FROM ".
+        $guest_result = mysql_query("SELECT DISTINCT uid, email, name, phone_number, rid, created_at, invite_status, picture_url, is_dummy FROM ".
             "`users`,`invites` WHERE `invites`.eid = $eid AND `invites`.guest_uid = `users`.uid");
 
         $no_of_rows = mysql_num_rows($guest_result);
