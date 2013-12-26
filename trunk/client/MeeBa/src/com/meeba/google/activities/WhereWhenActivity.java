@@ -166,12 +166,13 @@ public class WhereWhenActivity extends SherlockActivity {
                 Uri uri = selectedImage;
                 intent.setData(uri);
                 intent.putExtra("crop", "true");
-                intent.putExtra("aspectX", 0);
-                intent.putExtra("aspectY", 0);
+                intent.putExtra("aspectX", 3);
+                intent.putExtra("aspectY", 1);
                 intent.putExtra("outputX", 525);
                 intent.putExtra("outputY", 170);
                 intent.putExtra("noFaceDetection", true);
                 intent.putExtra("return-data", true);
+                intent.putExtra("scale", true);
                 startActivityForResult(intent, REQUEST_CROP_ICON);
             } else if(requestCode == REQUEST_CROP_ICON) {
                 // Get the cropped photo

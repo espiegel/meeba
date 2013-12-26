@@ -15,6 +15,7 @@ public class User implements Serializable {
     private int invite_status;
     private boolean selected;
     private String picture_url;
+    private int is_dummy;
 
     public User(int uid, String email, String name, String phone_number, String rid, String created_at, String picture_url) {
         this.uid = uid;
@@ -112,21 +113,6 @@ public class User implements Serializable {
 
 
     @Override
-    public String toString() {
-        return "User{" +
-                "uid=" + uid +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", phone_number='" + phone_number + '\'' +
-                ", rid='" + rid + '\'' +
-                ", created_at='" + created_at + '\'' +
-                ", invite_status=" + invite_status +
-                ", selected=" + selected +
-                ", picture_url='" + picture_url + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -152,5 +138,29 @@ public class User implements Serializable {
         result = 31 * result + rid.hashCode();
         result = 31 * result + picture_url.hashCode();
         return result;
+    }
+
+    public int getIs_dummy() {
+        return is_dummy;
+    }
+
+    public void setIs_dummy(int is_dummy) {
+        this.is_dummy = is_dummy;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "uid=" + uid +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", phone_number='" + phone_number + '\'' +
+                ", rid='" + rid + '\'' +
+                ", created_at='" + created_at + '\'' +
+                ", invite_status=" + invite_status +
+                ", selected=" + selected +
+                ", picture_url='" + picture_url + '\'' +
+                ", is_dummy=" + is_dummy +
+                '}';
     }
 }

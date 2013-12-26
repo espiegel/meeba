@@ -294,7 +294,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             @Override
             protected Void doInBackground(Void... params) {
                 Utils.LOGD("maxagi:registering " + email);
-                user = UserFunctions.createUser(email, name, phoneNumber, rid, pictureUrl);
+                user = UserFunctions.createUser(email, name, phoneNumber, rid, pictureUrl, 0);
                 return null;
             }
 
