@@ -43,6 +43,8 @@ public class WhereWhenActivity extends SherlockActivity {
 
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int REQUEST_CROP_ICON = 2;
+    private static final float BASE_WIDTH = 306;
+    private static final float BASE_HEIGHT = 100;
 
     AutoCompleteClearableEditText mEditWhere;
     ClearableEditText mEditTitle;
@@ -166,10 +168,13 @@ public class WhereWhenActivity extends SherlockActivity {
                 Uri uri = selectedImage;
                 intent.setData(uri);
                 intent.putExtra("crop", "true");
-                intent.putExtra("aspectX", 3);
-                intent.putExtra("aspectY", 1);
-                intent.putExtra("outputX", 525);
-                intent.putExtra("outputY", 170);
+                intent.putExtra("aspectX", 30);
+                intent.putExtra("aspectY", 10);
+                float density = getResources().getDisplayMetrics().density;
+                int width = (int)(BASE_WIDTH * density);
+                int height = (int)(BASE_HEIGHT * density);
+                intent.putExtra("outputX", width);
+                intent.putExtra("outputY", height);
                 intent.putExtra("noFaceDetection", true);
                 intent.putExtra("return-data", true);
                 intent.putExtra("scale", true);

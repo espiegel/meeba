@@ -18,10 +18,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/eventPictureLayout">
         <ImageView
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="-3dp"
             android:src="@drawable/pub"
             android:id="@+id/eventPicture" />
             <ImageView
@@ -30,8 +30,7 @@
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_input_add"
                 android:layout_alignBottom="@+id/eventPicture"
-                android:layout_marginLeft="10dp"
-                android:layout_marginBottom="12dp"
+                android:layout_alignLeft="@+id/eventPicture"
                 android:background="@color/card_shadow"
                 />
         </RelativeLayout>
