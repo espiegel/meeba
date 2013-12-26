@@ -82,6 +82,7 @@ $app->post('/createUser', function() use ($app, $db) {
 	$phone = $_POST['phone'];
 	$rid = $_POST['rid'];
 	$picture_url = $_POST['picture_url'];
+	$dummy = $_POST['is_dummy'];
 
 	// First we check if a user exists by the same email or phone
 	$user = $db->getUserByEmail($email); // check for user by email
@@ -97,7 +98,7 @@ $app->post('/createUser', function() use ($app, $db) {
 	}
 
 	// Otherwise store a new user
-	$user = $db->createUser($email, $name, $rid, $phone, $picture_url);
+	$user = $db->createUser($email, $name, $rid, $phone, $picture_url, $dummy);
 	if(!$user) {
 		echo json_encode(array(
 			'success' => 0,
