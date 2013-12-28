@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -71,7 +72,9 @@ public class ContactsActivity extends SherlockFragmentActivity {
         mWhen = bundle.getString("when");
         mTitle = bundle.getString("title");
         mWhere = bundle.getString("where");
-        mPicture = bundle.getParcelable("event_picture");
+
+        byte[] byteArray = bundle.getByteArray("event_picture");
+        mPicture = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 

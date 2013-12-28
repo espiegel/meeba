@@ -75,11 +75,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Upgrading database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
-        // Create tables again
+        if(newVersion > oldVersion) {
+            Utils.LOGD("Upgrading database from version "+oldVersion+" to version "+newVersion);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+            // Create tables again
 
-        onCreate(db);
+            onCreate(db);
+        }
     }
 
     /**

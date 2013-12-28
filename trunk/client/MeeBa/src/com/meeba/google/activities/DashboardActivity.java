@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -186,6 +187,9 @@ public class DashboardActivity extends SherlockActivity {
                 .setup(mPullToRefreshLayout);
 
         /** rest of onCreate :*/
+
+        // Upgrade our database
+        DatabaseFunctions.upgradeDatabase(DashboardActivity.this);
 
         mCurrentUser = DatabaseFunctions.getUserDetails(getApplicationContext());
         if (mCurrentUser == null) {
@@ -453,15 +457,16 @@ public class DashboardActivity extends SherlockActivity {
 
                 //get phones of user with meeba for later
                 // And change name of user like in phone and user to list
-                ListOfContacts=new ArrayList<User>();
+                ListOfContacts = new ArrayList<User>();
                 for (User user : ListOfAppContacts) {
                     meebaUsersPhones.add(user.getPhone_number());
-                    user.setName(phoneMap.get(user.getPhone_number()));
+
+                    String nameFromPhone = phoneMap.get(user.getPhone_number());
+                    if(nameFromPhone != null && !TextUtils.isEmpty(nameFromPhone)) {
+                        user.setName(nameFromPhone);
+                    }
                     ListOfContacts.add(user);
                 }
-
-
-
 
                 // Create an 'ordered' map so that we can sort contacts alphabetically
                 TreeMap<String, String> contactMap = new TreeMap<String, String>(new Comparator<String>() {
@@ -475,8 +480,6 @@ public class DashboardActivity extends SherlockActivity {
                 for (Map.Entry<String, String> entry : phoneMap.entrySet()) {
                     contactMap.put(entry.getValue(), entry.getKey());
                 }
-
-
 
                 //Now add users that don't have meeba to the list as DUMMMY-users
                 for (Map.Entry<String, String> entry : contactMap.entrySet()) {
