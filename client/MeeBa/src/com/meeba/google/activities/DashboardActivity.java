@@ -55,6 +55,7 @@ public class DashboardActivity extends SherlockActivity {
     private List<Event> mUnknownEventsList;
     private EventArrayAdapter mEventArrayAdapter;
     private List<User> ListOfAppContacts;
+    private List<User> ListOfContacts;
     private PullToRefreshLayout mPullToRefreshLayout;
 
     private NavDrawerListAdapter adapter;
@@ -449,9 +450,18 @@ public class DashboardActivity extends SherlockActivity {
                 }
 
                 List<String> meebaUsersPhones = new ArrayList<String>();
+
+                //get phones of user with meeba for later
+                // And change name of user like in phone and user to list
+                ListOfContacts=new ArrayList<User>();
                 for (User user : ListOfAppContacts) {
                     meebaUsersPhones.add(user.getPhone_number());
+                    user.setName(phoneMap.get(user.getPhone_number()));
+                    ListOfContacts.add(user);
                 }
+
+
+
 
                 // Create an 'ordered' map so that we can sort contacts alphabetically
                 TreeMap<String, String> contactMap = new TreeMap<String, String>(new Comparator<String>() {
@@ -466,16 +476,18 @@ public class DashboardActivity extends SherlockActivity {
                     contactMap.put(entry.getValue(), entry.getKey());
                 }
 
-                // Now add users that don't have meeba to the list
+
+
+                //Now add users that don't have meeba to the list as DUMMMY-users
                 for (Map.Entry<String, String> entry : contactMap.entrySet()) {
                     if (!meebaUsersPhones.contains(entry.getValue())) {
                         User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
-                        ListOfAppContacts.add(user);
+                        ListOfContacts.add(user);
                     }
                 }
 
-                if (ListOfAppContacts != null) {
-                    DatabaseFunctions.storeContacts(getApplicationContext(), ListOfAppContacts);
+                if (ListOfContacts != null) {
+                    DatabaseFunctions.storeContacts(getApplicationContext(), ListOfContacts);
                 }
 
                 return null;
