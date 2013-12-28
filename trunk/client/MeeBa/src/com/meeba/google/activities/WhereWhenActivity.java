@@ -44,6 +44,8 @@ public class WhereWhenActivity extends SherlockActivity {
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int REQUEST_CROP_ICON = 2;
     private static final float BASE_WIDTH = 289;
+    private static final float XHDPI_WIDTH = 730;
+    private static final float XHDPI_HEIGHT = 245;
     private static final float BASE_HEIGHT = 100;
 
     AutoCompleteClearableEditText mEditWhere;
@@ -171,8 +173,14 @@ public class WhereWhenActivity extends SherlockActivity {
                 intent.putExtra("aspectX", 30);
                 intent.putExtra("aspectY", 10);
                 float density = getResources().getDisplayMetrics().density;
-                int width = (int)(BASE_WIDTH * density);
-                int height = (int)(BASE_HEIGHT * density);
+                int width, height;
+                if(density == 2.0) { // XHDPI
+                    width = (int)XHDPI_WIDTH;
+                    height = (int)XHDPI_HEIGHT;
+                } else {
+                    width = (int)(BASE_WIDTH * density);
+                    height = (int)(BASE_HEIGHT * density);
+                }
                 intent.putExtra("outputX", width);
                 intent.putExtra("outputY", height);
                 intent.putExtra("noFaceDetection", true);
