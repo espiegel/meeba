@@ -43,7 +43,7 @@ public class WhereWhenActivity extends SherlockActivity {
 
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int REQUEST_CROP_ICON = 2;
-    private static final float BASE_WIDTH = 306;
+    private static final float BASE_WIDTH = 289;
     private static final float BASE_HEIGHT = 100;
 
     AutoCompleteClearableEditText mEditWhere;
