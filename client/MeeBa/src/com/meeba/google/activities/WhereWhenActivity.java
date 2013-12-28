@@ -253,7 +253,13 @@ public class WhereWhenActivity extends SherlockActivity {
         bundle.putString("when", when);
         bundle.putString("title", title);
         bundle.putString("where", where);
-        bundle.putParcelable("event_picture", ((BitmapDrawable)mEditPicture.getDrawable()).getBitmap());
+
+        // Compress the bitmap
+        Bitmap bitmap = ((BitmapDrawable)mEditPicture.getDrawable()).getBitmap();
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50, bs);
+
+        bundle.putByteArray("event_picture", bs.toByteArray());
         i.putExtras(bundle);
         startActivity(i);
     }

@@ -1,7 +1,9 @@
 package com.meeba.google.database;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.meeba.google.R;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
 
@@ -12,6 +14,7 @@ import java.util.List;
  */
 public class DatabaseFunctions {
 
+    public static final int NEW_VERSION = 3; // Database version. Increment this if you want users database to be renewed.
     private static DatabaseHandler mDatabaseHandler = null;
 
     private static DatabaseHandler getDatabase(Context context) {
@@ -98,8 +101,15 @@ public class DatabaseFunctions {
     }
 
     public static void upgradeDatabase(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.sharedpreferences), Context.MODE_PRIVATE);
+        int oldVersion = sharedPreferences.getInt(context.getString(R.string.database_version), 1);
+
         DatabaseHandler db = getDatabase(context);
-        db.onUpgrade(db.getWritableDatabase(), 1, 1);
+        db.onUpgrade(db.getWritableDatabase(), oldVersion, NEW_VERSION);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(context.getString(R.string.database_version), NEW_VERSION);
+        editor.commit();
     }
 
     public static void resetTables(Context context) {
@@ -110,19 +120,6 @@ public class DatabaseFunctions {
     private static boolean userIsStored(Context context) {
         return (getDatabase(context).getRowCount(DatabaseHandler.TABLE_USER) > 0);
     }
-
-    /**
-     * @param context application context
-     * @param user    the user to be searched in contacts table
-     * @return true iff user is stored in the contacts table
-    private static boolean contactIsStored(Context context, User user) {
-        List<User> users = loadContacts(context);
-        for (User u : users) {
-            if (u.getName().equals(user.getName()))
-                return true;
-        }
-        return false;
-    }*/
 
     /**
      * @param context application context
