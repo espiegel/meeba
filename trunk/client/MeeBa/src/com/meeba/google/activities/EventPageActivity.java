@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -67,6 +68,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
     private User mHost;           // Host of the event
     private int mInviteStatus;    // The current users event status  of the current event (if he is invited)
     private int newStatus = 0;    // The status to change to, when clicking the Image Button
+    private ImageView mEventPicture;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -80,17 +82,22 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
 
-        statusImgButton = (ImageButton) findViewById(R.id.statusImgBtn);
-        mTxtHost = (TextView) findViewById(R.id.txtHost);
-        mTxtTitle = (TextView) findViewById(R.id.txtTitle);
-        mTxtWhere = (TextView) findViewById(R.id.txtWhere);
-        mTxtWhen = (TextView) findViewById(R.id.txtWhen);
+        View header = LayoutInflater.from(this).inflate(R.layout.eventpage_activity_header, null);
+        mTxtHost = (TextView) header.findViewById(R.id.txtHost);
+        mTxtTitle = (TextView) header.findViewById(R.id.txtTitle);
+        mTxtWhere = (TextView) header.findViewById(R.id.txtWhere);
+        mTxtWhen = (TextView) header.findViewById(R.id.txtWhen);
+        mImageHost = (ImageView) header.findViewById(R.id.eventpage_host_pic);
+        mEventPicture = (ImageView) header.findViewById(R.id.eventPicture);
+        ImageView hostPicture = (ImageView) header.findViewById(R.id.eventpage_host_pic);
+        LinearLayout whereLayout = (LinearLayout) header.findViewById(R.id.whereLayout);
+        statusImgButton = (ImageButton) header.findViewById(R.id.statusImgBtn);
+        mMy_name = (TextView) header.findViewById(R.id.myname);
+        mMy_picture = (ImageView) header.findViewById(R.id.myPicture);
+        RelativeLayout guestLayout = (RelativeLayout) header.findViewById(R.id.relativeLayout);
+
         mListView = (ListView) findViewById(R.id.listGuests);
-        mImageHost = (ImageView) findViewById(R.id.eventpage_host_pic);
-
-        mMy_name = (TextView) findViewById(R.id.myname);
-        mMy_picture = (ImageView) findViewById(R.id.myPicture);
-
+        mListView.addHeaderView(header);
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
@@ -111,28 +118,33 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         mImageLoader = Utils.getImageLoader(this);
         mImageLoader.displayImage(mHost.getPicture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
+        mImageLoader.displayImage(mEvent.getEvent_picture(), mEventPicture);
 
-        RelativeLayout guestLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
-        LinearLayout hostLayout = (LinearLayout) findViewById(R.id.hostLayout);
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
                 User user = (User) adapterView.getItemAtPosition(position);
-                showContactDialog(user);
+                if(user != null) {
+                    showContactDialog(user);
+                }
                 return false;
             }
         });
         guestLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                showContactDialog(mMyCurrentUser);
+                if(mMyCurrentUser != null) {
+                    showContactDialog(mMyCurrentUser);
+                }
                 return false;
             }
         });
-        hostLayout.setOnLongClickListener(new View.OnLongClickListener() {
+        hostPicture.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                showContactDialog(mHost);
+                if(mHost != null) {
+                    showContactDialog(mHost);
+                }
                 return false;
             }
         });
@@ -190,8 +202,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         }
 
         /** rest of onCreate : **/
-        LinearLayout layoutWhere = (LinearLayout) findViewById(R.id.layoutWhere);
-        layoutWhere.setOnClickListener(new View.OnClickListener() {
+        whereLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 

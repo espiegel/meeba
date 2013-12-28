@@ -1,10 +1,11 @@
 package com.meeba.google.activities;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -42,11 +43,9 @@ import java.util.Calendar;
 public class WhereWhenActivity extends SherlockActivity {
 
     private static final int RESULT_LOAD_IMAGE = 1;
-    private static final int REQUEST_CROP_ICON = 2;
-    private static final float BASE_WIDTH = 289;
-    private static final float XHDPI_WIDTH = 730;
-    private static final float XHDPI_HEIGHT = 245;
-    private static final float BASE_HEIGHT = 100;
+    private static final int RESULT_CAMERA_IMAGE = 3;
+    private static final float BASE_WIDTH = 500;
+    private static final float BASE_HEIGHT = 250;
 
     AutoCompleteClearableEditText mEditWhere;
     ClearableEditText mEditTitle;
@@ -59,8 +58,32 @@ public class WhereWhenActivity extends SherlockActivity {
     private View.OnClickListener mOnPictureClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(i, RESULT_LOAD_IMAGE);
+            AlertDialog.Builder builder = new AlertDialog.Builder(WhereWhenActivity.this);
+            builder.setTitle("Event Picture")
+                    .setIcon(R.drawable.ic_launcher)
+                    .setMessage("Where to take the photo from?")
+                    .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .setPositiveButton("Camera", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(intent, RESULT_CAMERA_IMAGE);
+                        }
+                    })
+                    .setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(intent, RESULT_LOAD_IMAGE);
+                        }
+                    });
+            builder.create().show();
+
         }
     };
 
@@ -155,48 +178,19 @@ public class WhereWhenActivity extends SherlockActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && null != data) {
-            if(requestCode == RESULT_LOAD_IMAGE) {
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
-                cursor.close();
-
-                // Crop the photo
-                Intent intent = new Intent("com.android.camera.action.CROP");
-                Uri uri = selectedImage;
-                intent.setData(uri);
-                intent.putExtra("crop", "true");
-                intent.putExtra("aspectX", 30);
-                intent.putExtra("aspectY", 10);
-                float density = getResources().getDisplayMetrics().density;
-                int width, height;
-                if(density == 2.0) { // XHDPI
-                    width = (int)XHDPI_WIDTH;
-                    height = (int)XHDPI_HEIGHT;
-                } else {
-                    width = (int)(BASE_WIDTH * density);
-                    height = (int)(BASE_HEIGHT * density);
-                }
-                intent.putExtra("outputX", width);
-                intent.putExtra("outputY", height);
-                intent.putExtra("noFaceDetection", true);
-                intent.putExtra("return-data", true);
-                intent.putExtra("scale", true);
-                startActivityForResult(intent, REQUEST_CROP_ICON);
-            } else if(requestCode == REQUEST_CROP_ICON) {
-                // Get the cropped photo
-                Bundle extras = data.getExtras();
-                if(extras != null ) {
-                    Bitmap photo = extras.getParcelable("data");
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    photo.compress(Bitmap.CompressFormat.PNG, 75, stream);
-
-                    // Display the photo
+        if(resultCode == RESULT_OK && data != null) {
+            if(requestCode == RESULT_CAMERA_IMAGE) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                photo = Bitmap.createScaledBitmap(photo, (int)BASE_WIDTH, (int)BASE_HEIGHT, true);
+                mEditPicture.setImageBitmap(photo);
+            } else if(requestCode == RESULT_LOAD_IMAGE) {
+                try {
+                    Uri selectedImage = data.getData();
+                    Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                    photo = Bitmap.createScaledBitmap(photo, (int)BASE_WIDTH, (int)BASE_HEIGHT, true);
                     mEditPicture.setImageBitmap(photo);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }

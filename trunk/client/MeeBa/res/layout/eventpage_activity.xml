@@ -1,173 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/card_background"
+    android:background="@color/second_grey"
     android:id="@+id/eventpage_activity_layout"
-    android:padding="10dp">
+    android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/hostLayout"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_dark"
-        android:padding="10dp"
-        android:layout_gravity="center|left">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:background="@drawable/card_background_no_grey">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/eventpage_host_pic"
-            android:src="@drawable/no_photo" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/txtHost"
-            android:layout_marginLeft="10dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_dark"
-        android:padding="10dp"
-        android:layout_gravity="center|left">
-
-        <ImageView
+        <ListView
+            android:id="@+id/listGuests"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/imageView1"
-            android:src="@drawable/android_notepad"
-            android:focusableInTouchMode="true"
-            android:cropToPadding="false"
-            android:focusable="false" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/txtTitle"
-            android:layout_marginLeft="10dp" />
+            android:fadingEdge="none"
+            android:scrollbars="none"
+            android:layout_height="0dp"
+            android:layout_weight="3">
+        </ListView>
     </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_dark"
-        android:layout_gravity="center|left"
-        android:padding="10dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView3"
-            android:src="@drawable/clock" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/txtWhen"
-            android:layout_marginLeft="10dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layoutWhere"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:divider="@android:drawable/divider_horizontal_dark"
-        android:layout_gravity="center|left"
-        android:padding="10dp">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
-            android:src="@drawable/waze_icon" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/txtWhere"
-            android:layout_marginLeft="10dp" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:id="@+id/relativeLayout">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/myPicture"
-            android:src="@drawable/no_photo"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="5dp"
-            android:layout_gravity="center_vertical"
-            android:layout_alignParentLeft="false"
-            android:layout_centerVertical="true" />
-
-        <TextView
-            android:id="@+id/myname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="5dp"
-            android:text="@string/unknown"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:layout_centerVertical="true" />
-
-        <!--CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/checkInviteBox"
-            android:checked="false"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/myPicture" /-->
-
-
-        <ImageButton
-            android:id="@+id/statusImgBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/myPicture"
-            android:background="@null"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentRight="true" />
-
-
-    </RelativeLayout>
-
-    <ListView
-        android:id="@+id/listGuests"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="3">
-
-    </ListView>
-
 </LinearLayout>
