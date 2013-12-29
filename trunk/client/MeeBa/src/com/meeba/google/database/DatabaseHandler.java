@@ -38,6 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_RID = "rid";
     private static final String KEY_CREATED_AT = "created_at";
     private static final String KEY_PICTURE_URL = "picture_url";
+    private static final String KEY_IS_DUMMY = "is_dummy";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,7 +56,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_PHONE + " TEXT,"               // 3
                 + KEY_RID + " TEXT,"                 // 4
                 + KEY_CREATED_AT + " TEXT,"          // 5
-                + KEY_PICTURE_URL + " TEXT" + ")";   // 6
+                + KEY_PICTURE_URL + " TEXT,"      // 6
+                + KEY_IS_DUMMY        + " TEXT" + ")";   // 7
         Utils.LOGD(CREATE_LOGIN_TABLE);
         db.execSQL(CREATE_LOGIN_TABLE);
 
@@ -66,8 +68,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_NAME + " TEXT,"                // 2
                 + KEY_PHONE + " TEXT,"               // 3
                 + KEY_RID + " TEXT,"                 // 4
-                + KEY_CREATED_AT + " TEXT,"          // 5
-                + KEY_PICTURE_URL + " TEXT" + ")";   // 6
+                + KEY_CREATED_AT   + " TEXT,"          // 5
+                + KEY_PICTURE_URL + " TEXT,"      // 6
+                + KEY_IS_DUMMY        + " TEXT" + ")";   // 7
         Utils.LOGD(CREATE_CONTACTS_TABLE);
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
@@ -96,6 +99,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String email = user.getEmail();
         String name = user.getName();
         String picture_url = user.getPicture_url();
+        String is_dummy = String  .valueOf( user.getIs_dummy());
 
         Utils.LOGD("adding to  " + tableName + " user =" + user);
         SQLiteDatabase db = this.getWritableDatabase();
@@ -107,6 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_EMAIL, email);
         values.put(KEY_NAME, name);
         values.put(KEY_PICTURE_URL, picture_url);
+        values.put(KEY_IS_DUMMY, is_dummy);
 
         // Inserting Row
         db.insert(tableName, null, values);
@@ -132,6 +137,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             userDetails.put(KEY_RID, cursor.getString(4));
             userDetails.put(KEY_CREATED_AT, cursor.getString(5));
             userDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+            userDetails.put(KEY_IS_DUMMY, cursor.getString(7));
         }
         cursor.close();
         //db.close();
@@ -140,9 +146,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Utils.LOGD("DB: " + s);
         }
         // return user
-        User user = new User(Integer.valueOf(userDetails.get(KEY_UID)), userDetails.get(KEY_EMAIL),
-                userDetails.get(KEY_NAME), userDetails.get(KEY_PHONE), userDetails.get(KEY_RID),
-                userDetails.get(KEY_CREATED_AT), userDetails.get(KEY_PICTURE_URL));
+        User user = new User(
+                Integer.valueOf(userDetails.get(KEY_UID)),
+                userDetails.get(KEY_EMAIL),
+                userDetails.get(KEY_NAME),
+                userDetails.get(KEY_PHONE),
+                userDetails.get(KEY_RID),
+                userDetails.get(KEY_CREATED_AT),
+                userDetails.get(KEY_PICTURE_URL),
+                Integer.valueOf( userDetails.get(KEY_IS_DUMMY))
+        );
         return user;
     }
 
@@ -168,10 +181,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 contactDetails.put(KEY_RID, cursor.getString(4));
                 contactDetails.put(KEY_CREATED_AT, cursor.getString(5));
                 contactDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+                contactDetails.put(KEY_IS_DUMMY, cursor.getString(7));
+
 
                 User contact = new User(Integer.valueOf(contactDetails.get(KEY_UID)), contactDetails.get(KEY_EMAIL),
                         contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
-                        contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
+                        contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL)  , Integer.valueOf(contactDetails.get(KEY_IS_DUMMY) ));
 
                 Utils.LOGD("Got contact from database, user = "+contact);
                 contacts.add(contact);
@@ -196,7 +211,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         User contact = null;
 
-        Cursor cursor = db.query(TABLE_CONTACTS, new String[] { KEY_UID, KEY_EMAIL, KEY_NAME, KEY_PHONE, KEY_RID, KEY_CREATED_AT, KEY_PICTURE_URL },
+        Cursor cursor = db.query(TABLE_CONTACTS, new String[] { KEY_UID, KEY_EMAIL, KEY_NAME, KEY_PHONE, KEY_RID, KEY_CREATED_AT, KEY_PICTURE_URL,KEY_IS_DUMMY },
                 KEY_UID + " = ?", new String[] { String.valueOf(uid) }, null, null, null);
         // Move to first row
         cursor.moveToFirst();
@@ -208,10 +223,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contactDetails.put(KEY_RID, cursor.getString(4));
             contactDetails.put(KEY_CREATED_AT, cursor.getString(5));
             contactDetails.put(KEY_PICTURE_URL, cursor.getString(6));
+            contactDetails.put(KEY_IS_DUMMY, cursor.getString(7));
 
             contact = new User(Integer.valueOf(contactDetails.get(KEY_UID)), contactDetails.get(KEY_EMAIL),
                     contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
-                    contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL));
+                    contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL)  , Integer.valueOf(contactDetails.get(KEY_IS_DUMMY)) );
 
         }
 
@@ -319,6 +335,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @param user user to be deleted
      * @return returns true on success and false on failure
      */
+    //TODO what if user dosent exist? will this crash??
     public boolean removeContact(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 

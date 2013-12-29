@@ -459,7 +459,7 @@ public class DashboardActivity extends SherlockActivity {
                 // And change name of user like in phone and user to list
                 ListOfContacts = new ArrayList<User>();
                 for (User user : ListOfAppContacts) {
-                    meebaUsersPhones.add(user.getPhone_number());
+                        meebaUsersPhones.add(user.getPhone_number());
 
                     String nameFromPhone = phoneMap.get(user.getPhone_number());
                     if(nameFromPhone != null && !TextUtils.isEmpty(nameFromPhone)) {
@@ -483,16 +483,20 @@ public class DashboardActivity extends SherlockActivity {
 
                 //Now add users that don't have meeba to the list as DUMMMY-users
                 for (Map.Entry<String, String> entry : contactMap.entrySet()) {
-                    if (!meebaUsersPhones.contains(entry.getValue())) {
+                    User foundContact=DatabaseFunctions.getContact(entry.getValue(),DashboardActivity.this);
+                    if (!meebaUsersPhones.contains(entry.getValue() )
+                            //AND the user is not stored as a positive dummy
+                            //because if he is a positive dummy , then no need to create a negative dummy for him
+                          && !(foundContact!=null && foundContact.getIs_dummy()==1)  ) {
                         User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
                         ListOfContacts.add(user);
+                        Utils.LOGD("created negative dummy for  :  " + entry.getKey());
                     }
                 }
 
                 if (ListOfContacts != null) {
                     DatabaseFunctions.storeContacts(getApplicationContext(), ListOfContacts);
                 }
-
                 return null;
             }
 

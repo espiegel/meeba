@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class DatabaseFunctions {
 
-    public static final int NEW_VERSION = 3; // Database version. Increment this if you want users database to be renewed.
+    public static final int NEW_VERSION = 4; // Database version. Increment this if you want users database to be renewed.
     private static DatabaseHandler mDatabaseHandler = null;
 
     private static DatabaseHandler getDatabase(Context context) {
@@ -30,6 +30,7 @@ public class DatabaseFunctions {
      * @param context
      * @param users   store users in contacts table in phone DB
      */
+    //TODO this method should also delete a user if he's not in param: users (see issue #74)
     public static void storeContacts(Context context, List<User> users) {
         for (User user : users) {
             Utils.LOGD("storeContacts: storing  in database " + user);
@@ -48,6 +49,16 @@ public class DatabaseFunctions {
     }
 
     /**
+     * removes a user from table CONTACTS
+     *
+     * @param context
+     */
+    public static boolean removeContact(User toRemove, Context context) {
+        DatabaseHandler db = getDatabase(context);
+        return db.removeContact(toRemove);
+    }
+
+    /**
      * Use this only once on login
      *
      * @param context   Application context
@@ -56,7 +67,7 @@ public class DatabaseFunctions {
      */
     public static void storeUserDetails(Context context, User user, String tableName) {
         DatabaseHandler db = getDatabase(context);
-
+        //TODO update details if changed
         // Store only if there isn't a user stored already
         if (tableName.equals(DatabaseHandler.TABLE_USER) && userIsStored(context)) {
             Utils.LOGD(user.getName() + "storeUserDetails:   already stored in  " + tableName);
@@ -64,7 +75,6 @@ public class DatabaseFunctions {
         }
 
         if (tableName.equals(DatabaseHandler.TABLE_CONTACTS) && contactIsStored(context, user)) {
-            Utils.LOGD(user.getName() + "storeUserDetails :  already stored in  " + tableName);
 
             // This is a real meeba user
             if(user.getUid() != Utils.DUMMY_USER) {
@@ -129,4 +139,18 @@ public class DatabaseFunctions {
     private static boolean contactIsStored(Context context, User user) {
         return getDatabase(context).contactExists(user);
     }
+
+    //TODO this is very unefficient - implement a better one !
+    public static User getContact(String phoneNumber, Context context) {
+        User found = null;
+        List<User> all_users = loadContacts(context);
+
+        for (User u : all_users) {
+            if (u.getPhone_number().equals(phoneNumber))
+                found = u;
+        }
+        return found;
+    }
+
+
 }

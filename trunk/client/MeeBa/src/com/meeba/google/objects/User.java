@@ -17,6 +17,18 @@ public class User implements Serializable {
     private String picture_url;
     private int is_dummy;
 
+    public User(int uid, String email, String name, String phone_number, String rid, String created_at, String picture_url,int is_dummy) {
+        this.uid = uid;
+        this.email = email;
+        this.name = name;
+        this.phone_number = phone_number;
+        this.rid = rid;
+        this.created_at = created_at;
+        this.picture_url = picture_url;
+        this.selected = false;
+        this.is_dummy=is_dummy;
+    }
+
     public User(int uid, String email, String name, String phone_number, String rid, String created_at, String picture_url) {
         this.uid = uid;
         this.email = email;

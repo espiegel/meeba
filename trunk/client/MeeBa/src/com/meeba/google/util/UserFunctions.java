@@ -1,9 +1,11 @@
 package com.meeba.google.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Base64;
 
 import com.google.gson.Gson;
+import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 
@@ -18,7 +20,7 @@ import java.util.List;
 
 /**
  * Created by Eidan on 11/8/13.
- *
+ * <p/>
  * Important: All of these methods must be used asynchronously with the AsyncTask class
  * in order for the UI thread to not be frozen.
  * If not used asynchronously you will generate a runtime error.
@@ -27,6 +29,7 @@ public class UserFunctions {
 
     /**
      * Get a user by his email
+     *
      * @param email Email of the user
      * @return Returns a User object of the user with the same email or null if none was found.
      */
@@ -35,10 +38,10 @@ public class UserFunctions {
             Gson lGson = new Gson();
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getUserByEmail/" + email);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
             return lGson.fromJson(lJsonObject.getString("user"), User.class);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -48,6 +51,7 @@ public class UserFunctions {
 
     /**
      * Get a user by his uid
+     *
      * @param uid uid of the user
      * @return Returns a User object of the user with the same uid or null if none was found.
      */
@@ -56,10 +60,10 @@ public class UserFunctions {
             Gson lGson = new Gson();
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getUserByUid/" + uid);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
             return lGson.fromJson(lJsonObject.getString("user"), User.class);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -69,13 +73,15 @@ public class UserFunctions {
 
     /**
      * Creates a new user
-     * @param email Email of the new user
-     * @param name Name of the new user
-     * @param phone Phone number of the new user
-     * @param rid Registration ID of the new user (from GCM)
+     *
+     * @param email      Email of the new user
+     * @param name       Name of the new user
+     * @param phone      Phone number of the new user
+     * @param rid        Registration ID of the new user (from GCM)
      * @param pictureUrl Url of google plus picture
      * @return Returns a User object of the created user or null if user creation failed.
      */
+    //TODO check if user is a dummy first, if yes, delete the dummy  or update the dummy to be real user
     public static User createUser(String email, String name, String phone, String rid, String pictureUrl, int isDummy) {
         try {
             Gson lGson = new Gson();
@@ -91,10 +97,10 @@ public class UserFunctions {
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "createUser", params);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
             return lGson.fromJson(lJsonObject.getString("user"), User.class);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -103,7 +109,102 @@ public class UserFunctions {
     }
 
     /**
+     * @param user
+     * @param context
+     * @returns the name of the user as it appears in the contacts list if found.
+     * if no such number in contacts list , then returns user.getName()
+     */
+    public static String translateUserName(User user, Context context) {
+
+        User found = DatabaseFunctions.getContact(user.getPhone_number(), context);
+        Utils.LOGD("translating " + user+" found  :  " + found) ;
+
+        //user is a positive dummy
+        if (user.getIs_dummy() == 1) {
+            if (found == null)
+                return user.getPhone_number();
+            else
+                return found.getName();
+        }
+
+        //user is not a dummy
+        else {
+            if (found == null)
+                return user.getName();
+            else
+                return found.getName();
+        }
+    }
+
+
+    /**
+     * @param negativeDummies users with uid = -1
+     * @returna list of positive dummies (with uid>0)  and isDummy=1
+     */
+    public static List<User> createDummyUsers(List<User> negativeDummies, Context context) {
+        try {
+
+            List<User> dummyUsers = new ArrayList<User>();
+            for (User negativeDummy : negativeDummies) {
+                Utils.LOGD("creating dummy for   " + negativeDummy);
+                User dummy;
+                User foundContact = null;
+
+                //if a dummy with the same  phone number already exists , use it instead of creating
+
+                //search the user in the Phone DataBase
+                List<User> allContacts = DatabaseFunctions.loadContacts(context);
+                for (User contact : allContacts) {
+                    if (contact.getPhone_number().equals(negativeDummy.getPhone_number())) {
+                        foundContact = contact;
+                        break;
+                    }
+                }
+
+                //if user is found
+                if (foundContact != null) {
+                    User potentialDummy = foundContact;
+
+                    //if potentialDummy's uid >0 , then use it
+                    if (potentialDummy.getUid() != Utils.DUMMY_USER) {
+                        Utils.LOGD("in createDummyUsers : using existing   " + potentialDummy);
+                        dummy = potentialDummy;
+                    }
+
+                    //else remove him from contacts table ,and create a new positive dummy
+                    // (it will be stored in contacts later , in Dashboard updateContacts)
+                    else {
+                        Utils.LOGD("in createDummyUsers : removing negative dummy   " + potentialDummy);
+                        DatabaseFunctions.removeContact(potentialDummy, context);
+                        dummy = createUser(
+                                negativeDummy.getPhone_number(),                    //mail
+                                negativeDummy.getName(),                                      //name
+                                negativeDummy.getPhone_number(), "", "", 1);   //phone , rid , picUrl , isDummy
+                    }
+                }
+
+                //user is not found
+                else {
+                    dummy = createUser(
+                            negativeDummy.getPhone_number(),                    //mail
+                            negativeDummy.getName(),                                      //name
+                            negativeDummy.getPhone_number(), "", "", 1);   //phone , rid , picUrl , isDummy
+                }
+                dummyUsers.add(dummy);
+            }
+
+            Utils.LOGD("returning dummy users: " + dummyUsers);
+            return dummyUsers;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Get the events that user is participating in. Events that he is a host of and events that he is invited to.
+     *
      * @param uid User if of the user.
      * @return Returns a list of all events or null if the web service failed.
      */
@@ -112,36 +213,37 @@ public class UserFunctions {
             List<Event> events = new ArrayList<Event>();
             Gson lGson = new Gson();
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getEventsByUser/" + uid);
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            for(int i=0;i<lJsonObject.getJSONArray("events").length();i++) {
-                Utils.LOGD("events = "+lJsonObject.getJSONArray("events").get(i).toString());
+            for (int i = 0; i < lJsonObject.getJSONArray("events").length(); i++) {
+                Utils.LOGD("events = " + lJsonObject.getJSONArray("events").get(i).toString());
                 events.add(lGson.fromJson(lJsonObject.getJSONArray("events").get(i).toString(), Event.class));
             }
 
-            for(Event e : events) {
-                Utils.LOGD("event = "+e.toString());
+            for (Event e : events) {
+                Utils.LOGD("event = " + e.toString());
             }
 
             return events;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
-           // return null;
+            // return null;
         }
     }
 
     /**
      * Get the events that user is participating in and has a certain invite status in. (Event hosts count as status 1)
-     * @param uid User if of the user.
+     *
+     * @param uid    User if of the user.
      * @param status Invited status of the user. Must be one of {-1,0,1}
      * @return Returns a list of all events or null if the web service failed.
      */
     public static List<Event> getEventsByUser(int uid, int status) throws Exception {
-        if(status != 0 && status != -1 && status != 1) {
+        if (status != 0 && status != -1 && status != 1) {
             return null;
         }
 
@@ -149,17 +251,17 @@ public class UserFunctions {
             List<Event> events = new ArrayList<Event>();
             Gson lGson = new Gson();
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getEventsByUser/" + uid + "/" + status);
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            for(int i=0;i<lJsonObject.getJSONArray("events").length();i++) {
+            for (int i = 0; i < lJsonObject.getJSONArray("events").length(); i++) {
                 events.add(lGson.fromJson(lJsonObject.getJSONArray("events").get(i).toString(), Event.class));
             }
 
-            for(Event e : events) {
-                Utils.LOGD("event = "+e.toString());
+            for (Event e : events) {
+                Utils.LOGD("event = " + e.toString());
             }
 
             return events;
@@ -172,6 +274,7 @@ public class UserFunctions {
 
     /**
      * Gets a list of all users from a list of phone numbers
+     *
      * @param phones A list of all phone numbers. Every phone number must be a string of digits only.
      * @return Returns a list of users with the given phone numbers.
      */
@@ -187,17 +290,17 @@ public class UserFunctions {
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "getUsersByPhones", params);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject in getUsersByPhones = " + lJsonObject.toString());
 
-            for(int i=0;i<lJsonObject.getJSONArray("users").length();i++) {
+            for (int i = 0; i < lJsonObject.getJSONArray("users").length(); i++) {
                 users.add(lGson.fromJson(lJsonObject.getJSONArray("users").get(i).toString(), User.class));
             }
 
-            for(User e : users) {
-                Utils.LOGD("user = "+e.toString());
+            for (User e : users) {
+                Utils.LOGD("user = " + e.toString());
             }
             return users;
         } catch (Exception ex) {
@@ -208,13 +311,15 @@ public class UserFunctions {
 
     /**
      * Creates a new event. Sends out invitations to all users and sends them a push notification.
+     *
      * @param host_uid User id of the host
-     * @param where Where the event is taking place
-     * @param when When the event is taking place
-     * @param uids A List of Strings containing the uids of all the invited guests.
+     * @param where    Where the event is taking place
+     * @param when     When the event is taking place
+     * @param uids     A List of Strings containing the uids of all the invited guests.
      * @return Returns the created event on success or null if an error occurred.
      */
-    public static Event createEvent(int host_uid,String title, String where, String when, List<String> uids) {
+    public static Event createEvent(int host_uid, String title, String where, String when, List<String> uids) {
+        Utils.LOGD("in createEvent" + host_uid + " ::" + title + "::" + where + "::" + when + "\n" + uids);
         try {
             Gson lGson = new Gson();
 
@@ -229,11 +334,11 @@ public class UserFunctions {
             params.add(new BasicNameValuePair("uid", uidArray.toString()));
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "createEvent", params);
-
-            if(lJsonObject == null)
+            Utils.LOGD("in createEvent " + lJsonObject);
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject in createEvent = " + lJsonObject.toString());
             return lGson.fromJson(lJsonObject.getString("event"), Event.class);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -243,10 +348,11 @@ public class UserFunctions {
 
     /**
      * Updates an event with new values: title, where, when.
-     * @param eid eid of event to update
+     *
+     * @param eid   eid of event to update
      * @param title new title
      * @param where new where
-     * @param when new when
+     * @param when  new when
      * @return Returns new event on success and null on failure
      */
     public static Event updateEvent(int eid, String title, String when, String where) {
@@ -262,18 +368,20 @@ public class UserFunctions {
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "updateEvent", params);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
             return lGson.fromJson(lJsonObject.getString("event"), Event.class);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
+
     /**
      * Accept an invitation
+     *
      * @param uid The user id of the current user that is accepting this invitation
      * @param eid The event id that this user is accepting
      * @return Returns true on success and false on failure.
@@ -284,6 +392,7 @@ public class UserFunctions {
 
     /**
      * Decline an invitation
+     *
      * @param uid The user id of the current user that is declining this invitation
      * @param eid The event id that this user is declining
      * @return Returns true on success and false on failure.
@@ -303,15 +412,14 @@ public class UserFunctions {
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "respondToInvite", params);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return false;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            if(lJsonObject.getInt("success") == 1) {
+            if (lJsonObject.getInt("success") == 1) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         } catch (Exception ex) {
@@ -331,22 +439,21 @@ public class UserFunctions {
             Gson lGson = new Gson();
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "getUsersByEvent/" + eid);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            if(lJsonObject.getInt("success") == 1) {
-                for(int i=0;i<lJsonObject.getJSONObject("users").getJSONArray("guests").length();i++) {
+            if (lJsonObject.getInt("success") == 1) {
+                for (int i = 0; i < lJsonObject.getJSONObject("users").getJSONArray("guests").length(); i++) {
                     users.add(lGson.fromJson(lJsonObject.getJSONObject("users").getJSONArray("guests").get(i).toString(), User.class));
                 }
 
-                for(User e : users) {
-                    Utils.LOGD("user = "+e.toString());
+                for (User e : users) {
+                    Utils.LOGD("user = " + e.toString());
                 }
                 return users;
-            }
-            else {
+            } else {
                 return null;
             }
         } catch (Exception e) {
@@ -357,6 +464,7 @@ public class UserFunctions {
 
     /**
      * Deletes an event.
+     *
      * @param eid Event id
      * @return Returns true on success and false on failure.
      */
@@ -364,15 +472,14 @@ public class UserFunctions {
         try {
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "deleteEvent/" + eid);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return false;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            if(lJsonObject.getInt("success") == 1) {
+            if (lJsonObject.getInt("success") == 1) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         } catch (Exception e) {
@@ -383,6 +490,7 @@ public class UserFunctions {
 
     /**
      * Gives a list of place suggestions given a query input. Uses Google Places API.
+     *
      * @param input The input string to perform autocompletion on
      * @return Returns a list of autocompletion suggestions or null on failure.
      */
@@ -393,21 +501,20 @@ public class UserFunctions {
             Utils.LOGD(Utils.BASE_URL + "placeAutocomplete/" + input);
             JSONObject lJsonObject = (JSONObject) JSONParser.doGETRequest(Utils.BASE_URL + "placeAutocomplete/" + input);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            if(lJsonObject.getInt("success") == 1) {
+            if (lJsonObject.getInt("success") == 1) {
                 JSONArray places = lJsonObject.getJSONArray("places");
-                for(int i=0;i<places.length();i++) {
-                    suggestions.add((String)places.get(i));
+                for (int i = 0; i < places.length(); i++) {
+                    suggestions.add((String) places.get(i));
                 }
 
-                Utils.LOGD("suggestions = "+suggestions);
+                Utils.LOGD("suggestions = " + suggestions);
                 return suggestions;
-            }
-            else {
+            } else {
                 return null;
             }
         } catch (Exception e) {
@@ -441,15 +548,14 @@ public class UserFunctions {
 
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "uploadEventPicture", params);
 
-            if(lJsonObject == null)
+            if (lJsonObject == null)
                 return null;
 
-            Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
 
-            if(lJsonObject.getInt("success") == 1) {
+            if (lJsonObject.getInt("success") == 1) {
                 return lJsonObject.getString("url");
-            }
-            else {
+            } else {
                 return null;
             }
         } catch (Exception ex) {
