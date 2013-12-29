@@ -295,6 +295,9 @@ class DB_Functions {
         return $event;
     }
 
+    /**
+    * Adds a picture to an event. Returns url on success and false on failure.
+    */
     public function uploadEventPicture($eid, $pictureData) {
         $pictureData = base64_decode($pictureData);
 
@@ -321,7 +324,7 @@ class DB_Functions {
             return false;
         }
 
-        return true;
+        return $url;
     }
 
     /**

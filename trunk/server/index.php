@@ -333,11 +333,12 @@ $app->post('/uploadEventPicture', function() use ($app, $db) {
 	$eid = $_POST['eid'];
 	$pictureData = $_POST['pictureData'];
 
-	$success = $db->uploadEventPicture($eid, $pictureData);
+	$url = $db->uploadEventPicture($eid, $pictureData);
 
 	if(!$success) {
 		echo json_encode(array(
 			'success' => 0,
+			'url' => null,
 			'error' => "Failed to upload the picture",
 		));
 
@@ -346,6 +347,7 @@ $app->post('/uploadEventPicture', function() use ($app, $db) {
 
 	echo json_encode(array(
 			'success' => 1,
+			'url' => $url,
 			'error' => null,
 		));
 });
