@@ -86,4 +86,6 @@
     <string name="edit_event_details">Edit event details</string>
     <string name="sharedpreferences">sharedpreferences</string>
     <string name="database_version">database_version</string>
+    <string name="invitation_accept_toast">Accepting Invitation...</string>
+    <string name="invitation_decline_toast">Declining invitation...</string>
 </resources>

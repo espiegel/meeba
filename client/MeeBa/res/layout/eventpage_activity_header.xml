@@ -123,6 +123,26 @@
         android:layout_height="1dp"
         android:background="@android:color/darker_gray" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnLayout"
+        android:orientation="vertical">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/green_btn"
+            android:text="@string/invitation_accept"
+            android:id="@+id/btnAccept"
+            style="@style/ButtonText"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/red_btn"
+            android:text="@string/invitation_decline"
+            android:id="@+id/btnDecline"
+            style="@style/ButtonText"/>
+        </LinearLayout>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

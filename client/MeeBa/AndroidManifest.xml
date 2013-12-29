@@ -89,8 +89,6 @@
         <activity android:name=".activities.ContactsActivity"
                   android:windowSoftInputMode="stateHidden"
                   android:screenOrientation="portrait"/>
-        <activity android:name=".activities.InvitationActivity"
-                  android:screenOrientation="portrait"/>
         <activity android:name=".activities.EventPageActivity"
                   android:screenOrientation="portrait"/>
 

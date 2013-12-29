@@ -424,7 +424,13 @@ public class UserFunctions {
         return strBitMap;
     }
 
-    public static boolean uploadImage(int eid, Bitmap bitmap) {
+    /**
+     * Upload an image to an event
+     * @param eid eid of the event
+     * @param bitmap bitmap of event picture
+     * @return Returns image url on success and null on failure
+     */
+    public static String uploadImage(int eid, Bitmap bitmap) {
         String pictureData = bitMapToString(bitmap);
 
         try {
@@ -436,19 +442,19 @@ public class UserFunctions {
             JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "uploadEventPicture", params);
 
             if(lJsonObject == null)
-                return false;
+                return null;
 
             Utils.LOGD("lJsonObject = "+ lJsonObject.toString());
 
             if(lJsonObject.getInt("success") == 1) {
-                return true;
+                return lJsonObject.getString("url");
             }
             else {
-                return false;
+                return null;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return false;
+            return null;
         }
     }
 }

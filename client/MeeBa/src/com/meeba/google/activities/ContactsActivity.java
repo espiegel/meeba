@@ -201,7 +201,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             return;
         }
 
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Event>() {
             ProgressDialog progressDialog;
 
             @Override
@@ -213,21 +213,24 @@ public class ContactsActivity extends SherlockFragmentActivity {
             }
 
             @Override
-            protected Void doInBackground(Void... voids) {
-                mEvent= UserFunctions.createEvent(mHostUid,mTitle, mWhere, mWhen, mListUid);
-                if(mPicture != null) {
-                    UserFunctions.uploadImage(mEvent.getEid(), mPicture);
-                    //TODO eidan:mEvent can be null here 
+            protected Event doInBackground(Void... voids) {
+                Event event = UserFunctions.createEvent(mHostUid, mTitle, mWhere, mWhen, mListUid);
+                if(event == null) {
+                    return null;
                 }
-                return null;
+                if(mPicture != null) {
+                    String url = UserFunctions.uploadImage(event.getEid(), mPicture);
+                    event.setEvent_picture(url);
+                }
+                return event;
             }
 
             @Override
-            protected void onPostExecute(Void v) {
+            protected void onPostExecute(Event event) {
                 progressDialog.dismiss();
-
-                Utils.LOGD("newly created event ="+mEvent);
-                if (mEvent == null) {
+                mEvent = event;
+                Utils.LOGD("newly created event ="+event);
+                if (event == null) {
                     Utils.showToast(ContactsActivity.this, "Failed to create event");
                 } else {
                     Utils.showToast(ContactsActivity.this, "Created event successfully!");
