@@ -177,6 +177,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                         return null;
                     }
                     for (User u : guestList) {
+                        Utils.LOGD(u.getUid() + "=? " + mMyCurrentUser.getUid() );
                         if (u.getUid() == mMyCurrentUser.getUid()) {
                             mMe = u;
                         }
@@ -186,6 +187,13 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
                 @Override
                 protected void onPostExecute(final User me) {
+
+                    if(me==null){
+                        Toast.makeText(EventPageActivity.this,"oops! try again "
+                                ,Toast.LENGTH_LONG).show();
+                        onBackPressed();
+                    }
+
                     mInviteStatus = me.getInvite_status();
 
                     if (mInviteStatus == STATUS_ACCEPTED) {
