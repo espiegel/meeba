@@ -43,6 +43,27 @@ class DB_Functions {
     	}
     }
  
+    /*
+    * Update a user's details. Returns false on failure and returns the user on success.
+    */
+    public function updateUser($uid, $email, $name, $rid, $phone, $picture_url, $dummy) {
+        // Escape special characters in the strings
+        $email = mysql_real_escape_string($email);
+        $name = mysql_real_escape_string($name);
+        $phone = mysql_real_escape_string($phone);
+        $picture_url = mysql_real_escape_string($picture_url);
+        $rid = mysql_real_escape_string($rid);    
+
+        $result = mysql_query("UPDATE `users` SET `email` = '$email', `name` = '$name', `rid` = '$rid', ".
+            "`phone_number` = '$phone', `picture_url` = '$picture_url', `is_dummy` = $dummy WHERE uid = $uid") or die(mysql_error());
+
+        if(!$result) {
+            return false;
+        }
+
+        return $this->getUserByUid($uid);
+    }
+
     /**
      * Get user by email
      */

@@ -87,7 +87,32 @@ $app->post('/createUser', function() use ($app, $db) {
 	// First we check if a user exists by the same email or phone
 	$user = $db->getUserByEmail($email); // check for user by email
 	$user2 = $db->getUserByPhone($phone); // check for user by phone
-	if ($user != false || $user2 != false) { 		
+	if ($user != false || $user2 != false) {
+		// In this case update the dummies details with the new details
+		if($user2 != false && $dummy == 0 && $user2['is_dummy'] == 1) {
+			$uid = $user2['uid'];
+			$user2 = $db->updateUser($uid, $email, $name, $rid, $phone, $picture_url, $dummy);
+
+			if(!$user2) {
+				echo json_encode(array(
+					'success' => 0,
+					'error' => "Couldn't update user's details",
+					'user' => null,
+				));
+
+				return;
+			} else {
+				echo json_encode(array(
+					'success' => 1,
+					'error' => null,
+					'user' => $user2,
+				));
+
+				return;
+			}
+		} 		
+
+		// Otherwise we failed
  		echo json_encode(array(
 			'success' => 0,
 			'error' => "A user already exists with the same " . (($user!=false)?"email":"phone"),
@@ -335,7 +360,7 @@ $app->post('/uploadEventPicture', function() use ($app, $db) {
 
 	$url = $db->uploadEventPicture($eid, $pictureData);
 
-	if(!$success) {
+	if(!$url) {
 		echo json_encode(array(
 			'success' => 0,
 			'url' => null,
