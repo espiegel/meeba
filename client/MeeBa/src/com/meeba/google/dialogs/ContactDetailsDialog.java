@@ -3,6 +3,7 @@ package com.meeba.google.dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,9 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.meeba.google.R;
+import com.meeba.google.activities.EventPageActivity;
 import com.meeba.google.objects.User;
+import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
 /**
@@ -49,7 +52,7 @@ public class ContactDetailsDialog extends SherlockDialogFragment {
             url = url.replace("?sz=50","?sz=150");
             Utils.getImageLoader(getActivity()).displayImage(url, contactPicture);
         }
-        contactName.setText(mUser.getName());
+        contactName.setText(UserFunctions.translateUserName(mUser, getActivity()));
         contactPhone.setText(mUser.getPhone_number());
 
         final AlertDialog alertDialog = builder.create();

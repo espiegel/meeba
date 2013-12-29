@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.meeba.google.R;
 import com.meeba.google.objects.User;
+import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -61,7 +62,8 @@ public class GuestArrayAdapter extends ArrayAdapter<User> {
 
         User guest = list.get(position);
 
-        String name = guest.getName();
+        //String name = guest.getName();
+        String name = UserFunctions.translateUserName(guest, mContext);
         holder.guestlist_name.setText(name);
         holder.invite_status.setImageResource(getDrawable(guest.getInvite_status()));
 
