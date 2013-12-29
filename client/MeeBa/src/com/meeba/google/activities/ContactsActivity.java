@@ -224,58 +224,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
         //populates mPositiveDummies with dummies with uid>0 and isDummy=true;
         //and then calls asyncCreateEvent;
-
         asyncCreateDummies(mDummies);
-        // asyncCreateEvent();
-
-
-/*
-        new AsyncTask<Void, Void, Void>() {
-            ProgressDialog progressDialog;
-
-            @Override
-            protected void onPreExecute() {
-                Utils.LOGD("onPreExecute");
-                super.onPreExecute();
-                progressDialog = ProgressDialog
-                        .show(ContactsActivity.this, "Inviting your friends", "please wait !", true);
-            }
-            
-            @Override
-            protected Void doInBackground(Void... voids) {
-                mEvent= UserFunctions.createEvent(mHostUid,mTitle, mWhere, mWhen, mListUid);
-                if(mPicture != null) {
-                    UserFunctions.uploadImage(mEvent.getEid(), mPicture);
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void v) {
-                progressDialog.dismiss();
-
-                Utils.LOGD("newly created event ="+mEvent);
-                if (mEvent == null) {
-                    Utils.showToast(ContactsActivity.this, "Failed to create event");
-                } else {
-                    Utils.showToast(ContactsActivity.this, "Created event successfully!");
-                    Intent i = new Intent(ContactsActivity.this, EventPageActivity.class);
-                    Bundle extras = new Bundle();
-
-                    extras.putSerializable(Utils.BUNDLE_EVENT, mEvent);
-
-                    i.putExtras(extras);
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-
-                    if(!mDummies.isEmpty()) {
-                        sendSms(mDummies);
-                    }
-                    finish();
-                }
-            }
-        }.execute();
-        */
     }
 
     private void asyncCreateDummies(final List<User> negativeDummies) {
@@ -314,6 +263,10 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 for (User dummy : mPositiveDummies) {
                     mListUid.add(String.valueOf(dummy.getUid()));
                 }
+
+                //update the database after creating the dummies
+                DatabaseFunctions.storeContacts(ContactsActivity.this,mPositiveDummies);
+
                 return null;
             }
 
@@ -359,7 +312,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 if(event == null) {
                     return null;
                 }
-            //   mEvent = UserFunctions.createEvent(mHostUid, mTitle, mWhere, mWhen, mListUid);
            
                 if (mPicture != null) {
                     String url = UserFunctions.uploadImage(event.getEid(), mPicture);
