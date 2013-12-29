@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -69,7 +71,10 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
     private int mInviteStatus;    // The current users event status  of the current event (if he is invited)
     private int newStatus = 0;    // The status to change to, when clicking the Image Button
     private ImageView mEventPicture;
-
+    private LinearLayout mButtonLayout;
+    private Button mAccept;
+    private Button mDecline;
+    private RelativeLayout mGuestLayout;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +99,11 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         statusImgButton = (ImageButton) header.findViewById(R.id.statusImgBtn);
         mMy_name = (TextView) header.findViewById(R.id.myname);
         mMy_picture = (ImageView) header.findViewById(R.id.myPicture);
-        RelativeLayout guestLayout = (RelativeLayout) header.findViewById(R.id.relativeLayout);
+        mGuestLayout = (RelativeLayout) header.findViewById(R.id.relativeLayout);
+
+        mButtonLayout = (LinearLayout) header.findViewById(R.id.btnLayout);
+        mAccept = (Button) header.findViewById(R.id.btnAccept);
+        mDecline = (Button) header.findViewById(R.id.btnDecline);
 
         mListView = (ListView) findViewById(R.id.listGuests);
         mListView.addHeaderView(header);
@@ -118,7 +127,9 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         mImageLoader = Utils.getImageLoader(this);
         mImageLoader.displayImage(mHost.getPicture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
-        mImageLoader.displayImage(mEvent.getEvent_picture(), mEventPicture);
+        if(!TextUtils.isEmpty(mEvent.getEvent_picture())) {
+            mImageLoader.displayImage(mEvent.getEvent_picture(), mEventPicture);
+        }
 
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -130,10 +141,10 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 return false;
             }
         });
-        guestLayout.setOnLongClickListener(new View.OnLongClickListener() {
+        mGuestLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if(mMyCurrentUser != null) {
+                if (mMyCurrentUser != null) {
                     showContactDialog(mMyCurrentUser);
                 }
                 return false;
@@ -151,6 +162,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         //if the host is the current user , he shouldn't be able to change his status
         if (mMyCurrentUser.getUid() == mHost.getUid()) {
             Utils.LOGD(" max debug " + mMy_name + "  " + mMy_picture + " " + "  " + mMyCurrentUser);
+            mButtonLayout.setVisibility(View.GONE);
             mMy_name.setVisibility(View.GONE);
             mMy_picture.setVisibility(View.GONE);
             statusImgButton.setVisibility(View.GONE);
@@ -173,15 +185,64 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 }
 
                 @Override
-                protected void onPostExecute(User me) {
+                protected void onPostExecute(final User me) {
                     mInviteStatus = me.getInvite_status();
 
                     if (mInviteStatus == STATUS_ACCEPTED) {
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
-                        statusImgButton.setTag(1);
+                        statusImgButton.setTag(STATUS_ACCEPTED);
                     } else if (mInviteStatus == STATUS_UNKNOWN) {
+                        // If the status is unknown then show the button layout
+                        mButtonLayout.setVisibility(View.VISIBLE);
+                        mGuestLayout.setVisibility(View.GONE);
+                        mAccept.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                new AsyncTask<Void,Void,Void>() {
+                                    @Override
+                                    protected void onPreExecute() {
+                                        Utils.showToast(EventPageActivity.this, getString(R.string.invitation_accept_toast));
+                                    }
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        UserFunctions.acceptInvite(me.getUid(), mEvent.getEid());
+                                        return null;
+                                    }
+                                    @Override
+                                    protected void onPostExecute(Void v) {
+                                        mButtonLayout.setVisibility(View.GONE);
+                                        mGuestLayout.setVisibility(View.VISIBLE);
+                                        statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
+                                        statusImgButton.setTag(STATUS_ACCEPTED);
+                                    }
+                                }.execute();
+                            }
+                        });
+                        mDecline.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                new AsyncTask<Void,Void,Void>() {
+                                    @Override
+                                    protected void onPreExecute() {
+                                        Utils.showToast(EventPageActivity.this, getString(R.string.invitation_decline_toast));
+                                    }
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        UserFunctions.declineInvite(me.getUid(), mEvent.getEid());
+                                        return null;
+                                    }
+                                    @Override
+                                    protected void onPostExecute(Void v) {
+                                        mButtonLayout.setVisibility(View.GONE);
+                                        mGuestLayout.setVisibility(View.VISIBLE);
+                                        statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
+                                        statusImgButton.setTag(STATUS_REJECTED);
+                                    }
+                                }.execute();
+                            }
+                        });
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.empty_box));
-                        statusImgButton.setTag(0);
+                        statusImgButton.setTag(STATUS_UNKNOWN);
                     } else {
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
                         statusImgButton.setTag(STATUS_REJECTED);

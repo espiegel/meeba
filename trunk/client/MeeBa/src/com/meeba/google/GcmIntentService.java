@@ -12,7 +12,6 @@ import android.support.v4.app.NotificationCompat;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.meeba.google.activities.EventPageActivity;
-import com.meeba.google.activities.InvitationActivity;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.Utils;
@@ -119,7 +118,7 @@ public class GcmIntentService extends IntentService {
             mNotificationManager = (NotificationManager)
                     this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-            Intent intent = new Intent(this, InvitationActivity.class);
+            Intent intent = new Intent(this, EventPageActivity.class);
             Bundle bundle = new Bundle();
 
             bundle.putSerializable(Utils.BUNDLE_EVENT, event);
@@ -169,7 +168,7 @@ public class GcmIntentService extends IntentService {
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(user.getName())
+                            .setContentTitle(user.getName()+TITLE_INVITE+event.getTitle())
                             .setStyle(new NotificationCompat.BigTextStyle()
                                     .bigText(msg))
                             .setContentText(msg);
