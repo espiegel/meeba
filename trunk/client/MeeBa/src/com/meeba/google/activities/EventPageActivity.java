@@ -191,6 +191,8 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                     if (mInviteStatus == STATUS_ACCEPTED) {
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
                         statusImgButton.setTag(STATUS_ACCEPTED);
+                        mButtonLayout.setVisibility(View.GONE);
+                        mGuestLayout.setVisibility(View.VISIBLE);
                     } else if (mInviteStatus == STATUS_UNKNOWN) {
                         // If the status is unknown then show the button layout
                         mButtonLayout.setVisibility(View.VISIBLE);
@@ -246,6 +248,8 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                     } else {
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
                         statusImgButton.setTag(STATUS_REJECTED);
+                        mButtonLayout.setVisibility(View.GONE);
+                        mGuestLayout.setVisibility(View.VISIBLE);
                     }
 
 
