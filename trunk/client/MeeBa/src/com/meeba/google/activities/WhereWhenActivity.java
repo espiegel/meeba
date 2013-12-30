@@ -34,6 +34,8 @@ import com.meeba.google.util.Utils;
 import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.meeba.google.view.ClearableEditText;
 
+import org.joda.time.DateTime;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 
@@ -86,6 +88,10 @@ public class WhereWhenActivity extends SherlockActivity {
 
         }
     };
+    private int mDay;
+    private int mMonth;
+    private int mYear;
+    private DateTime dt;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -208,13 +214,10 @@ public class WhereWhenActivity extends SherlockActivity {
         mTimePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                String minutes;
-                if (selectedMinute < 10) {
-                    minutes = "0" + selectedMinute;
-                } else {
-                    minutes = String.valueOf(selectedMinute);
-                }
-                mEditWhen.setText(selectedHour + ":" + minutes + " " + mDate);
+                dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
+                mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
+                        dt.getHourOfDay()+":"+dt.getMinuteOfHour();
+                mEditWhen.setText(mDate);
                 mEditWhere.requestFocus();
             }
         }, hour, minute, true);//Yes 24 hour time
@@ -225,7 +228,9 @@ public class WhereWhenActivity extends SherlockActivity {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                 mEditWhen.setText("");
-                mDate = day + "/" + (month + 1) + "/" + year;
+                mMonth = month+1;
+                mDay = day;
+
                 mEditWhen.setText(mDate);
                 mTimePicker.show();
             }
