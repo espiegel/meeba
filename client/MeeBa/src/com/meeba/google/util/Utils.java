@@ -3,7 +3,11 @@ package com.meeba.google.util;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -11,8 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.meeba.google.R;
+import com.meeba.google.objects.Event;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -21,6 +28,8 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -163,5 +172,59 @@ public class Utils {
             InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
         } catch(Exception e) {}
+    }
+
+    public static void shareEvent(Context context, Event event, ImageView picture) {
+        String shareBody = "I'm going to: " + event.getTitle() + "\nat " + event.getWhere()
+                + "\nat " + event.getWhen() + "\n"+context.getString(R.string.generated);
+
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+        sharingIntent.setType("image/*");
+
+        if(isExternalStorageAvailable()) {
+            try {
+                picture.setDrawingCacheEnabled(true);
+                Bitmap b = picture.getDrawingCache();
+                File sdCard = Environment.getExternalStorageDirectory();
+                File file = new File(sdCard, "meeba/event_picture_"+event.getEid()+".jpg");
+                if(!file.exists()) {
+                    file.getParentFile().mkdirs();
+                    file.createNewFile();
+                }
+                FileOutputStream fos = new FileOutputStream(file);
+                b.compress(Bitmap.CompressFormat.JPEG, 95, fos);
+
+                Uri uri = Uri.fromFile(file);
+                sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+            } catch(Exception e) {
+                Utils.LOGD("Failed to store event picture");
+                e.printStackTrace();
+            }
+        }
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.share_event)));
+    }
+
+    public static boolean isExternalStorageAvailable() {
+        String state = Environment.getExternalStorageState();
+        boolean mExternalStorageAvailable = false;
+        boolean mExternalStorageWriteable = false;
+
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            // We can read and write the media
+            mExternalStorageAvailable = mExternalStorageWriteable = true;
+        } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            // We can only read the media
+            mExternalStorageAvailable = true;
+            mExternalStorageWriteable = false;
+        } else {
+            // Something else is wrong. It may be one of many other states, but
+            // all we need
+            // to know is we can neither read nor write
+            mExternalStorageAvailable = mExternalStorageWriteable = false;
+        }
+
+        return mExternalStorageAvailable && mExternalStorageWriteable;
     }
 }
