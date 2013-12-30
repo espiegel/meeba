@@ -188,7 +188,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         contactDetails.get(KEY_NAME), contactDetails.get(KEY_PHONE), contactDetails.get(KEY_RID),
                         contactDetails.get(KEY_CREATED_AT), contactDetails.get(KEY_PICTURE_URL)  , Integer.valueOf(contactDetails.get(KEY_IS_DUMMY) ));
 
-                Utils.LOGD("Got contact from database, user = "+contact);
+                //Utils.LOGD("Got contact from database, user = "+contact);
                 contacts.add(contact);
             }
             cursor.moveToNext();

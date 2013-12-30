@@ -490,7 +490,7 @@ public class DashboardActivity extends SherlockActivity {
                           && !(foundContact!=null && foundContact.getIs_dummy()==1)  ) {
                         User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
                         ListOfContacts.add(user);
-                        Utils.LOGD("created negative dummy for  :  " + entry.getKey());
+                        //Utils.LOGD("created negative dummy for  :  " + entry.getKey());
                     }
                 }
 
@@ -500,10 +500,10 @@ public class DashboardActivity extends SherlockActivity {
                 return null;
             }
 
-            protected void onPostExecute(Void v) {
+            /*protected void onPostExecute(Void v) {
                 for (User user : DatabaseFunctions.loadContacts(getApplicationContext()))
                     Utils.LOGD("contact loaded :  " + user);
-            }
+            }*/
         }.execute();
     }
 

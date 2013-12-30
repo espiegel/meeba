@@ -33,7 +33,6 @@ public class DatabaseFunctions {
     //TODO this method should also delete a user if he's not in param: users (see issue #74)
     public static void storeContacts(Context context, List<User> users) {
         for (User user : users) {
-            Utils.LOGD("storeContacts: storing  in database " + user);
             storeUserDetails(context, user, DatabaseHandler.TABLE_CONTACTS);
         }
     }
