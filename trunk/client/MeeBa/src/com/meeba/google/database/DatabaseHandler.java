@@ -365,6 +365,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             args.put(KEY_PICTURE_URL, user.getPicture_url());
             args.put(KEY_PHONE, user.getPhone_number());
             args.put(KEY_RID, user.getRid());
+            args.put(KEY_IS_DUMMY,user.getIs_dummy());
+
 
             result = db.update(TABLE_CONTACTS, args, KEY_UID + " = ?", new String[] { String.valueOf(user.getUid()) });
 
