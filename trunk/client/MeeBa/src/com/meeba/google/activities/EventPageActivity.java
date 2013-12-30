@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,6 +76,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
     private Button mAccept;
     private Button mDecline;
     private RelativeLayout mGuestLayout;
+    private ProgressBar mProgressBar;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,8 +107,12 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         mAccept = (Button) header.findViewById(R.id.btnAccept);
         mDecline = (Button) header.findViewById(R.id.btnDecline);
 
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mListView = (ListView) findViewById(R.id.listGuests);
         mListView.addHeaderView(header);
+
+        mProgressBar.setVisibility(View.VISIBLE);
+        mListView.setVisibility(View.GONE);
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
@@ -465,6 +471,8 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                     @Override
                     public void run() {
                         mListView.setAdapter(mGuestArrayAdapter);
+                        mProgressBar.setVisibility(View.GONE);
+                        mListView.setVisibility(View.VISIBLE);
                     }
                 });
 

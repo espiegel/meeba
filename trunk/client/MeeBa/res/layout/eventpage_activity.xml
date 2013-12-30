@@ -13,6 +13,14 @@
         android:orientation="vertical"
         android:background="@drawable/card_background_no_grey">
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_margin="50dp"
+            android:layout_gravity="center"/>
+
         <ListView
             android:id="@+id/listGuests"
             android:paddingLeft="10dp"
