@@ -35,6 +35,7 @@ import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.meeba.google.view.ClearableEditText;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
@@ -215,8 +216,9 @@ public class WhereWhenActivity extends SherlockActivity {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                 dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
+                long date_mili = dt.getMillis();
                 mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
-                        dt.getHourOfDay()+":"+dt.getMinuteOfHour();
+                        DateTimeFormat.forPattern("HH:mm").print(dt);
                 mEditWhen.setText(mDate);
                 mEditWhere.requestFocus();
             }
@@ -228,6 +230,7 @@ public class WhereWhenActivity extends SherlockActivity {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                 mEditWhen.setText("");
+                mYear = year;
                 mMonth = month+1;
                 mDay = day;
 
