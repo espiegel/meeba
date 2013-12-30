@@ -56,9 +56,10 @@ public class SmsIntentService extends IntentService {
                 }
             }
         }
-        //replace +XXX with 0 in  the phone number:
-        mMessageFrom = "0" + mMessageFrom.substring(4);
-
+        // We only need to replace the +, since 972 gets stored in our database for now...
+        // (See how allPhoneNumbersAndName() is implemented in Utils class)
+        // Until we figure out a good way to parse all country code numbers.
+        mMessageFrom = mMessageFrom.replaceAll("[^0-9]","");
 
         //for debugging:
         Utils.LOGD("SmsListener:msg_body=" + mMessageBody + " :: msg_from=" + mMessageFrom);

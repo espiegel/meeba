@@ -216,7 +216,6 @@ public class WhereWhenActivity extends SherlockActivity {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                 dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
-                long date_mili = dt.getMillis();
                 mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
                         DateTimeFormat.forPattern("HH:mm").print(dt);
                 mEditWhen.setText(mDate);
