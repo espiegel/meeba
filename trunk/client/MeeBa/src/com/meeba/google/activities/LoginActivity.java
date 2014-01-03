@@ -264,12 +264,11 @@ public class LoginActivity extends Activity implements OnClickListener,
             public void onClick(DialogInterface dialog, int whichButton) {
                 phoneNumber = input.getText() != null ? input.getText().toString() : "";
 
-                //check that  user entered 10 digits and starts with 05
-                if (phoneNumber.matches("05\\d{8}")) {
+                // Check that user entered 10 digits
+                if (phoneNumber.matches("d{10}")) {
                     backgroundRegisterUser();
-
                 } else {
-                    Toast.makeText(getApplicationContext(), "you have to enter a valid phone number !", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Phone number must be 10 digits", Toast.LENGTH_LONG).show();
                     backgroundProgressDialog.dismiss();
                     signoutAndDisconnect();
                 }
@@ -301,7 +300,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             @Override
             protected void onPostExecute(Void v) {
                 if (user == null) {
-                    Toast.makeText(LoginActivity.this, "error registering user in database", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Error registering user in database", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -325,7 +324,7 @@ public class LoginActivity extends Activity implements OnClickListener,
 
         if (view.getId() == R.id.sign_in_button) {
             if (mPlusClient.isConnected()) {
-                Toast.makeText(this, "you are already signed in!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "You are already signed in!", Toast.LENGTH_LONG).show();
             } else {
                 mPlusClient.connect();
                 Utils.LOGD("maxagi: mConnectionResult before trying to connect = " + mConnectionResult);
@@ -488,7 +487,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             DatabaseFunctions.resetTables(getApplicationContext());
             mSignInStatus.setText("signed out");
         } else {
-            Toast.makeText(LoginActivity.this, "user is  not connected / connecting ", Toast.LENGTH_LONG).show();
+            Toast.makeText(LoginActivity.this, "User is not connected.", Toast.LENGTH_LONG).show();
         }
     }
 
