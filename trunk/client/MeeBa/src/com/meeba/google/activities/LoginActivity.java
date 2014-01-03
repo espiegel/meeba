@@ -265,7 +265,7 @@ public class LoginActivity extends Activity implements OnClickListener,
                 phoneNumber = input.getText() != null ? input.getText().toString() : "";
 
                 // Check that user entered 10 digits
-                if (phoneNumber.matches("d{10}")) {
+                if (phoneNumber.matches("\\d{10}")) {
                     backgroundRegisterUser();
                 } else {
                     Toast.makeText(getApplicationContext(), "Phone number must be 10 digits", Toast.LENGTH_LONG).show();
