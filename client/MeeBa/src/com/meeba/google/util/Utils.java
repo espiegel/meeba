@@ -234,7 +234,7 @@ public class Utils {
         phone = phone.replaceAll("[^0-9]","");
         // Deal with Israel country code
         if(phone.startsWith("972")) {
-            phone.replaceFirst("972", "0");
+            phone = phone.replaceFirst("972", "0");
         }
         return phone;
     }
