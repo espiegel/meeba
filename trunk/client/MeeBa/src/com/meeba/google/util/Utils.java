@@ -122,7 +122,7 @@ public class Utils {
 
                     // Filter out all non-numeric characters
                     if(phoneNumber != null) {
-                        phoneNumber = phoneNumber.replaceAll("[^0-9]","");
+                        phoneNumber = Utils.sanitizePhoneNumber(phoneNumber);
                         phonesMap.put(phoneNumber, contact);
                     }
                 }
@@ -226,5 +226,16 @@ public class Utils {
         }
 
         return mExternalStorageAvailable && mExternalStorageWriteable;
+    }
+
+    // Still needs testing on non-israeli phone numbers since they can get screwed up since we depend
+    // on user input.
+    public static String sanitizePhoneNumber(String phone) {
+        phone = phone.replaceAll("[^0-9]","");
+        // Deal with Israel country code
+        if(phone.startsWith("972")) {
+            phone.replaceFirst("972", "0");
+        }
+        return phone;
     }
 }
