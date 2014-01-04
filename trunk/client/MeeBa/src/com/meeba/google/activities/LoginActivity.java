@@ -74,7 +74,7 @@ public class LoginActivity extends Activity implements OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         backgroundProgressDialog = new ProgressDialog(this);
-        backgroundProgressDialog.setMessage( "signing in...");
+        backgroundProgressDialog.setMessage("Signing in...");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -118,7 +118,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             Utils.LOGD("maxagi: mPlusClient.getCurrentPerson is null ");
             signoutAndDisconnect();
             Toast.makeText(LoginActivity.this, "Error getting account details!\n" +
-                    "you sure you have internet access?", Toast.LENGTH_LONG).show();
+                    "Are you sure you have internet access?", Toast.LENGTH_LONG).show();
         } else {
             Utils.LOGD("maxagi: mPlusClient.getCurrentPerson=  " + (mPlusClient.getCurrentPerson()));
             String currentPersonName = mPlusClient.getCurrentPerson().getDisplayName();
@@ -235,7 +235,7 @@ public class LoginActivity extends Activity implements OnClickListener,
             protected void onPostExecute(Object error) {
                 if (error != null) {
                     Toast.makeText(context,
-                            "registration error " + error, Toast.LENGTH_LONG).show();
+                            "Registration error " + error, Toast.LENGTH_LONG).show();
                     return;
                 }
                 Utils.LOGD("maxagi: in backgroundGetRegid();onPostExecute");
