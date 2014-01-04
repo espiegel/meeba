@@ -512,6 +512,16 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 dialog.show(getSupportFragmentManager(), EditEventDialog.TAG);
                 return true;
 
+            case R.id.action_add_guest:
+                Intent intent = new Intent(EventPageActivity.this, ContactsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(ContactsActivity.EVENT, mEvent);
+                ArrayList<User> guests = new ArrayList<User>(mGuestArrayAdapter.getList());
+                bundle.putSerializable(ContactsActivity.GUESTS, guests);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                return true;
+
             case R.id.action_share:
                 Utils.shareEvent(EventPageActivity.this, mEvent, mEventPicture);
                 return true;
@@ -560,7 +570,9 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         new AsyncTask<Void, Void, List<User>>() {
             @Override
             protected List<User> doInBackground(Void... voids) {
-                return UserFunctions.removeUserFromEvent(mEvent.getEid(), user.getUid());
+                List<User> users = UserFunctions.removeUserFromEvent(mEvent.getEid(), user.getUid());
+                refreshGuests();
+                return users;
             }
         }.execute();
     }

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/action_share"
-          android:icon="@drawable/ic_action_share"
-          android:title="@string/share_event"
-          android:showAsAction="always" />
-
-    <item android:id="@+id/action_edit"
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_action_share"
+        android:title="@string/share_event"
+        android:showAsAction="always" />
+    <item
+        android:id="@+id/action_add_guest"
+        android:icon="@drawable/ic_action_add_person"
+        android:title="@string/add_guest"
+        android:showAsAction="always" />
+    <item
+        android:id="@+id/action_edit"
         android:icon="@drawable/ic_action_edit"
         android:title="@string/edit_event_details"
         android:showAsAction="always" />

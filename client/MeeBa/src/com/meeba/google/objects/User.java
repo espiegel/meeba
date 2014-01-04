@@ -133,7 +133,6 @@ public class User implements Serializable {
 
         if (uid != user.uid) return false;
         if (!email.equals(user.email)) return false;
-        if (!name.equals(user.name)) return false;
         if (!phone_number.equals(user.phone_number)) return false;
         if (!picture_url.equals(user.picture_url)) return false;
         if (!rid.equals(user.rid)) return false;

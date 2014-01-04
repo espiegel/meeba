@@ -99,4 +99,5 @@
         <item quantity="other">Dismissing in %d</item>
     </plurals>
     <string name="countdown_dismissing">Dismissing...</string>
+    <string name="add_guest">Add Guest</string>
 </resources>
