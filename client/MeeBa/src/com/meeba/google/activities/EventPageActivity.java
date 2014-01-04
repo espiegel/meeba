@@ -27,6 +27,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.haarman.listviewanimations.itemmanipulation.contextualundo.ContextualUndoAdapter;
 import com.meeba.google.R;
 import com.meeba.google.adapters.GuestArrayAdapter;
 import com.meeba.google.database.DatabaseFunctions;
@@ -44,7 +45,7 @@ import java.util.List;
 /**
  * Created by Eidan on 11/19/13.
  */
-public class EventPageActivity extends SherlockFragmentActivity implements EditEventDialog.EventUpdateCallback{
+public class EventPageActivity extends SherlockFragmentActivity implements EditEventDialog.EventUpdateCallback, ContextualUndoAdapter.DeleteItemCallback {
     private final int STATUS_ACCEPTED = 1;
     private final int STATUS_REJECTED = -1;
     private final int STATUS_UNKNOWN = 0;
@@ -77,6 +78,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
     private Button mDecline;
     private RelativeLayout mGuestLayout;
     private ProgressBar mProgressBar;
+    private ContextualUndoAdapter mAdapter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -459,7 +461,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
                 List<User> guestList = UserFunctions.getUsersByEvent(eid);
                 if (guestList == null) {
-                    return null;
+                    guestList = new ArrayList<User>();
                 }
                 for (User u : guestList) {
                     if (u.getUid() != mMyCurrentUser.getUid()) {
@@ -470,7 +472,15 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mListView.setAdapter(mGuestArrayAdapter);
+                        if(mMyCurrentUser.getUid() == mHost.getUid()) {
+                            mAdapter = new ContextualUndoAdapter(mGuestArrayAdapter, R.layout.undo_row, R.id.undo_row_undobutton,
+                                    5000, R.id.undo_row_texttv, new MyFormatCountDownCallback());
+                            mAdapter.setAbsListView(mListView);
+                            mListView.setAdapter(mAdapter);
+                            mAdapter.setDeleteItemCallback(EventPageActivity.this);
+                        } else {
+                            mListView.setAdapter(mGuestArrayAdapter);
+                        }
                         mProgressBar.setVisibility(View.GONE);
                         mListView.setVisibility(View.VISIBLE);
                     }
@@ -536,5 +546,35 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         mTxtTitle.setText(newEvent.getTitle());
         mTxtWhen.setText(newEvent.getWhen());
         mTxtWhere.setText(newEvent.getWhere());
+    }
+
+    @Override
+    public void deleteItem(final int i) {
+        final User user = mGuestArrayAdapter.getItem(i);
+
+        // This happens before the userfunction is called to prevent the case
+        // that the user clicks undo during deletion
+        mGuestArrayAdapter.remove(user);
+        mGuestArrayAdapter.notifyDataSetChanged();
+
+        new AsyncTask<Void, Void, List<User>>() {
+            @Override
+            protected List<User> doInBackground(Void... voids) {
+                return UserFunctions.removeUserFromEvent(mEvent.getEid(), user.getUid());
+            }
+        }.execute();
+    }
+
+    private class MyFormatCountDownCallback implements ContextualUndoAdapter.CountDownFormatter {
+
+        @Override
+        public String getCountDownString(long millisUntilFinished) {
+            int seconds = (int) Math.ceil((millisUntilFinished / 1000.0));
+
+            if (seconds > 0) {
+                return getResources().getQuantityString(R.plurals.countdown_seconds, seconds, seconds);
+            }
+            return getString(R.string.countdown_dismissing);
+        }
     }
 }

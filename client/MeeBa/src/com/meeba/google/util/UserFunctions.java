@@ -563,4 +563,41 @@ public class UserFunctions {
             return null;
         }
     }
+
+    /**
+     * Remove a user from an event
+     * @param eid eid of event to update
+     * @param uid uid of the user
+     * @return null on failure and list of invited users on success
+     */
+    public static List<User> removeUserFromEvent(int eid, int uid) {
+        try {
+            List<User> users = new ArrayList<User>();
+            Gson lGson = new Gson();
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+            params.add(new BasicNameValuePair("eid", String.valueOf(eid)));
+            params.add(new BasicNameValuePair("uid", String.valueOf(uid)));
+
+            JSONObject lJsonObject = (JSONObject) JSONParser.doPOSTRequest(Utils.BASE_URL + "removeUserFromEvent", params);
+
+            if (lJsonObject == null)
+                return null;
+
+            Utils.LOGD("lJsonObject = " + lJsonObject.toString());
+
+            for (int i = 0; i < lJsonObject.getJSONObject("users").getJSONArray("guests").length(); i++) {
+                users.add(lGson.fromJson(lJsonObject.getJSONObject("users").getJSONArray("guests").get(i).toString(), User.class));
+            }
+
+            for (User e : users) {
+                Utils.LOGD("user = " + e.toString());
+            }
+            return users;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 }
