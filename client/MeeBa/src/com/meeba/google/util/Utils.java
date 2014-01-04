@@ -143,9 +143,16 @@ public class Utils {
     }
 
     public static ImageLoaderConfiguration getImageLoaderConfig(Context context) {
-        DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder().cacheInMemory(true).build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).denyCacheImageMultipleSizesInMemory()
-                .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
+        DisplayImageOptions mDisplayImageOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+                .writeDebugLogs()
+                .denyCacheImageMultipleSizesInMemory()
+                .memoryCacheSize(4 * 1024 * 1024)
+                .discCacheSize(10*1024*1024)
+                .threadPoolSize(10)
                 .defaultDisplayImageOptions(mDisplayImageOptions)
                 .build();
 
