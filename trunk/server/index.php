@@ -377,4 +377,50 @@ $app->post('/uploadEventPicture', function() use ($app, $db) {
 		));
 });
 
+$app->post('/removeUserFromEvent', function() use ($app, $db) {
+	$eid = $_POST['eid'];
+	$uid = $_POST['uid'];
+
+	$users = $db->removeUserFromEvent($eid, $uid);
+
+	if(!$users) {
+		echo json_encode(array(
+			'success' => 0,
+			'users' => null,
+			'error' => "Failed to remove user from the event",
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'users' => $users,
+			'error' => null,
+		));
+});
+
+$app->post('/addUserToEvent', function() use ($app, $db) {
+	$eid = $_POST['eid'];
+	$uid = $_POST['uid'];
+
+	$users = $db->addUserToEvent($eid, $uid);
+
+	if(!$users) {
+		echo json_encode(array(
+			'success' => 0,
+			'users' => null,
+			'error' => "Failed to add user to the event",
+		));
+
+		return;
+	}
+
+	echo json_encode(array(
+			'success' => 1,
+			'users' => $users,
+			'error' => null,
+		));
+});
+
 $app->run();
