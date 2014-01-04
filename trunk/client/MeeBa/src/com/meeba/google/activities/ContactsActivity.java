@@ -40,6 +40,10 @@ import java.util.Map;
  * Created by or malka on 11/11/13.
  */
 public class ContactsActivity extends SherlockFragmentActivity {
+
+    public final static String EVENT = "event";
+    public final static String GUESTS = "guests";
+
     private JazzyListView mUserListView;
     private ContactsArrayAdapter mContactsAdapter;
     private String mWhen;
@@ -53,6 +57,8 @@ public class ContactsActivity extends SherlockFragmentActivity {
     private SharedPreferences.Editor mPrefsEditor;
     private Event mEvent;
     private Bitmap mPicture;
+    private ArrayList<User> mGuests;
+    private boolean isAddingGuests = false;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,13 +77,24 @@ public class ContactsActivity extends SherlockFragmentActivity {
         mUserListView.setTransitionEffect(JazzyHelper.SLIDE_IN);
 
         Bundle bundle = getIntent().getExtras();
-        mWhen = bundle.getString("when");
-        mTitle = bundle.getString("title");
-        mWhere = bundle.getString("where");
+        if(bundle.containsKey(EVENT)) {
+            mEvent = (Event) bundle.getSerializable(EVENT);
+            mGuests = (ArrayList<User>) bundle.getSerializable(GUESTS);
+            isAddingGuests = true;
+            mWhen = mEvent.getWhen();
+            mTitle = mEvent.getTitle();
+            mWhere = mEvent.getWhere();
+        } else {
+            mEvent = null;
+            mGuests = null;
+            isAddingGuests = false;
+            mWhen = bundle.getString("when");
+            mTitle = bundle.getString("title");
+            mWhere = bundle.getString("where");
 
-        byte[] byteArray = bundle.getByteArray("event_picture");
-        mPicture = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-
+            byte[] byteArray = bundle.getByteArray("event_picture");
+            mPicture = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        }
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
         mUserListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -102,7 +119,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
                 progressDialog = ProgressDialog
-                        .show(ContactsActivity.this, "", "Loading  contacts...", true,true);
+                        .show(ContactsActivity.this, "", "Loading contacts...", true,true);
 
                 progressDialog.setCanceledOnTouchOutside(false);
 
@@ -130,18 +147,28 @@ public class ContactsActivity extends SherlockFragmentActivity {
                     }
                 });
 
+                if(mGuests != null) {
+                    for(User user : mGuests) {
+                        Utils.LOGD("mGuests user ="+user);
+                    }
+                }
                 // First add meeba users
                 for (User user : userList) {
                     Utils.LOGD("asyncRefresh user:" + user);
                     if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() != 1) {
-                        sortedUserList.add(user);
+                        if(!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
+                            sortedUserList.add(user);
+                        }
                     }
                 }
 
                 // Then add the rest of the contact list
                 for (User user : userList) {
-                    if (user.getUid() == Utils.DUMMY_USER || user.getIs_dummy() == 1)
-                        sortedUserList.add(user);
+                    if (user.getUid() == Utils.DUMMY_USER || user.getIs_dummy() == 1) {
+                        if(!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
+                            sortedUserList.add(user);
+                        }
+                    }
                 }
                 return sortedUserList;
             }
@@ -290,8 +317,9 @@ public class ContactsActivity extends SherlockFragmentActivity {
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
+                String message = isAddingGuests?"Adding Guests...":"Creating Event...";
                 progressDialog = ProgressDialog
-                        .show(ContactsActivity.this, "", "Creating Event...", true, true);
+                        .show(ContactsActivity.this, "", message, true, true);
 
                 progressDialog.setCanceledOnTouchOutside(false);
 
@@ -305,19 +333,31 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
             @Override
             protected Event doInBackground(Void... params) {
-                if(canceled)
+                if(canceled) {
                     return null;
+                }
 
-                Event event = UserFunctions.createEvent(mHostUid, mTitle, mWhere, mWhen, mListUid);
-                if(event == null) {
-                    return null;
+                // Adding guests to an existing event
+                if(isAddingGuests) {
+                    // invite everyone in mListUid
+                    for(String uid : mListUid) {
+                        UserFunctions.addUserToEvent(mEvent.getEid(), Integer.valueOf(uid));
+                    }
+                    return mEvent;
                 }
-           
-                if (mPicture != null) {
-                    String url = UserFunctions.uploadImage(event.getEid(), mPicture);
-                    event.setEvent_picture(url);
+                // Otherwise we are creating a new event
+                else {
+                    Event event = UserFunctions.createEvent(mHostUid, mTitle, mWhere, mWhen, mListUid);
+                    if(event == null) {
+                        return null;
+                    }
+
+                    if (mPicture != null) {
+                        String url = UserFunctions.uploadImage(event.getEid(), mPicture);
+                        event.setEvent_picture(url);
+                    }
+                    return event;
                 }
-                return event;
             }
 
             @Override
