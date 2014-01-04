@@ -262,6 +262,47 @@ class DB_Functions {
         return $result;
     }
 
+    /*
+    * Remove a user from an event. Returns a list of invited users on success or false on failure.
+    */
+    public function removeUserFromEvent($eid, $uid) {
+        $success = mysql_query("DELETE FROM `invites` WHERE guest_uid = $uid AND eid = $eid");
+
+        if(!$success) {
+            return false;
+        }
+
+        // Otherwise we succeeded, so we return a list of invited guests after the deletion.
+        $users = $this->getUsersByEvent($eid);
+
+        return $users;
+    }
+
+    /*
+    * Add a guest to an event. Returns a  list of invited users on success or false on failure.
+    */
+    public function addUserToEvent($eid, $uid) {
+        $user = $this->getUserByUid($uid);
+        $event = $this->getEventByEid($eid);
+
+        if(!$user || !$event) {
+            return false;
+        }
+
+        $host = $event['host'];
+
+        $guests = array();
+        $rids = array();
+        array_push($guests, $user);
+        array_push($rids, $user['rid']);
+        $this->createInvite($eid, $guests);
+        $this->sendInvite($host, $rids, $event);
+
+        $users = $this->getUsersByEvent($eid);
+
+        return $users;
+    }
+
     /**
     * Create an event, create and send out invitations to guests via gcm
     */
@@ -282,13 +323,7 @@ class DB_Functions {
         }
 
         $eid = mysql_insert_id();
-        $app->getLog()->info("SELECT * FROM `events` WHERE eid = $eid");
-        $event = mysql_query("SELECT * FROM `events` WHERE eid = $eid");
-        $event = mysql_fetch_assoc($event);
-
-        $app->getLog()->info("SELECT * from `users` WHERE uid = $host_uid");
-        $host = mysql_fetch_assoc(mysql_query("SELECT * from `users` WHERE uid = $host_uid"));
-        $event['host'] = $host;
+        $event = $this->getEventByEid($eid);
         $app->getLog()->info("event = " . print_r($event, TRUE));
 
         // Lets get an array of rids
@@ -309,9 +344,6 @@ class DB_Functions {
 
         // Send out invitations to an array of guest rids via gcm
         $response = $this->sendInvite($host, $rids, $event);
-
-        // Log the response
-        $app->getLog()->info("response = $response, array response=".print_r($response, TRUE));
 
         return $event;
     }
@@ -436,6 +468,8 @@ class DB_Functions {
                 )
             );
         
+        // Log the response
+        $app->getLog()->info("response = $response, array response=".print_r($response, TRUE));
         return $response;
     }
 
