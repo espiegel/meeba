@@ -28,14 +28,15 @@
             android:paddingRight="6dp"
             android:layout_centerVertical="true">
         </TextView>
-        <CheckBox
-            android:id="@+id/check"
+        <ImageView
+            android:id="@+id/deleteMe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/abs__ic_clear_holo_light"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="10dp"
             android:layout_centerVertical="true">
-        </CheckBox>
+        </ImageView>
     </RelativeLayout>
 </LinearLayout>
