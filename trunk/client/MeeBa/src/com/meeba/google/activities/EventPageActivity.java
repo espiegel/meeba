@@ -92,6 +92,8 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         ab.setDisplayHomeAsUpEnabled(true);
 
         View header = LayoutInflater.from(this).inflate(R.layout.eventpage_activity_header, null);
+
+
         mTxtHost = (TextView) header.findViewById(R.id.txtHost);
         mTxtTitle = (TextView) header.findViewById(R.id.txtTitle);
         mTxtWhere = (TextView) header.findViewById(R.id.txtWhere);
@@ -502,10 +504,14 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         } else {
             return super.onCreateOptionsMenu(menu);
         }
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if(mEvent==null)
+            return false;
+
         switch (menuItem.getItemId()) {
             case R.id.action_edit:
                 EditEventDialog dialog = new EditEventDialog(mEvent, this);
@@ -513,6 +519,8 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 return true;
 
             case R.id.action_add_guest:
+                if(mGuestArrayAdapter==null)
+                    return false;
                 Intent intent = new Intent(EventPageActivity.this, ContactsActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(ContactsActivity.EVENT, mEvent);
