@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.meeba.google.R;
 import com.meeba.google.objects.Event;
+import com.meeba.google.objects.User;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -121,7 +122,7 @@ public class Utils {
                     String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
                     // Filter out all non-numeric characters
-                    if(phoneNumber != null) {
+                    if (phoneNumber != null) {
                         phoneNumber = Utils.sanitizePhoneNumber(phoneNumber);
                         phonesMap.put(phoneNumber, contact);
                     }
@@ -151,7 +152,7 @@ public class Utils {
                 .writeDebugLogs()
                 .denyCacheImageMultipleSizesInMemory()
                 .memoryCacheSize(4 * 1024 * 1024)
-                .discCacheSize(10*1024*1024)
+                .discCacheSize(10 * 1024 * 1024)
                 .threadPoolSize(10)
                 .defaultDisplayImageOptions(mDisplayImageOptions)
                 .build();
@@ -160,7 +161,7 @@ public class Utils {
     }
 
     public static ImageLoader getImageLoader(Context context) {
-        if(!mImageLoader.isInited()) {
+        if (!mImageLoader.isInited()) {
             mImageLoader.init(Utils.getImageLoaderConfig(context));
         }
 
@@ -171,30 +172,57 @@ public class Utils {
         try {
             InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             keyboard.showSoftInput(view, 0);
-        } catch(Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     public static void hideKeyboard(Context context, View view) {
         try {
             InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        } catch(Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
-    public static void shareEvent(Context context, Event event, ImageView picture) {
-        String shareBody = "I'm going to: " + event.getTitle() + "\nat " + event.getWhere()
-                + "\nat " + event.getWhen() + "\n"+context.getString(R.string.generated);
+    public static void shareEvent(Context context, Event event, ImageView picture, List<User> guestList) {
+        String guestsString = "";
+        List<User> acceptedGuests = new ArrayList<User>();
+
+        if (guestList != null) {
+            for (User guest : guestList) {
+                if (guest.getInvite_status() == 1) {
+                    acceptedGuests.add(guest);
+                }
+            }
+        }
+
+        if (!acceptedGuests.isEmpty()) {
+            guestsString = "\nwith:  ";
+            for (User goingGuest : acceptedGuests) {
+                if (goingGuest.getInvite_status() == 1) {
+                    guestsString += goingGuest.getName() + ",";
+                }
+            }
+            //remove last ","
+            guestsString = guestsString.substring(0, guestsString.length() - 1);
+        }
+
+        String shareBody = "I'm going to: " + event.getTitle() +
+                "\nat " + event.getWhere()
+                + "\nat " + event.getWhen() +
+                guestsString +
+                "\n" + context.getString(R.string.generated);
 
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("image/*");
 
-        if(isExternalStorageAvailable()) {
+        if (isExternalStorageAvailable()) {
             try {
                 picture.setDrawingCacheEnabled(true);
                 Bitmap b = picture.getDrawingCache();
                 File sdCard = Environment.getExternalStorageDirectory();
-                File file = new File(sdCard, "meeba/event_picture_"+event.getEid()+".jpg");
-                if(!file.exists()) {
+                File file = new File(sdCard, "meeba/event_picture_" + event.getEid() + ".jpg");
+                if (!file.exists()) {
                     file.getParentFile().mkdirs();
                     file.createNewFile();
                 }
@@ -204,7 +232,7 @@ public class Utils {
                 Uri uri = Uri.fromFile(file);
                 sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 Utils.LOGD("Failed to store event picture");
                 e.printStackTrace();
             }
@@ -238,9 +266,9 @@ public class Utils {
     // Still needs testing on non-israeli phone numbers since they can get screwed up since we depend
     // on user input.
     public static String sanitizePhoneNumber(String phone) {
-        phone = phone.replaceAll("[^0-9]","");
+        phone = phone.replaceAll("[^0-9]", "");
         // Deal with Israel country code
-        if(phone.startsWith("972")) {
+        if (phone.startsWith("972")) {
             phone = phone.replaceFirst("972", "0");
         }
         return phone;

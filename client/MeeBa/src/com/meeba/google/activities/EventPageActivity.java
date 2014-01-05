@@ -70,6 +70,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
     private User mMyCurrentUser;  // User to be retrieved from phone DB
     private User mMe;             // User to be retrieved from current Event guests
     private User mHost;           // Host of the event
+    private List<User> mGuestList;
     private int mInviteStatus;    // The current users event status  of the current event (if he is invited)
     private int newStatus = 0;    // The status to change to, when clicking the Image Button
     private ImageView mEventPicture;
@@ -92,8 +93,6 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         ab.setDisplayHomeAsUpEnabled(true);
 
         View header = LayoutInflater.from(this).inflate(R.layout.eventpage_activity_header, null);
-
-
         mTxtHost = (TextView) header.findViewById(R.id.txtHost);
         mTxtTitle = (TextView) header.findViewById(R.id.txtTitle);
         mTxtWhere = (TextView) header.findViewById(R.id.txtWhere);
@@ -470,6 +469,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                         guestListWithoutMe.add(u);
                     }
                 }
+                mGuestList = guestListWithoutMe;
                 mGuestArrayAdapter = new GuestArrayAdapter(EventPageActivity.this, guestListWithoutMe);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -531,7 +531,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 return true;
 
             case R.id.action_share:
-                Utils.shareEvent(EventPageActivity.this, mEvent, mEventPicture);
+                Utils.shareEvent(EventPageActivity.this, mEvent, mEventPicture,mGuestList);
                 return true;
 
             default:
