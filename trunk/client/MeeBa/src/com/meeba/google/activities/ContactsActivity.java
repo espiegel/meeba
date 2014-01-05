@@ -9,8 +9,12 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -20,12 +24,14 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.meeba.google.R;
 import com.meeba.google.adapters.ContactsArrayAdapter;
+import com.meeba.google.adapters.ContactsAutoCompleteAdapter;
 import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.dialogs.ContactDetailsDialog;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.twotoasters.jazzylistview.JazzyHelper;
 import com.twotoasters.jazzylistview.JazzyListView;
 
@@ -41,11 +47,13 @@ import java.util.Map;
  */
 public class ContactsActivity extends SherlockFragmentActivity {
 
+
     public final static String EVENT = "event";
     public final static String GUESTS = "guests";
 
-    private JazzyListView mUserListView;
-    private ContactsArrayAdapter mContactsAdapter;
+    private static JazzyListView mUserListView;
+    private static ContactsArrayAdapter mContactsAdapter;
+
     private String mWhen;
     private String mTitle;
     private String mWhere;
@@ -57,8 +65,18 @@ public class ContactsActivity extends SherlockFragmentActivity {
     private SharedPreferences.Editor mPrefsEditor;
     private Event mEvent;
     private Bitmap mPicture;
+
+   // private EditText mFilterText;
     private ArrayList<User> mGuests;
     private boolean isAddingGuests = false;
+
+
+
+
+    AutoCompleteClearableEditText mEditFilterContacts;
+    private static List<User> forFilterList;
+    private static List<User> inviteList;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,9 +91,37 @@ public class ContactsActivity extends SherlockFragmentActivity {
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
 
+       // mFilterText = (EditText) findViewById(R.id.filterContacts);
         mUserListView = (JazzyListView) findViewById(R.id.appContacts);
         mUserListView.setTransitionEffect(JazzyHelper.SLIDE_IN);
 
+
+        mEditFilterContacts = (AutoCompleteClearableEditText) findViewById(R.id.filterContactsNew);
+
+
+
+
+
+        mEditFilterContacts.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+
+        mEditFilterContacts.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                        actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    return true;
+                }
+                return false;
+            }
+        });
         Bundle bundle = getIntent().getExtras();
         if(bundle.containsKey(EVENT)) {
             mEvent = (Event) bundle.getSerializable(EVENT);
@@ -97,16 +143,46 @@ public class ContactsActivity extends SherlockFragmentActivity {
         }
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
+       
+
+       mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+           @Override
+           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+               User user = (User) adapterView.getItemAtPosition(position);
+               removeFromInvitList(user);
+
+           }
+       });
+
+
+
         mUserListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                User user = (User)adapterView.getItemAtPosition(position);
+                User user = (User) adapterView.getItemAtPosition(position);
 
                 ContactDetailsDialog dialog = new ContactDetailsDialog(user);
                 dialog.show(getSupportFragmentManager(), ContactDetailsDialog.TAG);
                 return false;
             }
         });
+       /* mFilterText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                System.out.println("Text [" + s + "]");
+                mContactsAdapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });*/
         asyncRefresh();
     }
 
@@ -192,7 +268,23 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 for (User u : list) {
                     Utils.LOGD(u.toString());
                 }
-                mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, list);
+
+
+                forFilterList=list;
+                inviteList=new ArrayList<User>();
+
+                ContactsAutoCompleteAdapter autoCompleteAdapter = new ContactsAutoCompleteAdapter(ContactsActivity.this, R.layout.dropdown_autocomplete,
+                        R.id.txtViewSearch,forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
+                    @Override
+                    public void autoCompleteItemClicked(String query) {
+                        mEditFilterContacts.setText(query);
+                    }
+                });
+                mEditFilterContacts.setThreshold(0);
+                mEditFilterContacts.setAdapter(autoCompleteAdapter);
+
+
+                mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, inviteList);
                 mUserListView.setAdapter(mContactsAdapter);
 
             }
@@ -231,13 +323,13 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
         for (User user : mContactsAdapter.getList()) {
             Utils.LOGD("user= " + user.toString());
-            if (user.isSelected()) {
+
                 if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() == 0) {
                     mListUid.add(String.valueOf(user.getUid()));
                 } else {
                     mDummies.add(user);
                 }
-            }
+
         }
 
         if (mListUid.isEmpty()) {
@@ -452,6 +544,34 @@ public class ContactsActivity extends SherlockFragmentActivity {
         mSharedPrefs = this.getSharedPreferences("waitingList", 0); // 0 - for private mode
         mPrefsEditor = mSharedPrefs.edit();
         //mPrefsEditor.clear();//just for debugging
+    }
+
+    public static void addToInvitList(User user){
+
+        if(inviteList.contains(user)){
+
+        }else{
+
+            mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
+            mContactsAdapter.getList().add(user);
+            mContactsAdapter.notifyDataSetChanged();
+        }
+        forFilterList.remove(user);
+
+
+    }
+
+    public static void removeFromInvitList(User user){
+        mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
+        mContactsAdapter.getList().remove(user);
+        mContactsAdapter.notifyDataSetChanged();
+        if(forFilterList.contains(user)){
+        }else{
+            forFilterList.add(user);
+        }
+
+
+
     }
 
 }

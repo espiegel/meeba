@@ -16,6 +16,25 @@
         android:id="@+id/txtInviteYourFriends"
         android:layout_gravity="center_horizontal" />
 
+    <com.meeba.google.view.AutoCompleteClearableEditText
+        style="@style/MeebaStyle"
+        android:textColorHint="#888"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:inputType="textCapSentences|textNoSuggestions"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/filterContactsNew"
+        android:layout_gravity="center_horizontal"
+        android:imeOptions="actionDone"
+        android:dropDownVerticalOffset="5dp"
+        android:drawablePadding="5dp"/>
+    />
+
+
+
+
     <com.twotoasters.jazzylistview.JazzyListView
         android:id="@+id/appContacts"
         android:layout_width="fill_parent"
