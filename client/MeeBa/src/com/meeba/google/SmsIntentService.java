@@ -11,6 +11,7 @@ import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Created by Max on 25/12/13.
@@ -63,7 +64,7 @@ public class SmsIntentService extends IntentService {
         for (Map.Entry<String, ?> s : mSharedPrefs.getAll().entrySet()) {
             String eid = ((String) s.getValue()).split(",")[0];
             String uid = ((String) s.getValue()).split(",")[1];
-            Utils.LOGD("SmsListener: in waiting list : uid =" +  uid + " ::  eid = " + eid);
+            Utils.LOGD("SmsListener: in waiting list : uid =" + uid + " ::  eid = " + eid);
         }
 
         //check if the sender's phone number is in the waiting list
@@ -71,7 +72,7 @@ public class SmsIntentService extends IntentService {
 
             String uidAndEid = mSharedPrefs.getString(mMessageFrom, null);
 
-            if(uidAndEid==null){
+            if (uidAndEid == null) {
                 Utils.LOGD("SmsListener: a very  weired error happened");
                 return;
             }
@@ -80,25 +81,22 @@ public class SmsIntentService extends IntentService {
             int uid = Integer.valueOf(uidAndEid.split(",")[1]);
 
             //accept invite
-            if(mMessageBody.equals("1")){
-                UserFunctions.acceptInvite(uid,eid);
+            if (mMessageBody.contains("1")) {
+                UserFunctions.acceptInvite(uid, eid);
                 mPrefsEditor.remove(mMessageFrom);
                 mPrefsEditor.commit();
             }
 
             //decline invite
-           else  if(mMessageBody.equals("2")){
-                UserFunctions.declineInvite(uid,eid);
+            else if (mMessageBody.contains("2")) {
+                UserFunctions.declineInvite(uid, eid);
                 mPrefsEditor.remove(mMessageFrom);
                 mPrefsEditor.commit();
-            }
-
-            else{
+            } else {
                 /* Do Noting */
                 Utils.LOGD("SmsListener:sms body is not of the right form");
             }
         }
-
 
 
         // WARNING!!!

@@ -31,6 +31,7 @@ import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+import com.meeba.google.util.WaitList;
 import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.twotoasters.jazzylistview.JazzyHelper;
 import com.twotoasters.jazzylistview.JazzyListView;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 
 /**
@@ -66,12 +68,9 @@ public class ContactsActivity extends SherlockFragmentActivity {
     private Event mEvent;
     private Bitmap mPicture;
 
-   // private EditText mFilterText;
+    // private EditText mFilterText;
     private ArrayList<User> mGuests;
     private boolean isAddingGuests = false;
-
-
-
 
     AutoCompleteClearableEditText mEditFilterContacts;
     private static List<User> forFilterList;
@@ -79,6 +78,30 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
 
     public void onCreate(Bundle savedInstanceState) {
+
+        /**
+         * max's test , will remove later.
+         */
+
+        WaitList waitList = new WaitList();
+
+        WaitList.putInWaitList("1", "12");
+        WaitList.putInWaitList("1", "13");
+        WaitList.putInWaitList("1", "14");
+        WaitList.putInWaitList("2", "21");
+        WaitList.putInWaitList("2", "22");
+        WaitList.putInWaitList("3", "31");
+
+        String json = WaitList.toJson();
+
+        Map<String, Stack<String>> my = WaitList.fromJson(json);
+        Utils.LOGD("myjson" + my +" size =  " + my.size() );
+        for (Map.Entry<String, Stack<String>> e : my.entrySet()) {
+            Utils.LOGD(" uid = " + e.getKey() + "events =" + e.getValue());
+
+        }
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);
 
@@ -91,17 +114,11 @@ public class ContactsActivity extends SherlockFragmentActivity {
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
 
-       // mFilterText = (EditText) findViewById(R.id.filterContacts);
+        // mFilterText = (EditText) findViewById(R.id.filterContacts);
         mUserListView = (JazzyListView) findViewById(R.id.appContacts);
         mUserListView.setTransitionEffect(JazzyHelper.SLIDE_IN);
 
-
         mEditFilterContacts = (AutoCompleteClearableEditText) findViewById(R.id.filterContactsNew);
-
-
-
-
-
         mEditFilterContacts.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -123,7 +140,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             }
         });
         Bundle bundle = getIntent().getExtras();
-        if(bundle.containsKey(EVENT)) {
+        if (bundle.containsKey(EVENT)) {
             mEvent = (Event) bundle.getSerializable(EVENT);
             mGuests = (ArrayList<User>) bundle.getSerializable(GUESTS);
             isAddingGuests = true;
@@ -143,18 +160,15 @@ public class ContactsActivity extends SherlockFragmentActivity {
         }
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
-       
 
-       mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-           @Override
-           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-               User user = (User) adapterView.getItemAtPosition(position);
-               removeFromInvitList(user);
+        mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                User user = (User) adapterView.getItemAtPosition(position);
+                removeFromInvitList(user);
 
-           }
-       });
-
-
+            }
+        });
 
         mUserListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -189,13 +203,13 @@ public class ContactsActivity extends SherlockFragmentActivity {
     private void asyncRefresh() {
         new AsyncTask<Void, Void, List<User>>() {
             ProgressDialog progressDialog;
-            boolean canceled=false;
+            boolean canceled = false;
 
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
                 progressDialog = ProgressDialog
-                        .show(ContactsActivity.this, "", "Loading contacts...", true,true);
+                        .show(ContactsActivity.this, "", "Loading contacts...", true, true);
 
                 progressDialog.setCanceledOnTouchOutside(false);
 
@@ -209,7 +223,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
             protected List<User> doInBackground(Void... params) {
 
-                if(canceled)
+                if (canceled)
                     return null;
 
                 List<User> userList = DatabaseFunctions.loadContacts(getApplicationContext());
@@ -223,16 +237,16 @@ public class ContactsActivity extends SherlockFragmentActivity {
                     }
                 });
 
-                if(mGuests != null) {
-                    for(User user : mGuests) {
-                        Utils.LOGD("mGuests user ="+user);
+                if (mGuests != null) {
+                    for (User user : mGuests) {
+                        Utils.LOGD("mGuests user =" + user);
                     }
                 }
                 // First add meeba users
                 for (User user : userList) {
                     Utils.LOGD("asyncRefresh user:" + user);
                     if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() != 1) {
-                        if(!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
+                        if (!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
                             sortedUserList.add(user);
                         }
                     }
@@ -241,7 +255,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 // Then add the rest of the contact list
                 for (User user : userList) {
                     if (user.getUid() == Utils.DUMMY_USER || user.getIs_dummy() == 1) {
-                        if(!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
+                        if (!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
                             sortedUserList.add(user);
                         }
                     }
@@ -251,10 +265,10 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
             protected void onPostExecute(List<User> list) {
 
-                if(progressDialog!=null)
+                if (progressDialog != null)
                     progressDialog.dismiss();
 
-                if(canceled)
+                if (canceled)
                     finish();
 
                 if (list == null) {
@@ -270,11 +284,11 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 }
 
 
-                forFilterList=list;
-                inviteList=new ArrayList<User>();
+                forFilterList = list;
+                inviteList = new ArrayList<User>();
 
                 ContactsAutoCompleteAdapter autoCompleteAdapter = new ContactsAutoCompleteAdapter(ContactsActivity.this, R.layout.dropdown_autocomplete,
-                        R.id.txtViewSearch,forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
+                        R.id.txtViewSearch, forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
                     @Override
                     public void autoCompleteItemClicked(String query) {
                         mEditFilterContacts.setText(query);
@@ -312,7 +326,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
         return true;
     }
 
-
     private void invitePressed() {
 
         mListUid = new ArrayList<String>();
@@ -324,11 +337,11 @@ public class ContactsActivity extends SherlockFragmentActivity {
         for (User user : mContactsAdapter.getList()) {
             Utils.LOGD("user= " + user.toString());
 
-                if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() == 0) {
-                    mListUid.add(String.valueOf(user.getUid()));
-                } else {
-                    mDummies.add(user);
-                }
+            if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() == 0) {
+                mListUid.add(String.valueOf(user.getUid()));
+            } else {
+                mDummies.add(user);
+            }
 
         }
 
@@ -384,7 +397,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 }
 
                 //update the database after creating the dummies
-                DatabaseFunctions.storeContacts(ContactsActivity.this,mPositiveDummies);
+                DatabaseFunctions.storeContacts(ContactsActivity.this, mPositiveDummies);
 
                 return null;
             }
@@ -409,7 +422,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             protected void onPreExecute() {
                 Utils.LOGD("onPreExecute");
                 super.onPreExecute();
-                String message = isAddingGuests?"Adding Guests...":"Creating Event...";
+                String message = isAddingGuests ? "Adding Guests..." : "Creating Event...";
                 progressDialog = ProgressDialog
                         .show(ContactsActivity.this, "", message, true, true);
 
@@ -425,14 +438,14 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
             @Override
             protected Event doInBackground(Void... params) {
-                if(canceled) {
+                if (canceled) {
                     return null;
                 }
 
                 // Adding guests to an existing event
-                if(isAddingGuests) {
+                if (isAddingGuests) {
                     // invite everyone in mListUid
-                    for(String uid : mListUid) {
+                    for (String uid : mListUid) {
                         UserFunctions.addUserToEvent(mEvent.getEid(), Integer.valueOf(uid));
                     }
                     return mEvent;
@@ -440,7 +453,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 // Otherwise we are creating a new event
                 else {
                     Event event = UserFunctions.createEvent(mHostUid, mTitle, mWhere, mWhen, mListUid);
-                    if(event == null) {
+                    if (event == null) {
                         return null;
                     }
 
@@ -458,7 +471,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 if (progressDialog != null)
                     progressDialog.dismiss();
 
-                if(canceled)
+                if (canceled)
                     finish();
 
                 mEvent = event;
@@ -539,6 +552,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             }
         }
     }
+
     protected void onResume() {
         super.onResume();
         mSharedPrefs = this.getSharedPreferences("waitingList", 0); // 0 - for private mode
@@ -546,11 +560,11 @@ public class ContactsActivity extends SherlockFragmentActivity {
         //mPrefsEditor.clear();//just for debugging
     }
 
-    public static void addToInvitList(User user){
+    public static void addToInvitList(User user) {
 
-        if(inviteList.contains(user)){
+        if (inviteList.contains(user)) {
 
-        }else{
+        } else {
 
             mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
             mContactsAdapter.getList().add(user);
@@ -561,15 +575,14 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
     }
 
-    public static void removeFromInvitList(User user){
+    public static void removeFromInvitList(User user) {
         mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
         mContactsAdapter.getList().remove(user);
         mContactsAdapter.notifyDataSetChanged();
-        if(forFilterList.contains(user)){
-        }else{
+        if (forFilterList.contains(user)) {
+        } else {
             forFilterList.add(user);
         }
-
 
 
     }
