@@ -29,9 +29,9 @@ import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.dialogs.ContactDetailsDialog;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
+import com.meeba.google.util.JsonEventsStack;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
-import com.meeba.google.util.WaitList;
 import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.twotoasters.jazzylistview.JazzyHelper;
 import com.twotoasters.jazzylistview.JazzyListView;
@@ -83,24 +83,17 @@ public class ContactsActivity extends SherlockFragmentActivity {
          * max's test , will remove later.
          */
 
-        WaitList waitList = new WaitList();
 
-        WaitList.putInWaitList("1", "12");
-        WaitList.putInWaitList("1", "13");
-        WaitList.putInWaitList("1", "14");
-        WaitList.putInWaitList("2", "21");
-        WaitList.putInWaitList("2", "22");
-        WaitList.putInWaitList("3", "31");
+        Stack<String > test = new Stack<String>();
+        test.push("123");
+        test.push("124");
+        test.push("456");
+        test.push("678");
 
-        String json = WaitList.toJson();
+        String jsonArrString = JsonEventsStack.toJson(test);
+        Utils.LOGD( "jsonStack = " +jsonArrString);
 
-        Map<String, Stack<String>> my = WaitList.fromJson(json);
-        Utils.LOGD("myjson" + my +" size =  " + my.size() );
-        for (Map.Entry<String, Stack<String>> e : my.entrySet()) {
-            Utils.LOGD(" uid = " + e.getKey() + "events =" + e.getValue());
-
-        }
-
+        Utils.LOGD( "jsonStackConverted to  = "  +   JsonEventsStack.fromJson(jsonArrString));
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);

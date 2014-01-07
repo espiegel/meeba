@@ -119,6 +119,11 @@ public class DatabaseFunctions {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(context.getString(R.string.database_version), NEW_VERSION);
         editor.commit();
+
+        //also delete waiting list :
+        SharedPreferences waitingListPrefs= context.getSharedPreferences("waitingList",Context.MODE_PRIVATE);
+        SharedPreferences.Editor waitingListEditor= waitingListPrefs.edit();
+        waitingListEditor.clear();
     }
 
     public static void resetTables(Context context) {
