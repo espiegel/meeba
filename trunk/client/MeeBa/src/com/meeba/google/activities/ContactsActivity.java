@@ -36,6 +36,8 @@ import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.twotoasters.jazzylistview.JazzyHelper;
 import com.twotoasters.jazzylistview.JazzyListView;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -84,21 +86,27 @@ public class ContactsActivity extends SherlockFragmentActivity {
          */
 
 
-        Stack<String > test = new Stack<String>();
+        Stack<String> test = new Stack<String>();
         test.push("123");
         test.push("124");
         test.push("456");
         test.push("678");
 
-        String jsonArrString = JsonEventsStack.toJson(test);
-        Utils.LOGD( "jsonStack = " +jsonArrString);
+        String jsonArrString = null;
+        try {
+            jsonArrString = JsonEventsStack.toJson("6969", test);
 
-        Utils.LOGD( "jsonStackConverted to  = "  +   JsonEventsStack.fromJson(jsonArrString));
+            Utils.LOGD("jsonStack = " + jsonArrString);
+
+            Utils.LOGD("jsonStackConverted to  = " + JsonEventsStack.getEventsStackfromJson(jsonArrString));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);
 
-        mSharedPrefs = this.getSharedPreferences("waitingList", 0); // 0 - for private mode
+        mSharedPrefs = this.getSharedPreferences("waitingList", MODE_PRIVATE);
         mPrefsEditor = mSharedPrefs.edit();
         // mPrefsEditor.clear();//just for debugging
 
@@ -494,7 +502,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
 
     private void sendSms(List<User> dummies) {
-        List<String> stillWaiting = new ArrayList<String>();
+        Utils.LOGD("in sendSms dumies = " +dummies);
         // Open a dialog asking the user whether he wants to send an sms
         if (!dummies.isEmpty()) {
             String separator = "; ";
@@ -504,29 +512,28 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 separator = ", ";
             }
 
-            String address = "";
-            for (User dummy : dummies) {
-                if (TextUtils.isEmpty(address)) {
-                    address = address.concat(dummy.getPhone_number());
-                } else {
-                    address = address.concat(separator + dummy.getPhone_number());
-                }
-                for (String s : mSharedPrefs.getAll().keySet()) {
-                    Utils.LOGD("waiting :: " + s);
-                }
-                //put phone 'phone-number->eid+uid'  entry  in the waiting list .
-                mPrefsEditor.putString(dummy.getPhone_number(), "" + mEvent.getEid() + "," + dummy.getUid());
+            /**for denugging :*/
+            for (Map.Entry<String, ?> s : mSharedPrefs.getAll().entrySet() ) {
+                Utils.LOGD("waiting :: " + s);
             }
 
+            String address = "";
             try {
-                mPrefsEditor.commit();
-                for (Map.Entry<String, ?> s : mSharedPrefs.getAll().entrySet()) {
-                    String eid = ((String) s.getValue()).split(",")[0];
-                    String uid = ((String) s.getValue()).split(",")[1];
-                    Utils.LOGD(":: uid =" + uid + " ::  eid = " + eid);
+                for (User dummy : dummies) {
+                    if (TextUtils.isEmpty(address)) {
+                        address = address.concat(dummy.getPhone_number());
+                    } else {
+                        address = address.concat(separator + dummy.getPhone_number());
+                    }
+
+                    /**put phone 'phone-number->eid+uid'  entry  in the waiting list :*/
+                    Utils.pushToWaitingList(dummy.getPhone_number(), dummy.getUid(), mEvent.getEid(), mSharedPrefs);
+                    //mPrefsEditor.putString(dummy.getPhone_number(), "" + mEvent.getEid() + "," + dummy.getUid());
+                    //  mPrefsEditor.commit();
                 }
 
-                Utils.LOGD("address=" + address);
+                /**call sms intent :*/
+                Utils.LOGD("sending sms to address=" + address);
                 Intent sendIntent = new Intent(Intent.ACTION_VIEW);
                 sendIntent.putExtra("address", address);
                 sendIntent.putExtra("sms_body", "Hey, you're invited to " + mTitle + " at " + mWhere + " at " + mWhen + "!\n" +
@@ -534,7 +541,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
                         "to decline reply: 2\n" +
                         getString(R.string.generated));
                 sendIntent.setType("vnd.android-dir/mms-sms");
-
                 startActivity(sendIntent);
 
             } catch (Exception e) {
@@ -546,9 +552,10 @@ public class ContactsActivity extends SherlockFragmentActivity {
         }
     }
 
+
     protected void onResume() {
         super.onResume();
-        mSharedPrefs = this.getSharedPreferences("waitingList", 0); // 0 - for private mode
+        mSharedPrefs = this.getSharedPreferences("waitingList", MODE_PRIVATE);
         mPrefsEditor = mSharedPrefs.edit();
         //mPrefsEditor.clear();//just for debugging
     }

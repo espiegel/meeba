@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class DatabaseFunctions {
 
-    public static final int NEW_VERSION = 4; // Database version. Increment this if you want users database to be renewed.
+    public static final int NEW_VERSION = 5; // Database version. Increment this if you want users database to be renewed.(max:changed to 5 on jan 7  )
     private static DatabaseHandler mDatabaseHandler = null;
 
     private static DatabaseHandler getDatabase(Context context) {

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -31,12 +32,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.TreeMap;
 
 public class Utils {
@@ -45,6 +49,7 @@ public class Utils {
     public static final boolean DEBUG = true;
     public static final String BASE_URL = "http://54.214.243.219/meeba/";
     public static final int DUMMY_USER = -1;
+    public static final String DATE_FORMAT = "h:mm dd/MM/yyyy ";
 
     private static Utils mInstance = null;
     private CookieStore mCookie = null;
@@ -81,11 +86,11 @@ public class Utils {
     }
 
     public static void hideSoftKeyboard(Activity a) {
-        try{
-        InputMethodManager inputMethodManager = (InputMethodManager) a.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (a.getCurrentFocus() != null)
-            inputMethodManager.hideSoftInputFromWindow(a.getCurrentFocus().getWindowToken(), 0);
-        }catch (Exception e){
+        try {
+            InputMethodManager inputMethodManager = (InputMethodManager) a.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            if (a.getCurrentFocus() != null)
+                inputMethodManager.hideSoftInputFromWindow(a.getCurrentFocus().getWindowToken(), 0);
+        } catch (Exception e) {
             //this crashed to me , so i added try/catch here (max)
             e.printStackTrace();
         }
@@ -285,7 +290,7 @@ public class Utils {
 
     public static String makePrettyDate(String formmatedDate) {
         Utils.LOGD("event from  arrayadapter  =" + formmatedDate);
-        DateTime dt ;
+        DateTime dt;
         String prettyDate;
 
         dt = parseDate(formmatedDate);
@@ -293,14 +298,14 @@ public class Utils {
             prettyDate = formmatedDate;
         else
             prettyDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
-                    DateTimeFormat.forPattern("hh:mm  aaa").print(dt);
+                    DateTimeFormat.forPattern("hh:mm  ").print(dt);
 
         return prettyDate;
     }
 
     public static DateTime parseDate(String date) {
         DateTime dt = null;
-        DateTimeFormatter dateParser = DateTimeFormat.forPattern("h:mm dd/MM/yyyy ");
+        DateTimeFormatter dateParser = DateTimeFormat.forPattern(DATE_FORMAT);
         try {
             dt = dateParser.parseDateTime(date);
         } catch (Exception e) {
@@ -308,5 +313,38 @@ public class Utils {
         }
         return dt;
     }
-}
 
+    public static void pushToWaitingList(String phoneNumber, int iuid, int ieid,
+                                         SharedPreferences sharedPrefs) throws JSONException {
+
+        String uid = String.valueOf(iuid);
+        String eid = String .valueOf(ieid);
+        Stack<String> waitingStack;
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        String foundJsonObj = sharedPrefs.getString(phoneNumber, null);
+
+        if (foundJsonObj != null) {
+            waitingStack = JsonEventsStack.getEventsStackfromJson(foundJsonObj);
+        } else {
+            waitingStack = new Stack<String>();
+        }
+
+        waitingStack.push(eid);
+        //convert to string
+        String updatedJsonStack = JsonEventsStack.toJson(uid, waitingStack);
+        //store new Stack in phone
+        editor.putString(phoneNumber, updatedJsonStack);
+        editor.commit();
+        Utils.LOGD("pushToWaitingList : pushing  " +phoneNumber +"->" + updatedJsonStack  );
+    }
+
+    public static void updateWaitingList(String phoneNumber, String uid,
+                                         Stack<String> newWaitingList, SharedPreferences sharedPrefs) throws JSONException {
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        String updatedJsonStack = JsonEventsStack.toJson(uid,newWaitingList);
+        editor.putString(phoneNumber,updatedJsonStack);
+        editor.commit();
+    }
+
+}
