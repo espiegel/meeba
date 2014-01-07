@@ -29,6 +29,8 @@ import com.meeba.google.util.Utils;
 import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.meeba.google.view.ClearableEditText;
 
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
 
 /**
@@ -45,6 +47,11 @@ public class EditEventDialog extends SherlockDialogFragment {
     private String mDate;
     private ProgressBar mProgressBar;
     private LinearLayout mFields;
+    private String mFormmatedDate;
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+    private DateTime dt;
 
     public EditEventDialog(Event event, EventUpdateCallback callback) {
         mEvent = event;
@@ -75,10 +82,11 @@ public class EditEventDialog extends SherlockDialogFragment {
             @Override
             public void onClick(View view) {
                 final String title = mEditTitle.getText().toString();
-                final String when = mEditWhen.getText().toString();
+                //final String when = mEditWhen.getText().toString();
+                final String when = mFormmatedDate;
                 final String where = mEditWhere.getText().toString();
 
-                if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title))  {
+                if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title)) {
                     Toast.makeText(getActivity(), getString(R.string.bad_event_details_input), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -151,20 +159,22 @@ public class EditEventDialog extends SherlockDialogFragment {
     }
 
     private void updateDetails(final String title, final String when, final String where) {
-        new AsyncTask<Void,Void,Event>() {
+        new AsyncTask<Void, Void, Event>() {
             @Override
             protected void onPreExecute() {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mFields.setVisibility(View.GONE);
             }
+
             @Override
             protected Event doInBackground(Void... voids) {
                 Event event = UserFunctions.updateEvent(mEvent.getEid(), title, when, where);
                 return event;
             }
+
             @Override
             protected void onPostExecute(Event event) {
-                if(event == null) {
+                if (event == null) {
                     Utils.showToast(getActivity(), "Update event failed");
                     mProgressBar.setVisibility(View.GONE);
                     mFields.setVisibility(View.VISIBLE);
@@ -189,13 +199,19 @@ public class EditEventDialog extends SherlockDialogFragment {
         mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                String minutes;
-                if (selectedMinute < 10) {
-                    minutes = "0" + selectedMinute;
-                } else {
-                    minutes = String.valueOf(selectedMinute);
-                }
-                mEditWhen.setText(selectedHour + ":" + minutes + " " + mDate);
+            //    String minutes;
+             //   if (selectedMinute < 10) {
+          //          minutes = "0" + selectedMinute;
+         //       } else {
+          //          minutes = String.valueOf(selectedMinute);
+         //       }
+                // mEditWhen.setText(selectedHour + ":" + minutes + " " + mDate);
+                dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
+
+                mFormmatedDate = dt.toString( "h:mm dd/MM/yyyy ") ;
+                mDate=Utils.makePrettyDate(mFormmatedDate);
+
+                mEditWhen.setText(mDate);
                 mEditWhere.requestFocus();
             }
         }, hour, minute, true);//Yes 24 hour time
@@ -205,9 +221,16 @@ public class EditEventDialog extends SherlockDialogFragment {
         mDatePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
                 mEditWhen.setText("");
-                mDate = day + "/" + (month + 1) + "/" + year;
+               // mDate = day + "/" + (month + 1) + "/" + year;
+                //mEditWhen.setText(mDate);
+                mYear = year;
+                mMonth = month+1;
+                mDay = day;
+
                 mEditWhen.setText(mDate);
+
                 mTimePicker.show();
             }
         }, year, month, day);

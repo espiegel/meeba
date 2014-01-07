@@ -1,6 +1,14 @@
 package com.meeba.google.objects;
 
+
+import com.meeba.google.util.Utils;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.io.Serializable;
+
 
 /**
  * Created by Eidan on 11/8/13.
@@ -14,7 +22,7 @@ public class Event implements Serializable {
     private User host;
     private String event_picture;
 
-    public Event(int eid,String title, String where, String when, String created_at, User host) {
+    public Event(int eid, String title, String where, String when, String created_at, User host) {
         this.eid = eid;
         this.title = title;
         this.where = where;
@@ -23,8 +31,13 @@ public class Event implements Serializable {
         this.host = host;
     }
 
-    public User getHost() { return host; }
-    public void setHost(User host) { this.host = host; }
+    public User getHost() {
+        return host;
+    }
+
+    public void setHost(User host) {
+        this.host = host;
+    }
 
     public String getCreated_at() {
         return created_at;
@@ -42,9 +55,13 @@ public class Event implements Serializable {
         this.eid = eid;
     }
 
-    public String getTitle(){return title;}
+    public String getTitle() {
+        return title;
+    }
 
-    public void setTitle(String title) {this.title = title;}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getWhere() {
         return where;
@@ -55,7 +72,10 @@ public class Event implements Serializable {
     }
 
     public String getWhen() {
-        return when;
+        return Utils.makePrettyDate(when);
+    }
+    public String getFormmatedWhen() {
+        return  when;
     }
 
     public void setWhen(String when) {

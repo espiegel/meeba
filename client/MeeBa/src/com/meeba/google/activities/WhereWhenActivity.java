@@ -35,7 +35,6 @@ import com.meeba.google.view.AutoCompleteClearableEditText;
 import com.meeba.google.view.ClearableEditText;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
@@ -93,6 +92,7 @@ public class WhereWhenActivity extends SherlockActivity {
     private int mMonth;
     private int mYear;
     private DateTime dt;
+    private String mFormmatedDate;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,11 +215,23 @@ public class WhereWhenActivity extends SherlockActivity {
         mTimePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+
                 dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
-                mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
-                        DateTimeFormat.forPattern("HH:mm").print(dt);
+
+
+             //   mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
+                     //   DateTimeFormat.forPattern("HH:mm").print(dt);
+
+                mFormmatedDate = dt.toString( "h:mm dd/MM/yyyy ") ;
+                //if we want it in millis then use :
+                //dt.toInstant().getMillis());
+
+                mDate=Utils.makePrettyDate(mFormmatedDate);
                 mEditWhen.setText(mDate);
                 mEditWhere.requestFocus();
+
+
+
             }
         }, hour, minute, true);//Yes 24 hour time
         mTimePicker.setTitle("Select Time");
@@ -244,7 +256,9 @@ public class WhereWhenActivity extends SherlockActivity {
     private void nextButton() {
         String title =  mEditTitle.getText().toString();
         String where = mEditWhere.getText().toString();
-        String when = mEditWhen.getText().toString();
+        //String when = mEditWhen.getText().toString();
+        String when =mFormmatedDate;
+
         if (TextUtils.isEmpty(where) || TextUtils.isEmpty(when) || TextUtils.isEmpty(title))  {
             Toast.makeText(getApplicationContext(), getString(R.string.bad_event_details_input), Toast.LENGTH_SHORT).show();
             return;
