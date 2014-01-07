@@ -171,7 +171,7 @@ public class WhereWhenActivity extends SherlockActivity {
                 showTimePicker();
             }
         });
-
+        mEditWhen.setKeyListener(null);
         mEditWhen.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean focus) {
