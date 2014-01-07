@@ -33,7 +33,10 @@ import com.meeba.google.util.Utils;
 import com.twotoasters.jazzylistview.JazzyHelper;
 import com.twotoasters.jazzylistview.JazzyListView;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +75,7 @@ public class DashboardActivity extends SherlockActivity {
     private int appliedFilter = FILTER_ALL_EVENTS;
 
     private ImageView mNoEvent;
-    private final Event mDummyEvent = new Event(-1, "","", "", "", new User(-1, "", "", "", "", "", ""));
+    private final Event mDummyEvent = new Event(-1, "", "", "", "", new User(-1, "", "", "", "", "", ""));
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -229,16 +232,16 @@ public class DashboardActivity extends SherlockActivity {
         mEventListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                final Event event = ((EventArrayAdapter)mEventListView.getAdapter()).getItem((int)id);
-                Utils.LOGD("selected event = "+ event);
+                final Event event = ((EventArrayAdapter) mEventListView.getAdapter()).getItem((int) id);
+                Utils.LOGD("selected event = " + event);
 
-                if(mCurrentUser == null || event == null || event.getHost() == null ||
-                   event.getHost().getUid() != mCurrentUser.getUid()) {
+                if (mCurrentUser == null || event == null || event.getHost() == null ||
+                        event.getHost().getUid() != mCurrentUser.getUid()) {
                     return false;
                 }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(DashboardActivity.this);
-                builder.setMessage("Are you sure you want to delete "+event.getTitle()+"?")
+                builder.setMessage("Are you sure you want to delete " + event.getTitle() + "?")
                         .setTitle("Delete Event")
                         .setIcon(R.drawable.ic_launcher)
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -247,30 +250,30 @@ public class DashboardActivity extends SherlockActivity {
                                 dialogInterface.dismiss();
                             }
                         })
-                       .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                           @Override
-                           public void onClick(DialogInterface dialogInterface, int i) {
-                               new AsyncTask<Void, Void, Void>() {
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                new AsyncTask<Void, Void, Void>() {
 
-                                   @Override
-                                   protected void onPreExecute() {
-                                       Utils.showToast(DashboardActivity.this, "Deleting event...");
-                                   }
+                                    @Override
+                                    protected void onPreExecute() {
+                                        Utils.showToast(DashboardActivity.this, "Deleting event...");
+                                    }
 
-                                   @Override
-                                   protected Void doInBackground(Void... voids) {
-                                       UserFunctions.deleteEvent(event.getEid());
-                                       runOnUiThread(new Runnable() {
-                                           @Override
-                                           public void run() {
-                                               asyncRefresh();
-                                           }
-                                       });
-                                       return null;
-                                   }
-                               }.execute();
-                           }
-                       });
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        UserFunctions.deleteEvent(event.getEid());
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                asyncRefresh();
+                                            }
+                                        });
+                                        return null;
+                                    }
+                                }.execute();
+                            }
+                        });
                 builder.create().show();
                 return false;
             }
@@ -361,6 +364,28 @@ public class DashboardActivity extends SherlockActivity {
                 if (exceptionOccured)
                     Toast.makeText(DashboardActivity.this,
                             "An Error occured when trying to update events ", Toast.LENGTH_LONG).show();
+
+
+                //sort by event due date
+                Collections.sort(mAllEventsList, new Comparator<Event>() {
+                    @Override
+                    public int compare(Event event1, Event event2) {
+                        DateTime dt1 = Utils.parseDate(event1.getFormmatedWhen());
+                        DateTime dt2 = Utils.parseDate(event2.getFormmatedWhen());
+                        if (dt1 == null || dt2 == null) {
+                            return 0;
+                        }
+
+                        if (dt1.isBefore(dt2))
+                            return -1;
+
+                        else if (dt1.isAfter(dt2))
+                            return 1;
+
+                        else
+                            return 0;
+                    }
+                });
 
                 //apply the chosen filter to the updated event list
                 filterdEvents = filterEventList(mAllEventsList);
@@ -459,10 +484,10 @@ public class DashboardActivity extends SherlockActivity {
                 // And change name of user like in phone and user to list
                 ListOfContacts = new ArrayList<User>();
                 for (User user : ListOfAppContacts) {
-                        meebaUsersPhones.add(user.getPhone_number());
+                    meebaUsersPhones.add(user.getPhone_number());
 
                     String nameFromPhone = phoneMap.get(user.getPhone_number());
-                    if(nameFromPhone != null && !TextUtils.isEmpty(nameFromPhone)) {
+                    if (nameFromPhone != null && !TextUtils.isEmpty(nameFromPhone)) {
                         user.setName(nameFromPhone);
                     }
                     ListOfContacts.add(user);
@@ -483,11 +508,11 @@ public class DashboardActivity extends SherlockActivity {
 
                 //Now add users that don't have meeba to the list as DUMMMY-users
                 for (Map.Entry<String, String> entry : contactMap.entrySet()) {
-                    User foundContact=DatabaseFunctions.getContact(entry.getValue(),DashboardActivity.this);
-                    if (!meebaUsersPhones.contains(entry.getValue() )
+                    User foundContact = DatabaseFunctions.getContact(entry.getValue(), DashboardActivity.this);
+                    if (!meebaUsersPhones.contains(entry.getValue())
                             //AND the user is not stored as a positive dummy
                             //because if he is a positive dummy , then no need to create a negative dummy for him
-                          && !(foundContact!=null && foundContact.getIs_dummy()==1)  ) {
+                            && !(foundContact != null && foundContact.getIs_dummy() == 1)) {
                         User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
                         ListOfContacts.add(user);
                         //Utils.LOGD("created negative dummy for  :  " + entry.getKey());

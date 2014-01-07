@@ -28,6 +28,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,9 +81,15 @@ public class Utils {
     }
 
     public static void hideSoftKeyboard(Activity a) {
+        try{
         InputMethodManager inputMethodManager = (InputMethodManager) a.getSystemService(Activity.INPUT_METHOD_SERVICE);
         if (a.getCurrentFocus() != null)
             inputMethodManager.hideSoftInputFromWindow(a.getCurrentFocus().getWindowToken(), 0);
+        }catch (Exception e){
+            //this crashed to me , so i added try/catch here (max)
+            e.printStackTrace();
+        }
+
     }
 
     public static void setupUI(View view, final Activity a) {
@@ -272,6 +281,32 @@ public class Utils {
             phone = phone.replaceFirst("972", "0");
         }
         return phone;
+    }
+
+    public static String makePrettyDate(String formmatedDate) {
+        Utils.LOGD("event from  arrayadapter  =" + formmatedDate);
+        DateTime dt ;
+        String prettyDate;
+
+        dt = parseDate(formmatedDate);
+        if (dt == null)
+            prettyDate = formmatedDate;
+        else
+            prettyDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
+                    DateTimeFormat.forPattern("hh:mm  aaa").print(dt);
+
+        return prettyDate;
+    }
+
+    public static DateTime parseDate(String date) {
+        DateTime dt = null;
+        DateTimeFormatter dateParser = DateTimeFormat.forPattern("h:mm dd/MM/yyyy ");
+        try {
+            dt = dateParser.parseDateTime(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dt;
     }
 }
 
