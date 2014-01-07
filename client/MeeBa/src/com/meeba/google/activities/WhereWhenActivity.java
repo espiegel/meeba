@@ -222,7 +222,7 @@ public class WhereWhenActivity extends SherlockActivity {
              //   mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
                      //   DateTimeFormat.forPattern("HH:mm").print(dt);
 
-                mFormmatedDate = dt.toString( "h:mm dd/MM/yyyy ") ;
+                mFormmatedDate = dt.toString(Utils.DATE_FORMAT) ;
                 //if we want it in millis then use :
                 //dt.toInstant().getMillis());
 

@@ -2,6 +2,7 @@ package com.meeba.google.util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Stack;
 
@@ -10,31 +11,42 @@ import java.util.Stack;
  */
 public class JsonEventsStack {
 
-    public static String toJson(Stack<String> waitList) {
+    public static String toJson(String uid, Stack<String> waitList) throws JSONException {
+        JSONObject jsonWaitList = new JSONObject();
+
+        jsonWaitList.put("uid", uid);
         JSONArray jsonEventsStack = new JSONArray();
         for (String eid : waitList) {
             jsonEventsStack.put(eid);
         }
-        return jsonEventsStack.toString();
+
+        jsonWaitList.put("events", jsonEventsStack);
+
+        return jsonWaitList.toString();
     }
 
-    public static Stack<String> fromJson(String jsonArray) {
-        JSONArray jArray= null;
-        try {
-            jArray = new JSONArray(jsonArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public static Stack<String> getEventsStackfromJson(String jsonObject) throws JSONException {
+        JSONObject jObj ;
+        JSONArray jArray;
+        Stack<String> waitList ;
 
-        Stack<String> waitList = new Stack<String>();
+        jObj = new JSONObject(jsonObject);
+
+        jArray = jObj.getJSONArray("events");
+        waitList = new Stack<String>();
         int n = jArray.length();
         for (int i = 0; i < jArray.length(); i++) {
-            try {
-                waitList.push((String) jArray.get(n - i - 1));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            waitList.push((String) jArray.get(n - i - 1));
         }
+
         return waitList;
+    }
+
+    public static String getUidfromJson(String jsonObject) throws JSONException {
+        JSONObject jObj;
+        String uid ;
+        jObj = new JSONObject(jsonObject);
+        uid = jObj.getString("uid");
+        return uid;
     }
 }

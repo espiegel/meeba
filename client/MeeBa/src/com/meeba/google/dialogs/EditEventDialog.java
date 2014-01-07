@@ -208,7 +208,7 @@ public class EditEventDialog extends SherlockDialogFragment {
                 // mEditWhen.setText(selectedHour + ":" + minutes + " " + mDate);
                 dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
 
-                mFormmatedDate = dt.toString( "h:mm dd/MM/yyyy ") ;
+                mFormmatedDate = dt.toString( Utils.DATE_FORMAT) ;
                 mDate=Utils.makePrettyDate(mFormmatedDate);
 
                 mEditWhen.setText(mDate);

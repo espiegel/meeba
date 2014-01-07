@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsMessage;
 
+import com.meeba.google.util.JsonEventsStack;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
+
+import org.json.JSONException;
 
 import java.util.Map;
 import java.util.Stack;
@@ -59,50 +62,47 @@ public class SmsIntentService extends IntentService {
         }
         mMessageFrom = Utils.sanitizePhoneNumber(mMessageFrom);
 
-        //for debugging:
-        Utils.LOGD("SmsListener:msg_body=" + mMessageBody + " :: msg_from=" + mMessageFrom);
-        for (Map.Entry<String, ?> s : mSharedPrefs.getAll().entrySet()) {
-            String eid = ((String) s.getValue()).split(",")[0];
-            String uid = ((String) s.getValue()).split(",")[1];
-            Utils.LOGD("SmsListener: in waiting list : uid =" + uid + " ::  eid = " + eid);
-        }
 
         //check if the sender's phone number is in the waiting list
         if (mSharedPrefs.getAll().keySet().contains(mMessageFrom)) {
+            int eid, uid;
+            Stack<String> eventsStack;
+            String jsonWaitingList = mSharedPrefs.getString(mMessageFrom, null);
 
-            String uidAndEid = mSharedPrefs.getString(mMessageFrom, null);
+            try {
+                eventsStack = JsonEventsStack.getEventsStackfromJson(jsonWaitingList);
+                uid = Integer.valueOf(JsonEventsStack.getUidfromJson(jsonWaitingList));
+                eid = Integer.valueOf(eventsStack.pop());
 
-            if (uidAndEid == null) {
-                Utils.LOGD("SmsListener: a very  weired error happened");
-                return;
+                //accept invite
+                if (mMessageBody.contains("1")) {
+                    UserFunctions.acceptInvite(uid, eid);
+                    mPrefsEditor.remove(mMessageFrom);
+                    mPrefsEditor.commit();
+                }
+
+                //decline invite
+                else if (mMessageBody.contains("2")) {
+                    UserFunctions.declineInvite(uid, eid);
+                    mPrefsEditor.remove(mMessageFrom);
+                    mPrefsEditor.commit();
+                } else {
+                    Utils.LOGD("SmsListener:sms body is not of the right form");
+                }
+
+                //remove from waiting list
+                Utils.updateWaitingList(mMessageFrom, String.valueOf(uid), eventsStack, mSharedPrefs);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            int eid = Integer.valueOf(uidAndEid.split(",")[0]);
-            int uid = Integer.valueOf(uidAndEid.split(",")[1]);
+            // WARNING!!!
+            // If you uncomment the next line then received SMS will not be put to incoming.
+            // Be careful!
+            // this.abortBroadcast();
 
-            //accept invite
-            if (mMessageBody.contains("1")) {
-                UserFunctions.acceptInvite(uid, eid);
-                mPrefsEditor.remove(mMessageFrom);
-                mPrefsEditor.commit();
-            }
-
-            //decline invite
-            else if (mMessageBody.contains("2")) {
-                UserFunctions.declineInvite(uid, eid);
-                mPrefsEditor.remove(mMessageFrom);
-                mPrefsEditor.commit();
-            } else {
-                /* Do Noting */
-                Utils.LOGD("SmsListener:sms body is not of the right form");
-            }
         }
-
-
-        // WARNING!!!
-        // If you uncomment the next line then received SMS will not be put to incoming.
-        // Be careful!
-        // this.abortBroadcast();
-
+        Utils.LOGD("SmsListener:phone number not in waiting list " + mMessageFrom);
     }
 }
