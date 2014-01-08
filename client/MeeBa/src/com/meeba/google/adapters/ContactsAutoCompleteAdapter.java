@@ -74,7 +74,7 @@ public class ContactsAutoCompleteAdapter extends ArrayAdapter<User> implements F
                     return;
                 }
                 mCallback.autoCompleteItemClicked("");
-                ContactsActivity.addToInvitList(filterList.get(position));
+                ContactsActivity.addToInviteList(filterList.get(position));
             }
         });
 

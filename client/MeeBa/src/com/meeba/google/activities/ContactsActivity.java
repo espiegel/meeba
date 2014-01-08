@@ -166,7 +166,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 User user = (User) adapterView.getItemAtPosition(position);
-                removeFromInvitList(user);
+                removeFromInviteList(user);
 
             }
         });
@@ -181,23 +181,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 return false;
             }
         });
-       /* mFilterText.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                System.out.println("Text [" + s + "]");
-                mContactsAdapter.getFilter().filter(s.toString());
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });*/
         asyncRefresh();
     }
 
@@ -560,22 +543,16 @@ public class ContactsActivity extends SherlockFragmentActivity {
         //mPrefsEditor.clear();//just for debugging
     }
 
-    public static void addToInvitList(User user) {
-
-        if (inviteList.contains(user)) {
-
-        } else {
-
+    public static void addToInviteList(User user) {
+        if (!inviteList.contains(user)) {
             mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
             mContactsAdapter.getList().add(user);
             mContactsAdapter.notifyDataSetChanged();
         }
         forFilterList.remove(user);
-
-
     }
 
-    public static void removeFromInvitList(User user) {
+    public static void removeFromInviteList(User user) {
         mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
         mContactsAdapter.getList().remove(user);
         mContactsAdapter.notifyDataSetChanged();
@@ -583,8 +560,5 @@ public class ContactsActivity extends SherlockFragmentActivity {
         } else {
             forFilterList.add(user);
         }
-
-
     }
-
 }
