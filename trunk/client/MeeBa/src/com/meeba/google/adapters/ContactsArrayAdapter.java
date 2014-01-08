@@ -62,7 +62,7 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
                 public void onClick(View view) {
                     User element = (User) viewHolder.deleteMe
                             .getTag();
-                    ContactsActivity.addToInvitList(element);
+                    ContactsActivity.addToInviteList(element);
                 }
             });*/
 
