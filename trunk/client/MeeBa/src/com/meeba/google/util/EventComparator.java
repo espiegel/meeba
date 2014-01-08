@@ -15,14 +15,14 @@ public class EventComparator implements Comparator<Event> {
         DateTime dt1 = Utils.parseDate(event1.getFormmatedWhen());
         DateTime dt2 = Utils.parseDate(event2.getFormmatedWhen());
         if (dt1 == null || dt2 == null) {
-            return 0;
+            return 1;
         }
 
         if (dt1.isBefore(dt2))
-            return 1;
+            return -1;
 
         else if (dt1.isAfter(dt2))
-            return -1;
+            return 1;
 
         else
             return 0;

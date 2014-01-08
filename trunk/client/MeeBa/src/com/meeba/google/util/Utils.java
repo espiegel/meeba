@@ -318,7 +318,7 @@ public class Utils {
                                          SharedPreferences sharedPrefs) throws JSONException {
 
         String uid = String.valueOf(iuid);
-        String eid = String .valueOf(ieid);
+        String eid = String.valueOf(ieid);
         Stack<String> waitingStack;
         SharedPreferences.Editor editor = sharedPrefs.edit();
         String foundJsonObj = sharedPrefs.getString(phoneNumber, null);
@@ -335,16 +335,24 @@ public class Utils {
         //store new Stack in phone
         editor.putString(phoneNumber, updatedJsonStack);
         editor.commit();
-        Utils.LOGD("pushToWaitingList : pushing  " +phoneNumber +"->" + updatedJsonStack  );
+        Utils.LOGD("pushToWaitingList : pushing  " + phoneNumber + "->" + updatedJsonStack);
     }
 
     public static void updateWaitingList(String phoneNumber, String uid,
                                          Stack<String> newWaitingList, SharedPreferences sharedPrefs) throws JSONException {
 
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        String updatedJsonStack = JsonEventsStack.toJson(uid,newWaitingList);
-        editor.putString(phoneNumber,updatedJsonStack);
+        String updatedJsonStack = JsonEventsStack.toJson(uid, newWaitingList);
+        editor.putString(phoneNumber, updatedJsonStack);
         editor.commit();
     }
 
+    public static void deleteFromWaitingList(String eid, SharedPreferences sharedPrefs) {
+        Utils.LOGD("deleting eid =  " + eid + " from waitingList ");
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        if (sharedPrefs.contains(eid)) {
+            editor.remove(eid);
+            editor.commit();
+        }
+    }
 }

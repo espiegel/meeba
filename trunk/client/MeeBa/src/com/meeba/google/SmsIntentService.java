@@ -102,7 +102,7 @@ public class SmsIntentService extends IntentService {
             // Be careful!
             // this.abortBroadcast();
 
-        }
-        Utils.LOGD("SmsListener:phone number not in waiting list " + mMessageFrom);
+        } else
+            Utils.LOGD("SmsListener:phone number not in waiting list " + mMessageFrom);
     }
 }
