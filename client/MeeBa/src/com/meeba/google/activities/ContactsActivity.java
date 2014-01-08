@@ -185,108 +185,71 @@ public class ContactsActivity extends SherlockFragmentActivity {
     }
 
     private void asyncRefresh() {
-        new AsyncTask<Void, Void, List<User>>() {
-            ProgressDialog progressDialog;
-            boolean canceled = false;
+        ProgressDialog progressDialog;
 
-            protected void onPreExecute() {
-                Utils.LOGD("onPreExecute");
-                super.onPreExecute();
-                progressDialog = ProgressDialog
-                        .show(ContactsActivity.this, "", "Loading contacts...", true, true);
+        Utils.LOGD("onPreExecute");
+        progressDialog = ProgressDialog
+                .show(ContactsActivity.this, "", "Loading contacts...", true, true);
 
-                progressDialog.setCanceledOnTouchOutside(false);
+        List<User> userList = DatabaseFunctions.loadContacts(getApplicationContext());
+        List<User> sortedUserList = new ArrayList<User>();
 
-                progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        canceled = true;
-                    }
-                });
+        // Sort the user list by alphabetical order
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user, User user2) {
+                return user.getName().toLowerCase().compareTo(user2.getName().toLowerCase());
             }
+        });
 
-            protected List<User> doInBackground(Void... params) {
-
-                if (canceled)
-                    return null;
-
-                List<User> userList = DatabaseFunctions.loadContacts(getApplicationContext());
-                List<User> sortedUserList = new ArrayList<User>();
-
-                // Sort the user list by alphabetical order
-                Collections.sort(userList, new Comparator<User>() {
-                    @Override
-                    public int compare(User user, User user2) {
-                        return user.getName().toLowerCase().compareTo(user2.getName().toLowerCase());
-                    }
-                });
-
-                if (mGuests != null) {
-                    for (User user : mGuests) {
-                        Utils.LOGD("mGuests user =" + user);
-                    }
-                }
-                // First add meeba users
-                for (User user : userList) {
-                    Utils.LOGD("asyncRefresh user:" + user);
-                    if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() != 1) {
-                        if (!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
-                            sortedUserList.add(user);
-                        }
-                    }
-                }
-
-                // Then add the rest of the contact list
-                for (User user : userList) {
-                    if (user.getUid() == Utils.DUMMY_USER || user.getIs_dummy() == 1) {
-                        if (!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
-                            sortedUserList.add(user);
-                        }
-                    }
-                }
-                return sortedUserList;
+        if (mGuests != null) {
+            for (User user : mGuests) {
+                Utils.LOGD("mGuests user =" + user);
             }
-
-            protected void onPostExecute(List<User> list) {
-
-                if (progressDialog != null)
-                    progressDialog.dismiss();
-
-                if (canceled)
-                    finish();
-
-                if (list == null) {
-                    Utils.LOGD("getUsersByPhones returned null!");
-                    progressDialog.dismiss();
-                    return;
+        }
+        // First add meeba users
+        for (User user : userList) {
+            Utils.LOGD("asyncRefresh user:" + user);
+            if (user.getUid() != Utils.DUMMY_USER && user.getIs_dummy() != 1) {
+                if (!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
+                    sortedUserList.add(user);
                 }
-                Utils.LOGD("onPostExecute");
-
-                Utils.LOGD("list=...");
-                for (User u : list) {
-                    Utils.LOGD(u.toString());
-                }
-
-
-                forFilterList = list;
-                inviteList = new ArrayList<User>();
-
-                ContactsAutoCompleteAdapter autoCompleteAdapter = new ContactsAutoCompleteAdapter(ContactsActivity.this, R.layout.dropdown_autocomplete,
-                        R.id.txtViewSearch, forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
-                    @Override
-                    public void autoCompleteItemClicked(String query) {
-                        mEditFilterContacts.setText(query);
-                    }
-                });
-                mEditFilterContacts.setThreshold(0);
-                mEditFilterContacts.setAdapter(autoCompleteAdapter);
-
-
-                mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, inviteList);
-                mUserListView.setAdapter(mContactsAdapter);
-
             }
-        }.execute();
+        }
+
+        // Then add the rest of the contact list
+        for (User user : userList) {
+            if (user.getUid() == Utils.DUMMY_USER || user.getIs_dummy() == 1) {
+                if (!isAddingGuests || (mGuests != null && !mGuests.contains(user))) {
+                    sortedUserList.add(user);
+                }
+            }
+        }
+
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+
+        Utils.LOGD("list=...");
+        for (User u : sortedUserList) {
+            Utils.LOGD(u.toString());
+        }
+
+        forFilterList = sortedUserList;
+        inviteList = new ArrayList<User>();
+
+        ContactsAutoCompleteAdapter autoCompleteAdapter = new ContactsAutoCompleteAdapter(ContactsActivity.this, R.layout.dropdown_autocomplete,
+                R.id.txtViewSearch, forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
+            @Override
+            public void autoCompleteItemClicked(String query) {
+                mEditFilterContacts.setText(query);
+            }
+        });
+        mEditFilterContacts.setThreshold(0);
+        mEditFilterContacts.setAdapter(autoCompleteAdapter);
+
+        mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, inviteList);
+        mUserListView.setAdapter(mContactsAdapter);
     }
 
     @Override
