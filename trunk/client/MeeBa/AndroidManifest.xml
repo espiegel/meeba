@@ -86,6 +86,7 @@
         </activity>
 
         <activity android:name=".activities.WhereWhenActivity"
+                  android:windowSoftInputMode="adjustPan"
                   android:screenOrientation="portrait"/>
         <activity android:name=".activities.ContactsActivity"
                   android:windowSoftInputMode="adjustPan"

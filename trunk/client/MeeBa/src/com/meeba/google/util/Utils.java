@@ -49,7 +49,7 @@ public class Utils {
     public static final boolean DEBUG = true;
     public static final String BASE_URL = "http://54.214.243.219/meeba/";
     public static final int DUMMY_USER = -1;
-    public static final String DATE_FORMAT = "h:mm dd/MM/yyyy ";
+    public static final String DATE_FORMAT = "HH:mm dd/MM/yyyy";
 
     private static Utils mInstance = null;
     private CookieStore mCookie = null;
@@ -298,7 +298,7 @@ public class Utils {
             prettyDate = formmatedDate;
         else
             prettyDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
-                    DateTimeFormat.forPattern("hh:mm  ").print(dt);
+                    DateTimeFormat.forPattern("HH:mm").print(dt);
 
         return prettyDate;
     }

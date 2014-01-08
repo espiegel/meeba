@@ -1,6 +1,5 @@
 package com.meeba.google.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,12 +27,11 @@ import com.meeba.google.database.DatabaseFunctions;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.NavDrawerItem;
 import com.meeba.google.objects.User;
+import com.meeba.google.util.EventComparator;
 import com.meeba.google.util.UserFunctions;
 import com.meeba.google.util.Utils;
 import com.twotoasters.jazzylistview.JazzyHelper;
 import com.twotoasters.jazzylistview.JazzyListView;
-
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,14 +56,13 @@ public class DashboardActivity extends SherlockActivity {
     private List<Event> mAcceptedEventsList;
     private List<Event> mUnknownEventsList;
     private EventArrayAdapter mEventArrayAdapter;
-    private List<User> ListOfAppContacts;
-    private List<User> ListOfContacts;
+    private List<User> mListOfAppContacts;
+    private List<User> mListOfContacts;
     private PullToRefreshLayout mPullToRefreshLayout;
 
-    private NavDrawerListAdapter adapter;
+    private NavDrawerListAdapter mNavDrawerListAdapter;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private final Activity dashboard = this;
     private ActionBarDrawerToggle mDrawerToggle;
 
     private final int FILTER_ALL_EVENTS = 0;
@@ -76,6 +73,7 @@ public class DashboardActivity extends SherlockActivity {
 
     private ImageView mNoEvent;
     private final Event mDummyEvent = new Event(-1, "", "", "", "", new User(-1, "", "", "", "", "", ""));
+    private Comparator<Event> mEventComparator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,9 +111,9 @@ public class DashboardActivity extends SherlockActivity {
         // Recycle the typed array
         navMenuIcons.recycle();
 
-        // setting the nav drawer list adapter
-        adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
-        mDrawerList.setAdapter(adapter);
+        // setting the nav drawer list mNavDrawerListAdapter
+        mNavDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
+        mDrawerList.setAdapter(mNavDrawerListAdapter);
         //make the first row selected as default
         mDrawerList.setItemChecked(0, true);
 
@@ -147,7 +145,7 @@ public class DashboardActivity extends SherlockActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
                 mNoEvent.setVisibility(View.GONE);
-                NavDrawerItem selectedRow = (NavDrawerItem) adapter.getItem(position);
+                NavDrawerItem selectedRow = (NavDrawerItem) mNavDrawerListAdapter.getItem(position);
                 selectedRow.getTitle();
 
                 //create and show the filtered list,  and close the drawer
@@ -164,7 +162,7 @@ public class DashboardActivity extends SherlockActivity {
                     mNoEvent.setVisibility(View.VISIBLE);
                 }
 
-                EventArrayAdapter filteredAdapter = new EventArrayAdapter(dashboard, filteredList);
+                EventArrayAdapter filteredAdapter = new EventArrayAdapter(DashboardActivity.this, filteredList);
                 mEventListView.setAdapter(filteredAdapter);
                 mDrawerLayout.closeDrawer(mDrawerList);
             }
@@ -225,6 +223,7 @@ public class DashboardActivity extends SherlockActivity {
                     startActivity(intent);
                 }
             });
+            mEventComparator = new EventComparator();
             asyncRefresh();
             asyncUpdateContacts();
         }
@@ -367,25 +366,7 @@ public class DashboardActivity extends SherlockActivity {
 
 
                 //sort by event due date
-                Collections.sort(mAllEventsList, new Comparator<Event>() {
-                    @Override
-                    public int compare(Event event1, Event event2) {
-                        DateTime dt1 = Utils.parseDate(event1.getFormmatedWhen());
-                        DateTime dt2 = Utils.parseDate(event2.getFormmatedWhen());
-                        if (dt1 == null || dt2 == null) {
-                            return 0;
-                        }
-
-                        if (dt1.isBefore(dt2))
-                            return -1;
-
-                        else if (dt1.isAfter(dt2))
-                            return 1;
-
-                        else
-                            return 0;
-                    }
-                });
+                Collections.sort(mAllEventsList, mEventComparator);
 
                 //apply the chosen filter to the updated event list
                 filterdEvents = filterEventList(mAllEventsList);
@@ -397,7 +378,7 @@ public class DashboardActivity extends SherlockActivity {
                     mNoEvent.setVisibility(View.GONE);
                 }
 
-                mEventArrayAdapter = new EventArrayAdapter(dashboard, filterdEvents);
+                mEventArrayAdapter = new EventArrayAdapter(DashboardActivity.this, filterdEvents);
                 mEventListView.setAdapter(mEventArrayAdapter);
                 Utils.LOGD("list count =  " + mEventArrayAdapter.getCount());
             }
@@ -430,6 +411,9 @@ public class DashboardActivity extends SherlockActivity {
                     temp = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 0);
                     mUnknownEventsList = temp != null ? temp : new ArrayList<Event>();
 
+                    Collections.sort(mAcceptedEventsList, mEventComparator);
+                    Collections.sort(mRejectedEventsList, mEventComparator);
+                    Collections.sort(mUnknownEventsList, mEventComparator);
                 } catch (Exception e) {
                    /* Stack Trace is already printed in  UserFunctions*/
                     exceptionOccured = true;
@@ -472,9 +456,9 @@ public class DashboardActivity extends SherlockActivity {
                 }
 
                 List<String> phoneList = Utils.phoneList(phoneMap);
-                ListOfAppContacts = UserFunctions.getUsersByPhones(phoneList);
+                mListOfAppContacts = UserFunctions.getUsersByPhones(phoneList);
 
-                if (ListOfAppContacts == null) {
+                if (mListOfAppContacts == null) {
                     return null;
                 }
 
@@ -482,15 +466,15 @@ public class DashboardActivity extends SherlockActivity {
 
                 //get phones of user with meeba for later
                 // And change name of user like in phone and user to list
-                ListOfContacts = new ArrayList<User>();
-                for (User user : ListOfAppContacts) {
+                mListOfContacts = new ArrayList<User>();
+                for (User user : mListOfAppContacts) {
                     meebaUsersPhones.add(user.getPhone_number());
 
                     String nameFromPhone = phoneMap.get(user.getPhone_number());
                     if (nameFromPhone != null && !TextUtils.isEmpty(nameFromPhone)) {
                         user.setName(nameFromPhone);
                     }
-                    ListOfContacts.add(user);
+                    mListOfContacts.add(user);
                 }
 
                 // Create an 'ordered' map so that we can sort contacts alphabetically
@@ -514,13 +498,13 @@ public class DashboardActivity extends SherlockActivity {
                             //because if he is a positive dummy , then no need to create a negative dummy for him
                             && !(foundContact != null && foundContact.getIs_dummy() == 1)) {
                         User user = new User(Utils.DUMMY_USER, "", entry.getKey(), entry.getValue(), "", "", "");
-                        ListOfContacts.add(user);
+                        mListOfContacts.add(user);
                         //Utils.LOGD("created negative dummy for  :  " + entry.getKey());
                     }
                 }
 
-                if (ListOfContacts != null) {
-                    DatabaseFunctions.storeContacts(getApplicationContext(), ListOfContacts);
+                if (mListOfContacts != null) {
+                    DatabaseFunctions.storeContacts(getApplicationContext(), mListOfContacts);
                 }
                 return null;
             }
