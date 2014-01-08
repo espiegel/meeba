@@ -1,6 +1,7 @@
 package com.meeba.google.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,12 +10,11 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -129,7 +129,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             }
         });
 
-        mEditFilterContacts.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        /*mEditFilterContacts.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH ||
@@ -139,7 +139,8 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 }
                 return false;
             }
-        });
+        });*/
+
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey(EVENT)) {
             mEvent = (Event) bundle.getSerializable(EVENT);
@@ -238,13 +239,18 @@ public class ContactsActivity extends SherlockFragmentActivity {
         forFilterList = sortedUserList;
         inviteList = new ArrayList<User>();
 
-        ContactsAutoCompleteAdapter autoCompleteAdapter = new ContactsAutoCompleteAdapter(ContactsActivity.this, R.layout.dropdown_autocomplete,
-                R.id.txtViewSearch, forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
+        ContactsAutoCompleteAdapter autoCompleteAdapter = new ContactsAutoCompleteAdapter(ContactsActivity.this, R.layout.contacts_dropdown,
+                R.id.personName, forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
             @Override
-            public void autoCompleteItemClicked(String query) {
-                mEditFilterContacts.setText(query);
+            public void autoCompleteItemClicked(User user) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mEditFilterContacts.getWindowToken(), 0);
+                addToInviteList(user);
+                mEditFilterContacts.setText("");
             }
         });
+        mEditFilterContacts.setDropDownHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mEditFilterContacts.setThreshold(0);
         mEditFilterContacts.setAdapter(autoCompleteAdapter);
 
@@ -506,7 +512,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
         //mPrefsEditor.clear();//just for debugging
     }
 
-    public static void addToInviteList(User user) {
+    private void addToInviteList(User user) {
         if (!inviteList.contains(user)) {
             mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
             mContactsAdapter.getList().add(user);
@@ -515,7 +521,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
         forFilterList.remove(user);
     }
 
-    public static void removeFromInviteList(User user) {
+    private void removeFromInviteList(User user) {
         mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
         mContactsAdapter.getList().remove(user);
         mContactsAdapter.notifyDataSetChanged();

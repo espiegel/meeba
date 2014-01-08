@@ -30,6 +30,9 @@
     <string name="update">Update</string>
     <string name="cancel">Cancel</string>
     <string name="bad_event_details_input">You must input a title, location and a time</string>
+    <string name="add_guest">Add Guest</string>
+    <string name="select_contacts">Type contact name...</string>
+    <string name="add_event_guests">Add Event Guests</string>
 
     <string-array
         name="drawer_event_filters">
@@ -99,5 +102,4 @@
         <item quantity="other">Dismissing in %d</item>
     </plurals>
     <string name="countdown_dismissing">Dismissing...</string>
-    <string name="add_guest">Add Guest</string>
 </resources>
