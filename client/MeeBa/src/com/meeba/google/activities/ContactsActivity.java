@@ -243,7 +243,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 R.id.personName, forFilterList, new ContactsAutoCompleteAdapter.SearchAutoComplete() {
             @Override
             public void autoCompleteItemClicked(User user) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(
+                InputMethodManager imm = (InputMethodManager) getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(mEditFilterContacts.getWindowToken(), 0);
                 addToInviteList(user);
@@ -454,7 +454,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
 
     private void sendSms(List<User> dummies) {
-        Utils.LOGD("in sendSms dumies = " +dummies);
+        Utils.LOGD("in sendSms dumies = " + dummies);
         // Open a dialog asking the user whether he wants to send an sms
         if (!dummies.isEmpty()) {
             String separator = "; ";
@@ -465,7 +465,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
             }
 
             /**for denugging :*/
-            for (Map.Entry<String, ?> s : mSharedPrefs.getAll().entrySet() ) {
+            for (Map.Entry<String, ?> s : mSharedPrefs.getAll().entrySet()) {
                 Utils.LOGD("waiting :: " + s);
             }
 
@@ -487,8 +487,10 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 /**call sms intent :*/
                 Utils.LOGD("sending sms to address=" + address);
                 Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                String date = Utils.makePrettyDate(mEvent.getFormmatedWhen());
+                Utils.LOGD("new Date = " + date);
                 sendIntent.putExtra("address", address);
-                sendIntent.putExtra("sms_body", "Hey, you're invited to " + mTitle + " at " + mWhere + " at " + mWhen + "!\n" +
+                sendIntent.putExtra("sms_body", "Hey, you're invited to " + mTitle + " at " + mWhere + " at " + date + "!\n" +
                         "to attend reply: 1\n" +
                         "to decline reply: 2\n" +
                         getString(R.string.generated));
