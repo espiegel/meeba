@@ -88,7 +88,7 @@
         <activity android:name=".activities.WhereWhenActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".activities.ContactsActivity"
-                  android:windowSoftInputMode="stateHidden"
+                  android:windowSoftInputMode="adjustPan"
                   android:screenOrientation="portrait"/>
         <activity android:name=".activities.EventPageActivity"
                   android:screenOrientation="portrait"/>

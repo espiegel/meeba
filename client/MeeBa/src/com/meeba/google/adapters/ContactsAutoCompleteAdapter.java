@@ -5,18 +5,21 @@ package com.meeba.google.adapters;
  */
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.meeba.google.R;
-import com.meeba.google.activities.ContactsActivity;
 import com.meeba.google.objects.User;
+import com.meeba.google.util.Utils;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,31 +57,28 @@ public class ContactsAutoCompleteAdapter extends ArrayAdapter<User> implements F
 
         if(convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.dropdown_autocomplete, parent, false);
+            convertView = inflater.inflate(R.layout.contacts_dropdown, parent, false);
         }
 
-        final TextView txtView = (TextView) convertView.findViewById(R.id.txtViewSearch);
+        final TextView txtView = (TextView) convertView.findViewById(R.id.personName);
+        final ImageView imgView = (ImageView) convertView.findViewById(R.id.personPicture);
 
         if(position >= filterList.size()) {
             return convertView;
         }
 
-        User currentUser = filterList.get(position);
+        final User currentUser = filterList.get(position);
 
         txtView.setText(currentUser.getName());
+        ImageLoader imageLoader = Utils.getImageLoader(mContext);
+        String pic = currentUser.getPicture_url();
+        if(pic != null && !TextUtils.isEmpty(pic)) {
+            imageLoader.displayImage(currentUser.getPicture_url(), imgView);
+        } else {
+            imgView.setImageResource(R.drawable.no_photo);
+        }
 
-        txtView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(view == null) {
-                    return;
-                }
-                mCallback.autoCompleteItemClicked("");
-                ContactsActivity.addToInviteList(filterList.get(position));
-            }
-        });
-
-        RelativeLayout layout = (RelativeLayout) convertView.findViewById(R.id.layoutAutoComplete);
+        final RelativeLayout layout = (RelativeLayout) convertView.findViewById(R.id.layoutAutoComplete);
 
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,13 +87,11 @@ public class ContactsAutoCompleteAdapter extends ArrayAdapter<User> implements F
                     return;
                 }
 
-                for (int itemPos = 0; itemPos < ((ViewGroup)view).getChildCount(); itemPos++) {
+                for (int itemPos = 0; itemPos < layout.getChildCount(); itemPos++) {
                     View child = ((ViewGroup)view).getChildAt(itemPos);
                     if (child instanceof TextView) {
                         TextView textView = (TextView) child; //Found it!
-
-                        mCallback.autoCompleteItemClicked(textView.getText().toString());
-
+                        mCallback.autoCompleteItemClicked(currentUser);
                         break;
                     }
                 }
@@ -119,8 +117,9 @@ public class ContactsAutoCompleteAdapter extends ArrayAdapter<User> implements F
                     ArrayList<User> filterData = new ArrayList<User>();
 
                     for (User p : list) {
-                        if (p.getName().toLowerCase().startsWith(constraint.toString().toLowerCase()))
+                        if (p.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
                             filterData.add(p);
+                        }
                     }
 
                     results.values = filterData;
@@ -145,6 +144,6 @@ public class ContactsAutoCompleteAdapter extends ArrayAdapter<User> implements F
     }
 
     public interface SearchAutoComplete {
-        public void autoCompleteItemClicked(String query);
+        public void autoCompleteItemClicked(User user);
     }
 }
