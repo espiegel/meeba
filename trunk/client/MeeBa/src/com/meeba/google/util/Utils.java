@@ -357,7 +357,7 @@ public class Utils {
         }
     }
 
-    public  static  List<Event> sortEvents (List<Event> events ){
+    public static List<Event> sortEvents(List<Event> events) {
         List<Event> pastEvents = new ArrayList<Event>();
         List<Event> futureEvents = new ArrayList<Event>();
         List<Event> sortedEvents = new ArrayList<Event>();
@@ -366,20 +366,26 @@ public class Utils {
         DateTime now = new DateTime();
         Utils.LOGD("sortEvents :current time = " + now);
 
-        for(Event ev : events){
-            if (parseDate( ev.getFormmatedWhen()).isBefore(now)){
-                pastEvents.add(ev);
-            }
-            else {
-                futureEvents.add(ev);
-            }
-            Collections.sort(pastEvents,pastEventsComparator);
-            Collections.sort(futureEvents,futureEventsComparator);
-        }
+        try {
+            for (Event ev : events) {
+                Utils.LOGD("sortEvents :ev  = " + ev);
+                Utils.LOGD("sortEvents : ev.getFormmatedWhen()  = " + ev.getFormmatedWhen());
 
-        Utils.LOGD("sortEvents :future events  = " + futureEvents);
-        sortedEvents.addAll(futureEvents);
-        sortedEvents.addAll(pastEvents);
+                if (parseDate(ev.getFormmatedWhen()).isBefore(now)) {
+                    pastEvents.add(ev);
+                } else {
+                    futureEvents.add(ev);
+                }
+                Collections.sort(pastEvents, pastEventsComparator);
+                Collections.sort(futureEvents, futureEventsComparator);
+            }
+
+            Utils.LOGD("sortEvents :future events  = " + futureEvents);
+            sortedEvents.addAll(futureEvents);
+            sortedEvents.addAll(pastEvents);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return sortedEvents;
     }
 
