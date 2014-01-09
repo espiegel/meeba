@@ -22,7 +22,6 @@ import android.widget.Toast;
 import com.meeba.google.R;
 import com.meeba.google.objects.Event;
 import com.meeba.google.objects.User;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -33,7 +32,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,6 +49,7 @@ public class Utils {
     public static final String BASE_URL = "http://54.214.243.219/meeba/";
     public static final int DUMMY_USER = -1;
     public static final String DATE_FORMAT = "HH:mm dd/MM/yyyy";
+    public static final String PRETTY_DATE_FORMAT = "EEE, MMM d, HH:mm";
 
     private static Utils mInstance = null;
     private CookieStore mCookie = null;
@@ -298,8 +297,9 @@ public class Utils {
         if (dt == null)
             prettyDate = formmatedDate;
         else
-            prettyDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
-                    DateTimeFormat.forPattern("HH:mm").print(dt);
+            prettyDate = dt.toString(PRETTY_DATE_FORMAT);
+        //    prettyDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
+//                    DateTimeFormat.forPattern("HH:mm").print(dt);
 
         return prettyDate;
     }
@@ -309,8 +309,19 @@ public class Utils {
         DateTimeFormatter dateParser = DateTimeFormat.forPattern(DATE_FORMAT);
         try {
             dt = dateParser.parseDateTime(date);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e1) {
+            try {
+                DateTimeFormatter oldDateParser = DateTimeFormat.forPattern(PRETTY_DATE_FORMAT);
+                dt = oldDateParser.parseDateTime(date);
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+
+        //if parsing didn't succeed neither with DATE_FORMAT && PRETTY_DATE_FORMAT
+        if (dt == null) {
+            //make dt the current time . (its not an expected behaviour - but app wont crash
+            dt = new DateTime();
         }
         return dt;
     }
@@ -366,26 +377,27 @@ public class Utils {
         DateTime now = new DateTime();
         Utils.LOGD("sortEvents :current time = " + now);
 
-        try {
-            for (Event ev : events) {
-                Utils.LOGD("sortEvents :ev  = " + ev);
-                Utils.LOGD("sortEvents : ev.getFormmatedWhen()  = " + ev.getFormmatedWhen());
 
-                if (parseDate(ev.getFormmatedWhen()).isBefore(now)) {
-                    pastEvents.add(ev);
-                } else {
-                    futureEvents.add(ev);
-                }
-                Collections.sort(pastEvents, pastEventsComparator);
-                Collections.sort(futureEvents, futureEventsComparator);
+        for (Event ev : events) {
+            Utils.LOGD("sortEvents :ev  = " + ev);
+            Utils.LOGD("sortEvents : ev.getFormmatedWhen()  = " + ev.getFormmatedWhen());
+            DateTime eventDate = null;
+
+            eventDate = parseDate(ev.getFormmatedWhen());
+
+            if (eventDate.isBefore(now)) {
+                pastEvents.add(ev);
+            } else {
+                futureEvents.add(ev);
             }
-
-            Utils.LOGD("sortEvents :future events  = " + futureEvents);
-            sortedEvents.addAll(futureEvents);
-            sortedEvents.addAll(pastEvents);
-        } catch (Exception e) {
-            e.printStackTrace();
+            Collections.sort(pastEvents, pastEventsComparator);
+            Collections.sort(futureEvents, futureEventsComparator);
         }
+
+        Utils.LOGD("sortEvents :future events  = " + futureEvents);
+        sortedEvents.addAll(futureEvents);
+        sortedEvents.addAll(pastEvents);
+
         return sortedEvents;
     }
 
