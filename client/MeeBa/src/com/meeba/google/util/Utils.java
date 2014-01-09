@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -355,4 +356,31 @@ public class Utils {
             editor.commit();
         }
     }
+
+    public  static  List<Event> sortEvents (List<Event> events ){
+        List<Event> pastEvents = new ArrayList<Event>();
+        List<Event> futureEvents = new ArrayList<Event>();
+        List<Event> sortedEvents = new ArrayList<Event>();
+        EventComparator futureEventsComparator = new EventComparator(false);
+        EventComparator pastEventsComparator = new EventComparator(true);
+        DateTime now = new DateTime();
+        Utils.LOGD("sortEvents :current time = " + now);
+
+        for(Event ev : events){
+            if (parseDate( ev.getFormmatedWhen()).isBefore(now)){
+                pastEvents.add(ev);
+            }
+            else {
+                futureEvents.add(ev);
+            }
+            Collections.sort(pastEvents,pastEventsComparator);
+            Collections.sort(futureEvents,futureEventsComparator);
+        }
+
+        Utils.LOGD("sortEvents :future events  = " + futureEvents);
+        sortedEvents.addAll(futureEvents);
+        sortedEvents.addAll(pastEvents);
+        return sortedEvents;
+    }
+
 }

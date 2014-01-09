@@ -52,6 +52,8 @@ public class DashboardActivity extends SherlockActivity {
     private JazzyListView mEventListView;
     private User mCurrentUser;
     private List<Event> mAllEventsList;
+    private List<Event> mPastEvents;
+    private List<Event> mFutureEvents;
     private List<Event> mRejectedEventsList;
     private List<Event> mAcceptedEventsList;
     private List<Event> mUnknownEventsList;
@@ -366,7 +368,8 @@ public class DashboardActivity extends SherlockActivity {
 
 
                 //sort by event due date
-                Collections.sort(mAllEventsList, mEventComparator);
+                //Collections.sort(mAllEventsList, mEventComparator);
+                mAllEventsList = Utils.sortEvents(mAllEventsList);
 
                 //apply the chosen filter to the updated event list
                 filterdEvents = filterEventList(mAllEventsList);
@@ -411,9 +414,10 @@ public class DashboardActivity extends SherlockActivity {
                     temp = UserFunctions.getEventsByUser(mCurrentUser.getUid(), 0);
                     mUnknownEventsList = temp != null ? temp : new ArrayList<Event>();
 
-                    Collections.sort(mAcceptedEventsList, mEventComparator);
-                    Collections.sort(mRejectedEventsList, mEventComparator);
-                    Collections.sort(mUnknownEventsList, mEventComparator);
+                    mAcceptedEventsList = Utils.sortEvents(mAcceptedEventsList);
+                    mRejectedEventsList = Utils.sortEvents(mRejectedEventsList);
+                    mUnknownEventsList = Utils.sortEvents(mUnknownEventsList);
+
                 } catch (Exception e) {
                    /* Stack Trace is already printed in  UserFunctions*/
                     exceptionOccured = true;
