@@ -2,6 +2,9 @@ package com.meeba.google.objects;
 
 
 import com.meeba.google.util.Utils;
+
+import org.joda.time.DateTime;
+
 import java.io.Serializable;
 
 
@@ -70,7 +73,17 @@ public class Event implements Serializable {
         return Utils.makePrettyDate(when);
     }
     public String getFormmatedWhen() {
-        return  when;
+        return when;
+    }
+
+    public DateTime getWhenAsDateTimeObj() {
+        DateTime dt = Utils.parseDate(getFormmatedWhen());
+        return dt;
+    }
+
+    public boolean isOver() {
+        DateTime now = new DateTime();
+        return getWhenAsDateTimeObj().isBefore(now);
     }
 
     public void setWhen(String when) {
