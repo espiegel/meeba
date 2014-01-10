@@ -5,10 +5,15 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -136,7 +141,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         mImageLoader = Utils.getImageLoader(this);
         mImageLoader.displayImage(mHost.getPicture_url(), mImageHost);
         mImageLoader.displayImage(mMyCurrentUser.getPicture_url(), mMy_picture);
-        if(!TextUtils.isEmpty(mEvent.getEvent_picture())) {
+        if (!TextUtils.isEmpty(mEvent.getEvent_picture())) {
             mImageLoader.displayImage(mEvent.getEvent_picture(), mEventPicture);
         }
 
@@ -144,7 +149,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
                 User user = (User) adapterView.getItemAtPosition(position);
-                if(user != null) {
+                if (user != null) {
                     showContactDialog(user);
                 }
                 return false;
@@ -162,12 +167,37 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         hostPicture.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if(mHost != null) {
+                if (mHost != null) {
                     showContactDialog(mHost);
                 }
                 return false;
             }
         });
+
+        if (mEvent.isOver()) {
+            mAccept.setEnabled(false);
+            mDecline.setEnabled(false);
+            statusImgButton.setEnabled(false);
+            // mTxtTitle.setText(mTxtTitle.getText() + "(Finished)");
+
+            final String FINISHED = " (Finished)";
+            final int FINISHED_LENGTH = FINISHED.length();
+            final SpannableStringBuilder sb = new SpannableStringBuilder(mTxtTitle.getText() +FINISHED);
+            final ForegroundColorSpan fcs = new ForegroundColorSpan(Color.rgb(158, 0, 0));
+
+            // Span to set text color to some RGB value
+            final StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
+
+            // Span to make text bold
+            sb.setSpan(fcs, mTxtTitle.getText().length(), mTxtTitle.getText().length() + FINISHED_LENGTH, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+            // Set the text color for first 4 characters
+            sb.setSpan(bss,  mTxtTitle.getText().length(), mTxtTitle.getText().length() + FINISHED_LENGTH, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            mTxtTitle.setText(sb);
+
+            //TODO set buttons color to be gray
+        }
+
         //if the host is the current user , he shouldn't be able to change his status
         if (mMyCurrentUser.getUid() == mHost.getUid()) {
             Utils.LOGD(" max debug " + mMy_name + "  " + mMy_picture + " " + "  " + mMyCurrentUser);
@@ -186,7 +216,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                         return null;
                     }
                     for (User u : guestList) {
-                        Utils.LOGD(u.getUid() + "=? " + mMyCurrentUser.getUid() );
+                        Utils.LOGD(u.getUid() + "=? " + mMyCurrentUser.getUid());
                         if (u.getUid() == mMyCurrentUser.getUid()) {
                             mMe = u;
                         }
@@ -197,13 +227,14 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 @Override
                 protected void onPostExecute(final User me) {
 
-                    if(me==null){
-                        Toast.makeText(EventPageActivity.this,"oops! try again "
-                                ,Toast.LENGTH_LONG).show();
+                    if (me == null) {
+                        Toast.makeText(EventPageActivity.this, "oops! try again "
+                                , Toast.LENGTH_LONG).show();
                         onBackPressed();
                     }
 
                     mInviteStatus = me.getInvite_status();
+
 
                     if (mInviteStatus == STATUS_ACCEPTED) {
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
@@ -214,19 +245,23 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                         // If the status is unknown then show the button layout
                         mButtonLayout.setVisibility(View.VISIBLE);
                         mGuestLayout.setVisibility(View.GONE);
+
+
                         mAccept.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                new AsyncTask<Void,Void,Void>() {
+                                new AsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected void onPreExecute() {
                                         Utils.showToast(EventPageActivity.this, getString(R.string.invitation_accept_toast));
                                     }
+
                                     @Override
                                     protected Void doInBackground(Void... voids) {
                                         UserFunctions.acceptInvite(me.getUid(), mEvent.getEid());
                                         return null;
                                     }
+
                                     @Override
                                     protected void onPostExecute(Void v) {
                                         mButtonLayout.setVisibility(View.GONE);
@@ -240,16 +275,18 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                         mDecline.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                new AsyncTask<Void,Void,Void>() {
+                                new AsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected void onPreExecute() {
                                         Utils.showToast(EventPageActivity.this, getString(R.string.invitation_decline_toast));
                                     }
+
                                     @Override
                                     protected Void doInBackground(Void... voids) {
                                         UserFunctions.declineInvite(me.getUid(), mEvent.getEid());
                                         return null;
                                     }
+
                                     @Override
                                     protected void onPostExecute(Void v) {
                                         mButtonLayout.setVisibility(View.GONE);
@@ -474,7 +511,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(mMyCurrentUser.getUid() == mHost.getUid()) {
+                        if (mMyCurrentUser.getUid() == mHost.getUid()) {
                             mAdapter = new ContextualUndoAdapter(mGuestArrayAdapter, R.layout.undo_row, R.id.undo_row_undobutton,
                                     5000, R.id.undo_row_texttv, new MyFormatCountDownCallback());
                             mAdapter.setAbsListView(mListView);
@@ -497,7 +534,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(mMyCurrentUser.getUid() == mEvent.getHost().getUid()) {
+        if (mMyCurrentUser.getUid() == mEvent.getHost().getUid()) {
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.actionbar_eventpage, menu);
             return true;
@@ -509,29 +546,34 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if(mEvent==null)
+        if (mEvent == null)
             return false;
+
 
         switch (menuItem.getItemId()) {
             case R.id.action_edit:
-                EditEventDialog dialog = new EditEventDialog(mEvent, this);
-                dialog.show(getSupportFragmentManager(), EditEventDialog.TAG);
+                if (!mEvent.isOver()) {
+                    EditEventDialog dialog = new EditEventDialog(mEvent, this);
+                    dialog.show(getSupportFragmentManager(), EditEventDialog.TAG);
+                }
                 return true;
 
             case R.id.action_add_guest:
-                if(mGuestArrayAdapter==null)
-                    return false;
-                Intent intent = new Intent(EventPageActivity.this, ContactsActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(ContactsActivity.EVENT, mEvent);
-                ArrayList<User> guests = new ArrayList<User>(mGuestArrayAdapter.getList());
-                bundle.putSerializable(ContactsActivity.GUESTS, guests);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                if (!mEvent.isOver()) {
+                    if (mGuestArrayAdapter == null)
+                        return false;
+                    Intent intent = new Intent(EventPageActivity.this, ContactsActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(ContactsActivity.EVENT, mEvent);
+                    ArrayList<User> guests = new ArrayList<User>(mGuestArrayAdapter.getList());
+                    bundle.putSerializable(ContactsActivity.GUESTS, guests);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
                 return true;
 
             case R.id.action_share:
-                Utils.shareEvent(EventPageActivity.this, mEvent, mEventPicture,mGuestList);
+                Utils.shareEvent(EventPageActivity.this, mEvent, mEventPicture, mGuestList);
                 return true;
 
             default:
