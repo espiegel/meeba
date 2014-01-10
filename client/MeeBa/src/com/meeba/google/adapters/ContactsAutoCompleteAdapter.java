@@ -117,7 +117,9 @@ public class ContactsAutoCompleteAdapter extends ArrayAdapter<User> implements F
                     ArrayList<User> filterData = new ArrayList<User>();
 
                     for (User p : list) {
-                        if (p.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        if (p.getName().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                            filterData.add(p);
+                        }else if (p.getName().toLowerCase().contains(" "+constraint.toString().toLowerCase())){
                             filterData.add(p);
                         }
                     }
