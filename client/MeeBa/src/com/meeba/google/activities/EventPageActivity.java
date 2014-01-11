@@ -178,11 +178,12 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
             mAccept.setEnabled(false);
             mDecline.setEnabled(false);
             statusImgButton.setEnabled(false);
-            // mTxtTitle.setText(mTxtTitle.getText() + "(Finished)");
+            mAccept.setBackgroundColor(Color.GRAY);
+            mDecline.setBackgroundColor(Color.GRAY);
 
             final String FINISHED = " (Finished)";
             final int FINISHED_LENGTH = FINISHED.length();
-            final SpannableStringBuilder sb = new SpannableStringBuilder(mTxtTitle.getText() +FINISHED);
+            final SpannableStringBuilder sb = new SpannableStringBuilder(mTxtTitle.getText() + FINISHED);
             final ForegroundColorSpan fcs = new ForegroundColorSpan(Color.rgb(158, 0, 0));
 
             // Span to set text color to some RGB value
@@ -192,10 +193,8 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
             sb.setSpan(fcs, mTxtTitle.getText().length(), mTxtTitle.getText().length() + FINISHED_LENGTH, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
             // Set the text color for first 4 characters
-            sb.setSpan(bss,  mTxtTitle.getText().length(), mTxtTitle.getText().length() + FINISHED_LENGTH, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            sb.setSpan(bss, mTxtTitle.getText().length(), mTxtTitle.getText().length() + FINISHED_LENGTH, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
             mTxtTitle.setText(sb);
-
-            //TODO set buttons color to be gray
         }
 
         //if the host is the current user , he shouldn't be able to change his status
@@ -237,7 +236,12 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
 
                     if (mInviteStatus == STATUS_ACCEPTED) {
-                        statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
+
+                        if (mEvent.isOver())
+                            statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed_disabled));
+                        else
+                            statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.green_check_boxed));
+
                         statusImgButton.setTag(STATUS_ACCEPTED);
                         mButtonLayout.setVisibility(View.GONE);
                         mGuestLayout.setVisibility(View.VISIBLE);
@@ -300,7 +304,12 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
                         statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.empty_box));
                         statusImgButton.setTag(STATUS_UNKNOWN);
                     } else {
-                        statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
+
+                        if (mEvent.isOver())
+                            statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed_disabled));
+                        else
+                            statusImgButton.setImageDrawable(getResources().getDrawable(R.drawable.red_cross_boxed));
+
                         statusImgButton.setTag(STATUS_REJECTED);
                         mButtonLayout.setVisibility(View.GONE);
                         mGuestLayout.setVisibility(View.VISIBLE);
@@ -534,7 +543,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mMyCurrentUser.getUid() == mEvent.getHost().getUid()) {
+        if (mEvent != null && mMyCurrentUser.getUid() == mEvent.getHost().getUid() && !mEvent.isOver()) {
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.actionbar_eventpage, menu);
             return true;
@@ -552,24 +561,20 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
 
         switch (menuItem.getItemId()) {
             case R.id.action_edit:
-                if (!mEvent.isOver()) {
-                    EditEventDialog dialog = new EditEventDialog(mEvent, this);
-                    dialog.show(getSupportFragmentManager(), EditEventDialog.TAG);
-                }
+                EditEventDialog dialog = new EditEventDialog(mEvent, this);
+                dialog.show(getSupportFragmentManager(), EditEventDialog.TAG);
                 return true;
 
             case R.id.action_add_guest:
-                if (!mEvent.isOver()) {
-                    if (mGuestArrayAdapter == null)
-                        return false;
-                    Intent intent = new Intent(EventPageActivity.this, ContactsActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(ContactsActivity.EVENT, mEvent);
-                    ArrayList<User> guests = new ArrayList<User>(mGuestArrayAdapter.getList());
-                    bundle.putSerializable(ContactsActivity.GUESTS, guests);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                }
+                if (mGuestArrayAdapter == null)
+                    return false;
+                Intent intent = new Intent(EventPageActivity.this, ContactsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(ContactsActivity.EVENT, mEvent);
+                ArrayList<User> guests = new ArrayList<User>(mGuestArrayAdapter.getList());
+                bundle.putSerializable(ContactsActivity.GUESTS, guests);
+                intent.putExtras(bundle);
+                startActivity(intent);
                 return true;
 
             case R.id.action_share:

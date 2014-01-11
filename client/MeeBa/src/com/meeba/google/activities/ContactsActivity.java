@@ -80,29 +80,6 @@ public class ContactsActivity extends SherlockFragmentActivity {
 
 
     public void onCreate(Bundle savedInstanceState) {
-
-        /**
-         * max's test , will remove later.
-         */
-
-
-        Stack<String> test = new Stack<String>();
-        test.push("123");
-        test.push("124");
-        test.push("456");
-        test.push("678");
-
-        String jsonArrString = null;
-        try {
-            jsonArrString = JsonEventsStack.toJson("6969", test);
-
-            Utils.LOGD("jsonStack = " + jsonArrString);
-
-            Utils.LOGD("jsonStackConverted to  = " + JsonEventsStack.getEventsStackfromJson(jsonArrString));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contacts_activity);
 

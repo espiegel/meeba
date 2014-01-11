@@ -80,7 +80,7 @@ public class WhereWhenActivity extends SherlockActivity {
                     .setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                             startActivityForResult(intent, RESULT_LOAD_IMAGE);
                         }
                     });
@@ -93,6 +93,7 @@ public class WhereWhenActivity extends SherlockActivity {
     private int mYear;
     private DateTime dt;
     private String mFormmatedDate;
+    private DatePickerDialog mDatePicker;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,16 +186,16 @@ public class WhereWhenActivity extends SherlockActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && data != null) {
-            if(requestCode == RESULT_CAMERA_IMAGE) {
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == RESULT_CAMERA_IMAGE) {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
-                photo = Bitmap.createScaledBitmap(photo, (int)BASE_WIDTH, (int)BASE_HEIGHT, true);
+                photo = Bitmap.createScaledBitmap(photo, (int) BASE_WIDTH, (int) BASE_HEIGHT, true);
                 mEditPicture.setImageBitmap(photo);
-            } else if(requestCode == RESULT_LOAD_IMAGE) {
+            } else if (requestCode == RESULT_LOAD_IMAGE) {
                 try {
                     Uri selectedImage = data.getData();
                     Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
-                    photo = Bitmap.createScaledBitmap(photo, (int)BASE_WIDTH, (int)BASE_HEIGHT, true);
+                    photo = Bitmap.createScaledBitmap(photo, (int) BASE_WIDTH, (int) BASE_HEIGHT, true);
                     mEditPicture.setImageBitmap(photo);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -212,43 +213,50 @@ public class WhereWhenActivity extends SherlockActivity {
         int minute = currentTime.get(Calendar.MINUTE);
 
         final TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+
+        /** configure the OnTimeSetListener  for mTimePicker */
+       TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-
                 dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
+                mFormmatedDate = dt.toString(Utils.DATE_FORMAT);
 
-
-             //   mDate = dt.dayOfWeek().getAsShortText() + ", " + dt.monthOfYear().getAsShortText() + " " + dt.dayOfMonth().getAsShortText() + ", " +
-                     //   DateTimeFormat.forPattern("HH:mm").print(dt);
-
-                mFormmatedDate = dt.toString(Utils.DATE_FORMAT) ;
-                //if we want it in millis then use :
-                //dt.toInstant().getMillis());
-
-                mDate=Utils.makePrettyDate(mFormmatedDate);
+                mDate = Utils.makePrettyDate(mFormmatedDate);
                 mEditWhen.setText(mDate);
+
                 mEditWhere.requestFocus();
-
-
-
             }
-        }, hour, minute, true);//Yes 24 hour time
-        mTimePicker.setTitle("Select Time");
+        };
+        /** configure the OnDismissListener  for mTimePicker */
+        DialogInterface.OnDismissListener mOnDismissListener = new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //if someone tries to set the date to a past date:
+                if (Utils.parseDate(mFormmatedDate).isBefore(new DateTime().minusMinutes(1))) {
+                    Toast.makeText(WhereWhenActivity.this, "choose a time in future ! ", Toast.LENGTH_SHORT).show();
+                    mEditWhen.setText("");
+                    mFormmatedDate="";
+                    mDatePicker.show();
+                }
+            }
+        };
+        /** configure   mTimePicker */
+        mTimePicker = new TimePickerDialog(this, mTimeSetListener, hour, minute, true);
+        mTimePicker.setOnDismissListener(mOnDismissListener);
+        mTimePicker.setTitle("Select time");
 
-        DatePickerDialog mDatePicker;
+
+        /** configure  mDatePicker */
         mDatePicker = new DatePickerDialog(WhereWhenActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                mEditWhen.setText("");
                 mYear = year;
-                mMonth = month+1;
+                mMonth = month + 1;
                 mDay = day;
-
-                mEditWhen.setText(mDate);
                 mTimePicker.show();
             }
-        }, year, month, day);
+        }
+                , year, month, day);
         mDatePicker.setTitle("Select date");
         mDatePicker.show();
     }
