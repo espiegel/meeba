@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -52,6 +53,7 @@ public class EditEventDialog extends SherlockDialogFragment {
     private int mMonth;
     private int mDay;
     private DateTime dt;
+    private DatePickerDialog mDatePicker;
 
     public EditEventDialog(Event event, EventUpdateCallback callback) {
         mEvent = event;
@@ -196,41 +198,49 @@ public class EditEventDialog extends SherlockDialogFragment {
         int minute = currentTime.get(Calendar.MINUTE);
 
         final TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+
+        /** configure the OnTimeSetListener  for mTimePicker */
+        TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-            //    String minutes;
-             //   if (selectedMinute < 10) {
-          //          minutes = "0" + selectedMinute;
-         //       } else {
-          //          minutes = String.valueOf(selectedMinute);
-         //       }
-                // mEditWhen.setText(selectedHour + ":" + minutes + " " + mDate);
                 dt = new DateTime(mYear, mMonth, mDay, selectedHour, selectedMinute);
+                mFormmatedDate = dt.toString(Utils.DATE_FORMAT);
 
-                mFormmatedDate = dt.toString( Utils.DATE_FORMAT) ;
-                mDate=Utils.makePrettyDate(mFormmatedDate);
-
+                mDate = Utils.makePrettyDate(mFormmatedDate);
                 mEditWhen.setText(mDate);
+
                 mEditWhere.requestFocus();
             }
-        }, hour, minute, true);//Yes 24 hour time
-        mTimePicker.setTitle("Select Time");
+        };
+        /** configure the OnDismissListener  for mTimePicker */
+        DialogInterface.OnDismissListener mOnDismissListener = new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //if someone tries to set the date to a past date:
+                if (Utils.parseDate(mFormmatedDate).isBefore(new DateTime().minusMinutes(1))) {
+                    Toast.makeText(getActivity(), "choose a time in future ! ", Toast.LENGTH_SHORT).show();
+                    mEditWhen.setText("");
+                    mFormmatedDate="";
+                    mDatePicker.show();
+                }
+            }
+        };
 
-        DatePickerDialog mDatePicker;
+        /** configure   mTimePicker */
+        mTimePicker = new TimePickerDialog(getActivity(), mTimeSetListener, hour, minute, true);
+        mTimePicker.setOnDismissListener(mOnDismissListener);
+        mTimePicker.setTitle("Select time");
+
+        /** configure  mDatePicker */
         mDatePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
-                mEditWhen.setText("");
-               // mDate = day + "/" + (month + 1) + "/" + year;
+                // mDate = day + "/" + (month + 1) + "/" + year;
                 //mEditWhen.setText(mDate);
                 mYear = year;
-                mMonth = month+1;
+                mMonth = month + 1;
                 mDay = day;
-
-                mEditWhen.setText(mDate);
-
                 mTimePicker.show();
             }
         }, year, month, day);
