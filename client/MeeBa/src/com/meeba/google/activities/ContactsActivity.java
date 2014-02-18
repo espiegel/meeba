@@ -467,7 +467,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
                 String date = Utils.makePrettyDate(mEvent.getFormmatedWhen());
                 Utils.LOGD("new Date = " + date);
                 sendIntent.putExtra("address", address);
-                sendIntent.putExtra("sms_body", "Hey, you're invited to " + mTitle + " at " + mWhere + " at " + date + "!\n" +
+                sendIntent.putExtra("sms_body", "Hey, you're invited to " + mTitle + " on " + mWhere + " at " + date + "!\n" +
                         "to attend reply: 1\n" +
                         "to decline reply: 2\n" +
                         getString(R.string.generated));
