@@ -602,6 +602,7 @@ public class EventPageActivity extends SherlockFragmentActivity implements EditE
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("refresh", true);
         startActivity(intent);
         finish();
     }

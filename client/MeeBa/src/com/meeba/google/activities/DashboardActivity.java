@@ -576,10 +576,13 @@ public class DashboardActivity extends SherlockActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        asyncRefresh();
-
+    protected void onNewIntent(Intent intent) {
+        if(intent != null) {
+            Utils.LOGD("intent != null");
+            if(intent.hasExtra("refresh") && intent.getBooleanExtra("refresh", false)) {
+                asyncRefresh();
+            }
+        }
+        super.onNewIntent(intent);
     }
-
 }
