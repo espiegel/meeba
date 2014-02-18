@@ -83,7 +83,7 @@ public class Event implements Serializable {
 
     public boolean isOver() {
         DateTime now = new DateTime();
-        return getWhenAsDateTimeObj().isBefore(now);
+        return getWhenAsDateTimeObj().plusHours(5).isBefore(now);
     }
 
     public void setWhen(String when) {
