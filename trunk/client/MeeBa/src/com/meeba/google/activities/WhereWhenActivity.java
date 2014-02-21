@@ -189,13 +189,13 @@ public class WhereWhenActivity extends SherlockActivity {
         if (resultCode == RESULT_OK && data != null) {
             if (requestCode == RESULT_CAMERA_IMAGE) {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
-                photo = Bitmap.createScaledBitmap(photo, (int) BASE_WIDTH, (int) BASE_HEIGHT, true);
+                //photo = Bitmap.createScaledBitmap(photo, (int) BASE_WIDTH, (int) BASE_HEIGHT, true);
                 mEditPicture.setImageBitmap(photo);
             } else if (requestCode == RESULT_LOAD_IMAGE) {
                 try {
                     Uri selectedImage = data.getData();
                     Bitmap photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
-                    photo = Bitmap.createScaledBitmap(photo, (int) BASE_WIDTH, (int) BASE_HEIGHT, true);
+                    //photo = Bitmap.createScaledBitmap(photo, (int) BASE_WIDTH, (int) BASE_HEIGHT, true);
                     mEditPicture.setImageBitmap(photo);
                 } catch (Exception e) {
                     e.printStackTrace();
