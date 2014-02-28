@@ -49,7 +49,7 @@ import java.util.Stack;
 /**
  * Created by or malka on 11/11/13.
  */
-public class ContactsActivity extends SherlockFragmentActivity {
+public class ContactsActivity extends SherlockFragmentActivity implements ContactsArrayAdapter.OnListDeleteClick {
 
 
     public final static String EVENT = "event";
@@ -140,14 +140,13 @@ public class ContactsActivity extends SherlockFragmentActivity {
         mHostUid = DatabaseFunctions.getUserDetails(getApplicationContext()).getUid();
 
 
-        mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*mUserListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 User user = (User) adapterView.getItemAtPosition(position);
                 removeFromInviteList(user);
-
             }
-        });
+        });*/
 
         mUserListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -231,7 +230,7 @@ public class ContactsActivity extends SherlockFragmentActivity {
         mEditFilterContacts.setThreshold(0);
         mEditFilterContacts.setAdapter(autoCompleteAdapter);
 
-        mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, inviteList);
+        mContactsAdapter = new ContactsArrayAdapter(ContactsActivity.this, inviteList, ContactsActivity.this);
         mUserListView.setAdapter(mContactsAdapter);
     }
 
@@ -500,7 +499,17 @@ public class ContactsActivity extends SherlockFragmentActivity {
         forFilterList.remove(user);
     }
 
-    private void removeFromInviteList(User user) {
+/*    private void removeFromInviteList(User user) {
+        mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
+        mContactsAdapter.getList().remove(user);
+        mContactsAdapter.notifyDataSetChanged();
+        if (!forFilterList.contains(user)) {
+            forFilterList.add(user);
+        }
+    }*/
+
+    @Override
+    public void onListDeleteClicked(User user) {
         mContactsAdapter = (ContactsArrayAdapter) mUserListView.getAdapter();
         mContactsAdapter.getList().remove(user);
         mContactsAdapter.notifyDataSetChanged();

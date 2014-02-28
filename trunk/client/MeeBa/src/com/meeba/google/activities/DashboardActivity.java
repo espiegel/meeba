@@ -75,7 +75,6 @@ public class DashboardActivity extends SherlockActivity {
 
     private ImageView mNoEvent;
     private final Event mDummyEvent = new Event(-1, "", "", "", "", new User(-1, "", "", "", "", "", ""));
-    private Comparator<Event> mEventComparator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -225,7 +224,6 @@ public class DashboardActivity extends SherlockActivity {
                     startActivity(intent);
                 }
             });
-            mEventComparator = new EventComparator();
             asyncRefresh();
             asyncUpdateContacts();
         }
@@ -368,7 +366,6 @@ public class DashboardActivity extends SherlockActivity {
 
 
                 //sort by event due date
-                //Collections.sort(mAllEventsList, mEventComparator);
                 mAllEventsList = Utils.sortEvents(mAllEventsList);
 
                 //apply the chosen filter to the updated event list
