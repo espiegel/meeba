@@ -79,6 +79,7 @@ public class EditEventDialog extends SherlockDialogFragment {
         mEditTitle.setText(mEvent.getTitle());
         mEditWhen.setText(mEvent.getWhen());
         mEditWhere.setText(mEvent.getWhere());
+        mFormmatedDate = mEditWhen.getText().toString();
 
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override

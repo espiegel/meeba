@@ -26,11 +26,13 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
     //private List<User> filterList;
     private Activity mContext;
     private ImageLoader mImageLoader;
+    private OnListDeleteClick mCallback;
 
-    public ContactsArrayAdapter(Activity context, List<User> list) {
+    public ContactsArrayAdapter(Activity context, List<User> list, OnListDeleteClick callback) {
         super(context, R.layout.contactlistlayout, list);
         this.mContext = context;
         this.list = list;
+        this.mCallback = callback;
         //this.filterList = list;
     }
 
@@ -86,11 +88,18 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
         }
         final ViewHolder holder = (ViewHolder) view.getTag();
 
-        User user = list.get(position);
+        final User user = list.get(position);
         // For now just show the name
         String name = user.getName();
         //boolean check = user.isSelected();
         String picture_url = user.getPicture_url();
+
+        holder.deleteMe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallback.onListDeleteClicked(user);
+            }
+        });
 
         holder.text.setText(name);
         /*holder.checkbox.setChecked(check);*/
@@ -147,5 +156,9 @@ public class ContactsArrayAdapter extends ArrayAdapter<User> implements Filterab
             }
         };
     }*/
+
+    public interface OnListDeleteClick {
+        public void onListDeleteClicked(User user);
+    }
 }
 
